@@ -1,14 +1,7 @@
-import { sampleEvents } from "@/data/events";
+import { fetchUpcomingEvents } from "@/lib/supabase";
 import type { Event } from "@/types";
 
-const TODAY = new Date("2026-04-28T08:00:00-07:00");
-
-const longDate = TODAY.toLocaleDateString("en-US", {
-  weekday: "long",
-  month: "long",
-  day: "numeric",
-  year: "numeric",
-});
+export const revalidate = 60;
 
 function eventDate(iso: string) {
   return new Date(iso);
@@ -50,8 +43,17 @@ function groupByDay(events: Event[]) {
   );
 }
 
-export default function Home() {
-  const grouped = groupByDay(sampleEvents);
+export default async function Home() {
+  const events = await fetchUpcomingEvents();
+  const grouped = groupByDay(events);
+
+  const today = new Date();
+  const longDate = today.toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
 
   return (
     <div className="flex flex-col flex-1 w-full">
@@ -80,60 +82,66 @@ export default function Home() {
             On Today
           </h2>
           <p className="text-muted text-sm italic mb-6">
-            A preview, hand-curated from local sources. Live data coming soon.
+            Live from the database. Sources update on a schedule.
           </p>
         </section>
 
-        <div className="space-y-12">
-          {grouped.map(([dayKey, events]) => (
-            <section key={dayKey}>
-              <h3 className="font-serif text-2xl font-bold mb-4 flex items-baseline gap-3">
-                <span>{formatDayLabel(new Date(dayKey))}</span>
-                <span className="flex-1 h-px bg-rule" />
-              </h3>
-              <ul className="space-y-6">
-                {events.map((ev) => (
-                  <li
-                    key={ev.id}
-                    className="grid grid-cols-1 md:grid-cols-[10rem_1fr] gap-x-6 gap-y-1"
-                  >
-                    <div className="text-sm">
-                      <p className="font-semibold">
-                        {formatTimeRange(
-                          eventDate(ev.startsAt),
-                          ev.endsAt ? eventDate(ev.endsAt) : undefined
-                        )}
-                      </p>
-                      <p className="text-muted uppercase text-[11px] tracking-wider mt-1">
-                        {ev.category}
-                      </p>
-                    </div>
-                    <div>
-                      <h4 className="font-serif text-xl font-bold leading-snug">
-                        {ev.title}
-                      </h4>
-                      <p className="text-sm text-muted mt-0.5">
-                        {ev.venue} &middot; {ev.community}
-                      </p>
-                      <p className="mt-2 leading-relaxed">{ev.description}</p>
-                      <p className="mt-2 text-xs text-muted">
-                        Source:{" "}
-                        <a
-                          href={ev.sourceUrl}
-                          className="underline decoration-dotted underline-offset-2 hover:text-accent"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          {ev.source}
-                        </a>
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ))}
-        </div>
+        {grouped.length === 0 ? (
+          <p className="text-muted italic">
+            No upcoming events. Check back soon.
+          </p>
+        ) : (
+          <div className="space-y-12">
+            {grouped.map(([dayKey, events]) => (
+              <section key={dayKey}>
+                <h3 className="font-serif text-2xl font-bold mb-4 flex items-baseline gap-3">
+                  <span>{formatDayLabel(new Date(dayKey))}</span>
+                  <span className="flex-1 h-px bg-rule" />
+                </h3>
+                <ul className="space-y-6">
+                  {events.map((ev) => (
+                    <li
+                      key={ev.id}
+                      className="grid grid-cols-1 md:grid-cols-[10rem_1fr] gap-x-6 gap-y-1"
+                    >
+                      <div className="text-sm">
+                        <p className="font-semibold">
+                          {formatTimeRange(
+                            eventDate(ev.startsAt),
+                            ev.endsAt ? eventDate(ev.endsAt) : undefined
+                          )}
+                        </p>
+                        <p className="text-muted uppercase text-[11px] tracking-wider mt-1">
+                          {ev.category}
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="font-serif text-xl font-bold leading-snug">
+                          {ev.title}
+                        </h4>
+                        <p className="text-sm text-muted mt-0.5">
+                          {ev.venue} &middot; {ev.community}
+                        </p>
+                        <p className="mt-2 leading-relaxed">{ev.description}</p>
+                        <p className="mt-2 text-xs text-muted">
+                          Source:{" "}
+                          <a
+                            href={ev.sourceUrl}
+                            className="underline decoration-dotted underline-offset-2 hover:text-accent"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            {ev.source}
+                          </a>
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ))}
+          </div>
+        )}
       </main>
 
       <footer className="border-t border-rule mt-10 px-6 py-6">
