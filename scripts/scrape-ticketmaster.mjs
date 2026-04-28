@@ -40,6 +40,16 @@ function mapEvent(e) {
       venue?.name || "a local venue"
     }.`;
 
+  // Prefer the venue's own website over Ticketmaster's URL, which 404s for
+  // events Ticketmaster has indexed but doesn't actually sell tickets for
+  // (e.g., shows ticketed via Eventbrite). The venue page always works and
+  // accurately points to whoever is actually selling tickets.
+  const venueBoxOffice = e.outlets?.find(
+    (o) => o.type === "venueBoxOffice"
+  )?.url;
+  const sourceUrl = venueBoxOffice || e.url;
+  const source = venueBoxOffice && venue?.name ? venue.name : "Ticketmaster";
+
   return {
     id: `tm-${e.id}`,
     title: e.name,
@@ -48,8 +58,8 @@ function mapEvent(e) {
     venue: venue?.name || "TBA",
     community: venue?.city?.name || "San Luis Obispo Area",
     description,
-    source: "Ticketmaster",
-    source_url: e.url,
+    source,
+    source_url: sourceUrl,
     category,
   };
 }
