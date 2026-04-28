@@ -1,0 +1,107 @@
+import type { Event } from "@/types";
+
+export const sampleEvents: Event[] = [
+  {
+    id: "science-after-dark-2026-04-28",
+    title: "Science After Dark",
+    startsAt: "2026-04-28T17:30",
+    endsAt: "2026-04-28T20:00",
+    venue: "Central Coast Aquarium",
+    community: "Avila Beach",
+    description:
+      "An evening of marine science, hands-on exhibits, and after-hours access to the aquarium's tanks and touch pools.",
+    source: "Visit Avila Beach",
+    sourceUrl: "https://visitavilabeach.com/events",
+    category: "Family",
+  },
+  {
+    id: "downtown-slo-farmers-2026-05-01",
+    title: "Thursday Night Farmers Market",
+    startsAt: "2026-04-30T18:00",
+    endsAt: "2026-04-30T21:00",
+    venue: "Higuera Street",
+    community: "Downtown San Luis Obispo",
+    description:
+      "Higuera Street closes for the weekly market: produce, food vendors, live music, and barbecue. Top-ten farmers market in the country per USA Today.",
+    source: "Downtown SLO",
+    sourceUrl: "https://downtownslo.com/events",
+    category: "Community",
+  },
+  {
+    id: "avila-farmers-market-2026-05-01",
+    title: "Avila Beach Farmers Market",
+    startsAt: "2026-05-01T16:00",
+    endsAt: "2026-05-01T20:00",
+    venue: "Avila Beach Promenade",
+    community: "Avila Beach",
+    description:
+      "Weekly oceanfront market with fresh produce, artisan crafts, and prepared food from Central Coast vendors.",
+    source: "Visit Avila Beach",
+    sourceUrl: "https://visitavilabeach.com/events",
+    category: "Food & Drink",
+  },
+  {
+    id: "art-after-dark-2026-05-02",
+    title: "Art After Dark — First Friday",
+    startsAt: "2026-05-01T17:00",
+    endsAt: "2026-05-01T20:00",
+    venue: "Galleries throughout Downtown",
+    community: "San Luis Obispo",
+    description:
+      "Free, self-guided gallery walk on the first Friday of every month. Working artists, open studios, light refreshments at participating venues.",
+    source: "SLO County Arts",
+    sourceUrl: "https://slocountyarts.org/experience-aad",
+    category: "Arts",
+  },
+  {
+    id: "cayucos-antique-faire-2026-05-03",
+    title: "Cayucos Spring Antique Street Faire",
+    startsAt: "2026-05-02T09:00",
+    endsAt: "2026-05-02T17:00",
+    venue: "Ocean Avenue",
+    community: "Cayucos",
+    description:
+      "Vendors line Ocean Avenue with antiques, vintage clothing, and collectibles. Held twice a year — the spring edition draws regional crowds.",
+    source: "Cayucos Chamber of Commerce",
+    sourceUrl: "https://www.cayucoschamber.com/calendar",
+    category: "Community",
+  },
+  {
+    id: "billy-currington-2026-05-07",
+    title: "Billy Currington",
+    startsAt: "2026-05-07T17:00",
+    venue: "Avila Beach Golf Resort",
+    community: "Avila Beach",
+    description:
+      "Country touring artist headlines the 2026 Avila Beach Resort concert series. Outdoor oceanfront venue.",
+    source: "Songkick / Ticketmaster",
+    sourceUrl: "https://events.avilabeachresort.com",
+    category: "Music",
+  },
+  {
+    id: "paso-wine-fest-2026-05-15",
+    title: "Paso Wine Fest — Grand Tasting Weekend",
+    startsAt: "2026-05-15T12:00",
+    endsAt: "2026-05-17T18:00",
+    venue: "Downtown City Park & member wineries",
+    community: "Paso Robles",
+    description:
+      "Three days of tasting events across Paso wine country, anchored by the Saturday Grand Tasting in Downtown City Park. Member wineries host satellite events.",
+    source: "Paso Robles Wine Country Alliance",
+    sourceUrl: "https://pasowine.com/consumer_events",
+    category: "Food & Drink",
+  },
+  {
+    id: "live-oak-festival-2026-06-19",
+    title: "Live Oak Music Festival",
+    startsAt: "2026-06-19T16:00",
+    endsAt: "2026-06-21T22:00",
+    venue: "El Chorro Regional Park",
+    community: "San Luis Obispo",
+    description:
+      "Bluegrass, soul, Americana, and world music across three stages. KCBX's annual fundraiser, in its 38th year. Camping available.",
+    source: "My805Tix",
+    sourceUrl: "https://my805tix.com/e/liveoak2026",
+    category: "Music",
+  },
+];
