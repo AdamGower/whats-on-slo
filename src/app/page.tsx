@@ -3,8 +3,14 @@ import type { Event } from "@/types";
 
 export const revalidate = 60;
 
+const TIMEZONE = "America/Los_Angeles";
+
 function eventDate(iso: string) {
   return new Date(iso);
+}
+
+function dayKey(d: Date) {
+  return d.toLocaleDateString("en-CA", { timeZone: TIMEZONE });
 }
 
 function formatDayLabel(d: Date) {
@@ -12,35 +18,41 @@ function formatDayLabel(d: Date) {
     weekday: "long",
     month: "long",
     day: "numeric",
+    timeZone: TIMEZONE,
   });
 }
 
+function formatTime(d: Date) {
+  return d
+    .toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      timeZone: TIMEZONE,
+    })
+    .replace(":00 ", " ");
+}
+
 function formatTimeRange(start: Date, end?: Date) {
-  const s = start.toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: start.getMinutes() === 0 ? undefined : "2-digit",
-  });
+  const s = formatTime(start);
   if (!end) return s;
-  if (end.toDateString() !== start.toDateString()) {
-    return `${s} → ${end.toLocaleDateString("en-US", { month: "short", day: "numeric" })}`;
+  if (dayKey(end) !== dayKey(start)) {
+    return `${s} → ${end.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      timeZone: TIMEZONE,
+    })}`;
   }
-  const e = end.toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: end.getMinutes() === 0 ? undefined : "2-digit",
-  });
-  return `${s} – ${e}`;
+  return `${s} – ${formatTime(end)}`;
 }
 
 function groupByDay(events: Event[]) {
   const map = new Map<string, Event[]>();
   for (const ev of events) {
-    const key = eventDate(ev.startsAt).toDateString();
+    const key = dayKey(eventDate(ev.startsAt));
     if (!map.has(key)) map.set(key, []);
     map.get(key)!.push(ev);
   }
-  return Array.from(map.entries()).sort(
-    ([a], [b]) => new Date(a).getTime() - new Date(b).getTime()
-  );
+  return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
 }
 
 export default async function Home() {
@@ -53,6 +65,7 @@ export default async function Home() {
     month: "long",
     day: "numeric",
     year: "numeric",
+    timeZone: TIMEZONE,
   });
 
   return (
@@ -95,7 +108,7 @@ export default async function Home() {
             {grouped.map(([dayKey, events]) => (
               <section key={dayKey}>
                 <h3 className="font-serif text-2xl font-bold mb-4 flex items-baseline gap-3">
-                  <span>{formatDayLabel(new Date(dayKey))}</span>
+                  <span>{formatDayLabel(eventDate(events[0].startsAt))}</span>
                   <span className="flex-1 h-px bg-rule" />
                 </h3>
                 <ul className="space-y-6">
@@ -117,7 +130,14 @@ export default async function Home() {
                       </div>
                       <div>
                         <h4 className="font-serif text-xl font-bold leading-snug">
-                          {ev.title}
+                          <a
+                            href={ev.sourceUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="hover:text-accent"
+                          >
+                            {ev.title}
+                          </a>
                         </h4>
                         <p className="text-sm text-muted mt-0.5">
                           {ev.venue} &middot; {ev.community}
