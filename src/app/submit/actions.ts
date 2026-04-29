@@ -163,6 +163,10 @@ export async function submitEvent(formData: FormData) {
   if (!community) errors.push("Community / city is required.");
   if (!description) errors.push("Description is required.");
   if (!startsAtRaw) errors.push("Start date and time are required.");
+  if (!submitterEmail) errors.push("Your email is required.");
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(submitterEmail)) {
+    errors.push("That email doesn't look right.");
+  }
   if (!(VALID_CATEGORIES as readonly string[]).includes(category)) {
     errors.push("Pick a valid category.");
   }

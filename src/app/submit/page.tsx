@@ -196,10 +196,11 @@ export default async function SubmitPage({
                   name="submitter_name"
                 />
                 <Field
-                  label="Your email (optional)"
+                  label="Your email"
                   name="submitter_email"
                   type="email"
-                  hint="In case we need to follow up."
+                  required
+                  hint="So we can follow up if anything's unclear."
                 />
               </div>
 
