@@ -21,7 +21,7 @@ if (!SUPABASE_URL || !SUPABASE_SECRET_KEY) {
 }
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SECRET_KEY);
-const UA = "whats-on-slo/1.0 (+https://whats-on-slo.vercel.app)";
+const UA = "whats-on-slo/1.0 (+https://whatsonslo.com)";
 
 // RFC 5545: lines longer than 75 chars are folded with CRLF + (space|tab).
 // Unfold by removing those continuations.

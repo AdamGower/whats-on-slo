@@ -103,7 +103,7 @@ async function main() {
     "https://sanluisobispo.librarycalendar.com/events/feed/json",
     {
       headers: {
-        "User-Agent": "whats-on-slo/1.0 (+https://whats-on-slo.vercel.app)",
+        "User-Agent": "whats-on-slo/1.0 (+https://whatsonslo.com)",
         Accept: "application/json",
       },
     }

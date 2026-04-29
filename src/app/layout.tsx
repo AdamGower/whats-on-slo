@@ -17,7 +17,7 @@ const SITE_DESCRIPTION =
   "A daily guide to live music, food, festivals, and community events across San Luis Obispo and the Central Coast — Paso Robles, Morro Bay, Avila Beach, Pismo Beach, Cambria, Atascadero, and beyond.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://whats-on-slo.vercel.app"),
+  metadataBase: new URL("https://whatsonslo.com"),
   title: {
     default: "What's On SLO — San Luis Obispo & the Central Coast",
     template: "%s | What's On SLO",
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     siteName: "What's On SLO",
     title: "What's On SLO — San Luis Obispo & the Central Coast",
     description: SITE_DESCRIPTION,
-    url: "https://whats-on-slo.vercel.app",
+    url: "https://whatsonslo.com",
     locale: "en_US",
   },
   twitter: {

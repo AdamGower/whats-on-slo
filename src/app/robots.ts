@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://whats-on-slo.vercel.app/sitemap.xml",
+    sitemap: "https://whatsonslo.com/sitemap.xml",
   };
 }

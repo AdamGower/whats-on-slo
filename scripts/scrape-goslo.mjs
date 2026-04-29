@@ -82,7 +82,7 @@ function communityFromVenue(venue) {
 async function main() {
   console.log("Fetching https://goslo.events/all ...");
   const res = await fetch("https://goslo.events/all", {
-    headers: { "User-Agent": "whats-on-slo/1.0 (+https://whats-on-slo.vercel.app)" },
+    headers: { "User-Agent": "whats-on-slo/1.0 (+https://whatsonslo.com)" },
   });
   if (!res.ok) throw new Error(`goslo.events ${res.status}`);
   const html = await res.text();

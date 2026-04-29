@@ -20,7 +20,7 @@ if (!SUPABASE_URL || !SUPABASE_SECRET_KEY) {
 const supabase = createClient(SUPABASE_URL, SUPABASE_SECRET_KEY);
 
 const BASE = "https://visitslo.com/wp-json/tribe/events/v1/events";
-const UA = "whats-on-slo/1.0 (+https://whats-on-slo.vercel.app)";
+const UA = "whats-on-slo/1.0 (+https://whatsonslo.com)";
 const DAYS_AHEAD = 90;
 const PER_PAGE = 50; // API caps at 50 even when more is requested
 const MAX_PAGES = 12;

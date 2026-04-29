@@ -128,7 +128,7 @@ async function sendNotifications(submission: SubmissionPayload) {
           `Thanks for submitting "${submission.title}" to What's On SLO.`,
           "",
           "We review every submission before it goes live on the calendar.",
-          "If it fits, you'll see it appear at https://whats-on-slo.vercel.app within a day or two.",
+          "If it fits, you'll see it appear at https://whatsonslo.com within a day or two.",
           "",
           "— What's On SLO",
         ].join("\n"),

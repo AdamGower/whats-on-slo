@@ -1,7 +1,7 @@
 import { fetchUpcomingEvents } from "@/lib/supabase";
 import type { MetadataRoute } from "next";
 
-const BASE = "https://whats-on-slo.vercel.app";
+const BASE = "https://whatsonslo.com";
 const TIMEZONE = "America/Los_Angeles";
 
 function monthKey(d: Date) {
