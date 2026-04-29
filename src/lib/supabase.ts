@@ -35,12 +35,20 @@ function rowToEvent(row: EventRow): Event {
 }
 
 // Source priority for deduplication: lowest score wins. Hand-curated rows
-// (no source prefix) > Ticketmaster (`tm-`) — TM has real start times >
-// goslo.events (`gs-`) — goslo only gives us a date, not a time.
+// (no source prefix) sit at the top, Ticketmaster wins ties for ticketed
+// shows (it has the real ticket-purchase URL), Madonna Inn iCal is similar
+// quality but loses the tie to TM, goslo.events is last because it gives us
+// only a date, not a time.
+const SOURCE_PRIORITY: Array<[string, number]> = [
+  ["tm-", 1],
+  ["mi-", 2],
+  ["gs-", 3],
+];
 function sourceScore(id: string): number {
-  if (id.startsWith("tm-")) return 1;
-  if (id.startsWith("gs-")) return 2;
-  return 0; // hand-curated
+  for (const [prefix, score] of SOURCE_PRIORITY) {
+    if (id.startsWith(prefix)) return score;
+  }
+  return 0; // hand-curated rows have no prefix
 }
 
 // Build a cross-source dedup key that catches "same event indexed by two
