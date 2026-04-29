@@ -445,9 +445,14 @@ export default async function Home({
       <footer className="border-t border-rule mt-10 px-6 py-6">
         <div className="mx-auto max-w-5xl text-xs text-muted flex flex-col sm:flex-row items-center justify-between gap-2">
           <span>What&rsquo;s On SLO &middot; A preview edition</span>
-          <span>
-            Aggregating 40+ Central Coast event sources. Live data and filters
-            coming soon.
+          <span className="flex items-center gap-4">
+            <a
+              href="/submit"
+              className="underline decoration-dotted underline-offset-2 hover:text-accent"
+            >
+              Submit your event
+            </a>
+            <span>Aggregating 40+ Central Coast event sources.</span>
           </span>
         </div>
       </footer>
