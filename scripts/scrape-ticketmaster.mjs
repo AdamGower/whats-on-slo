@@ -40,15 +40,15 @@ function mapEvent(e) {
       venue?.name || "a local venue"
     }.`;
 
-  // Prefer the venue's own website over Ticketmaster's URL, which 404s for
-  // events Ticketmaster has indexed but doesn't actually sell tickets for
-  // (e.g., shows ticketed via Eventbrite). The venue page always works and
-  // accurately points to whoever is actually selling tickets.
-  const venueBoxOffice = e.outlets?.find(
-    (o) => o.type === "venueBoxOffice"
-  )?.url;
-  const sourceUrl = venueBoxOffice || e.url;
-  const source = venueBoxOffice && venue?.name ? venue.name : "Ticketmaster";
+  // Use Ticketmaster's event URL as the source link. For events TM actually
+  // sells (the majority), this lands on the event-specific ticket page — what
+  // the user wants. For the minority of events TM only indexes (e.g. shows
+  // ticketed via Eventbrite or Prekindle), this URL 404s. We can't tell from
+  // the API alone which is which; the alternative — falling back to the venue
+  // homepage — is generic for ALL events, including the working majority. Net
+  // user experience is better with TM URL primary.
+  const sourceUrl = e.url;
+  const source = "Ticketmaster";
 
   return {
     id: `tm-${e.id}`,
