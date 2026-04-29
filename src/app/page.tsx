@@ -33,11 +33,12 @@ function formatMonthLabel(monthKey: string) {
 function formatMonthShort(monthKey: string) {
   const [y, m] = monthKey.split("-").map(Number);
   const d = new Date(Date.UTC(y, m - 1, 1, 19, 0, 0));
-  return d.toLocaleDateString("en-US", {
+  const month = d.toLocaleDateString("en-US", {
     month: "short",
-    year: "2-digit",
     timeZone: TIMEZONE,
   });
+  const yr = String(y).slice(-2);
+  return `${month} ’${yr}`;
 }
 
 function formatDayLabel(d: Date) {
