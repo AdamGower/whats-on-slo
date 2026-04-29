@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Playfair_Display } from "next/font/google";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
+
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
+const GA_ENABLED = process.env.NODE_ENV === "production" && !!GA_ID;
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -66,6 +70,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${playfair.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
+      {GA_ENABLED && <GoogleAnalytics gaId={GA_ID!} />}
     </html>
   );
 }
