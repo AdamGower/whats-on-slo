@@ -39,14 +39,14 @@ function laWallTimeToUtcIso(dateStr) {
 function stripHtml(s) {
   if (!s) return "";
   return s
-    .replace(/<[^>]*>/g, "")
+    .replace(/<[^>]*>/g, " ") // replace tags with a space so "</p><p>" doesn't smash sentences together
     .replace(/&nbsp;/g, " ")
     .replace(/&amp;/g, "&")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
     .replace(/&#0?39;/g, "'")
     .replace(/&quot;/g, '"')
-    .replace(/\s+/g, " ")
+    .replace(/\s+/g, " ") // collapse the multiple spaces this can introduce
     .trim();
 }
 

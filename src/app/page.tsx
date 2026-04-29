@@ -83,10 +83,18 @@ function stripBilingualSpanish(text: string) {
   return idx === -1 ? text : text.slice(0, idx).trim();
 }
 
+// HTML stripping in scrapers can leave sentences smashed together when
+// paragraph tags are removed: "End.Next sentence" or "(format)Next". Insert
+// a space between sentence-ending punctuation and the next capitalized word.
+function fixPunctuationSpacing(text: string) {
+  if (!text) return text;
+  return text.replace(/([.!?)])([A-Z])/g, "$1 $2");
+}
+
 // Truncate at a word boundary near maxWords. Adds an ellipsis when truncated.
 function truncateWords(text: string, maxWords: number) {
   if (!text) return "";
-  const cleaned = stripBilingualSpanish(text).trim();
+  const cleaned = fixPunctuationSpacing(stripBilingualSpanish(text)).trim();
   const words = cleaned.split(/\s+/);
   if (words.length <= maxWords) return cleaned;
   // Try to break on the nearest sentence-ending punctuation in the last few
