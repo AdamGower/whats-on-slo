@@ -4,6 +4,7 @@ import type { Event } from "@/types";
 export const revalidate = 60;
 
 const TIMEZONE = "America/Los_Angeles";
+const DESCRIPTION_WORD_LIMIT = 50;
 
 function eventDate(iso: string) {
   return new Date(iso);
@@ -11,6 +12,32 @@ function eventDate(iso: string) {
 
 function dayKey(d: Date) {
   return d.toLocaleDateString("en-CA", { timeZone: TIMEZONE });
+}
+
+// "2026-04" — Pacific calendar month of a Date
+function monthKey(d: Date) {
+  return dayKey(d).slice(0, 7);
+}
+
+function formatMonthLabel(monthKey: string) {
+  // Construct a date at noon Pacific on the first of that month for safe formatting
+  const [y, m] = monthKey.split("-").map(Number);
+  const d = new Date(Date.UTC(y, m - 1, 1, 19, 0, 0));
+  return d.toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric",
+    timeZone: TIMEZONE,
+  });
+}
+
+function formatMonthShort(monthKey: string) {
+  const [y, m] = monthKey.split("-").map(Number);
+  const d = new Date(Date.UTC(y, m - 1, 1, 19, 0, 0));
+  return d.toLocaleDateString("en-US", {
+    month: "short",
+    year: "2-digit",
+    timeZone: TIMEZONE,
+  });
 }
 
 function formatDayLabel(d: Date) {
@@ -45,6 +72,20 @@ function formatTimeRange(start: Date, end?: Date) {
   return `${s} – ${formatTime(end)}`;
 }
 
+// Truncate at a word boundary near maxWords. Adds an ellipsis when truncated.
+function truncateWords(text: string, maxWords: number) {
+  if (!text) return "";
+  const words = text.trim().split(/\s+/);
+  if (words.length <= maxWords) return text.trim();
+  // Try to break on the nearest sentence-ending punctuation in the last few
+  // words of the cap so we don't dangle mid-clause.
+  const slice = words.slice(0, maxWords);
+  for (let i = slice.length - 1; i >= Math.max(0, slice.length - 8); i--) {
+    if (/[.!?]$/.test(slice[i])) return slice.slice(0, i + 1).join(" ");
+  }
+  return slice.join(" ") + "…";
+}
+
 function groupByDay(events: Event[]) {
   const map = new Map<string, Event[]>();
   for (const ev of events) {
@@ -55,9 +96,39 @@ function groupByDay(events: Event[]) {
   return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
 }
 
-export default async function Home() {
+function buildMonthIndex(events: Event[]) {
+  const counts = new Map<string, number>();
+  for (const ev of events) {
+    const key = monthKey(eventDate(ev.startsAt));
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+  return Array.from(counts.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, count]) => ({ key, count, label: formatMonthLabel(key) }));
+}
+
+type SearchParams = Promise<{ month?: string }>;
+
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  const params = await searchParams;
   const events = await fetchUpcomingEvents();
-  const grouped = groupByDay(events);
+  const months = buildMonthIndex(events);
+
+  // Default to the first month with events (the current/upcoming one).
+  const requestedMonth = params.month;
+  const validMonth =
+    requestedMonth && months.some((m) => m.key === requestedMonth)
+      ? requestedMonth
+      : months[0]?.key ?? monthKey(new Date());
+
+  const monthEvents = events.filter(
+    (ev) => monthKey(eventDate(ev.startsAt)) === validMonth
+  );
+  const grouped = groupByDay(monthEvents);
 
   const today = new Date();
   const longDate = today.toLocaleDateString("en-US", {
@@ -90,18 +161,54 @@ export default async function Home() {
       </header>
 
       <main className="mx-auto max-w-5xl w-full px-6 py-10 flex-1">
+        {months.length > 0 && (
+          <nav
+            aria-label="Browse by month"
+            className="flex flex-wrap gap-x-5 gap-y-2 items-baseline border-b border-rule pb-4 mb-8 text-sm"
+          >
+            <span className="text-[11px] uppercase tracking-widest text-muted">
+              Browse:
+            </span>
+            {months.map((m) => {
+              const active = m.key === validMonth;
+              return (
+                <a
+                  key={m.key}
+                  href={m.key === months[0].key ? "/" : `/?month=${m.key}`}
+                  className={
+                    active
+                      ? "font-serif font-bold text-accent border-b-2 border-accent pb-0.5"
+                      : "font-serif text-foreground/80 hover:text-accent"
+                  }
+                >
+                  {formatMonthShort(m.key)}
+                  <span
+                    className={
+                      "ml-1 text-[11px] " +
+                      (active ? "text-accent/80" : "text-muted")
+                    }
+                  >
+                    {m.count}
+                  </span>
+                </a>
+              );
+            })}
+          </nav>
+        )}
+
         <section className="mb-10">
           <h2 className="font-serif text-3xl font-bold border-b border-foreground/40 pb-2 mb-2">
-            On Today
+            {formatMonthLabel(validMonth)}
           </h2>
           <p className="text-muted text-sm italic mb-6">
-            Live from the database. Sources update on a schedule.
+            {monthEvents.length} events &middot; updated automatically every
+            6 hours.
           </p>
         </section>
 
         {grouped.length === 0 ? (
           <p className="text-muted italic">
-            No upcoming events. Check back soon.
+            No events listed for this month yet. Check back soon.
           </p>
         ) : (
           <div className="space-y-12">
@@ -142,7 +249,9 @@ export default async function Home() {
                         <p className="text-sm text-muted mt-0.5">
                           {ev.venue} &middot; {ev.community}
                         </p>
-                        <p className="mt-2 leading-relaxed">{ev.description}</p>
+                        <p className="mt-2 leading-relaxed">
+                          {truncateWords(ev.description, DESCRIPTION_WORD_LIMIT)}
+                        </p>
                         <p className="mt-2 text-xs text-muted">
                           Source:{" "}
                           <a
