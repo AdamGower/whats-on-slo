@@ -160,6 +160,31 @@ function buildHref(
 
 type SearchParams = Promise<{ month?: string; cat?: string }>;
 
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  const params = await searchParams;
+  const monthLabel = params.month ? formatMonthLabel(params.month) : null;
+  const cat = params.cat;
+
+  const title =
+    monthLabel && cat
+      ? `${cat} events in ${monthLabel}`
+      : monthLabel
+      ? `Events in ${monthLabel}`
+      : cat
+      ? `${cat} events`
+      : null;
+
+  return {
+    title,
+    openGraph: { title: title ?? undefined },
+    twitter: { title: title ?? undefined },
+  };
+}
+
 export default async function Home({
   searchParams,
 }: {
@@ -397,7 +422,7 @@ export default async function Home({
                           href={ev.sourceUrl}
                           target="_blank"
                           rel="noreferrer"
-                          className="md:order-3 order-2 block"
+                          className="md:order-3 order-2 block max-w-[12rem] md:max-w-none"
                         >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
