@@ -127,7 +127,38 @@ function buildMonthIndex(events: Event[]) {
     .map(([key, count]) => ({ key, count, label: formatMonthLabel(key) }));
 }
 
-type SearchParams = Promise<{ month?: string }>;
+const CATEGORIES: Event["category"][] = [
+  "Music",
+  "Food & Drink",
+  "Arts",
+  "Community",
+  "Family",
+  "Outdoors",
+];
+
+function buildCategoryCounts(events: Event[]) {
+  const counts = new Map<string, number>();
+  for (const ev of events) {
+    counts.set(ev.category, (counts.get(ev.category) ?? 0) + 1);
+  }
+  return counts;
+}
+
+// Build a URL preserving the params we want and dropping defaults so the
+// canonical "/" stays clean.
+function buildHref(
+  month: string | null,
+  cat: string | null,
+  defaultMonth: string | null
+) {
+  const params = new URLSearchParams();
+  if (month && month !== defaultMonth) params.set("month", month);
+  if (cat) params.set("cat", cat);
+  const qs = params.toString();
+  return qs ? `/?${qs}` : "/";
+}
+
+type SearchParams = Promise<{ month?: string; cat?: string }>;
 
 export default async function Home({
   searchParams,
@@ -148,7 +179,20 @@ export default async function Home({
   const monthEvents = events.filter(
     (ev) => monthKey(eventDate(ev.startsAt)) === validMonth
   );
-  const grouped = groupByDay(monthEvents);
+
+  // Category filter — applied within the selected month
+  const requestedCat = params.cat;
+  const validCat =
+    requestedCat && (CATEGORIES as string[]).includes(requestedCat)
+      ? (requestedCat as Event["category"])
+      : null;
+  const categoryCounts = buildCategoryCounts(monthEvents);
+  const filteredEvents = validCat
+    ? monthEvents.filter((ev) => ev.category === validCat)
+    : monthEvents;
+  const grouped = groupByDay(filteredEvents);
+
+  const defaultMonthKey = months[0]?.key ?? null;
 
   const today = new Date();
   const longDate = today.toLocaleDateString("en-US", {
@@ -184,7 +228,7 @@ export default async function Home({
         {months.length > 0 && (
           <nav
             aria-label="Browse by month"
-            className="flex flex-wrap gap-x-5 gap-y-2 items-baseline border-b border-rule pb-4 mb-8 text-sm"
+            className="flex flex-wrap gap-x-5 gap-y-2 items-baseline border-b border-rule pb-4 mb-4 text-sm"
           >
             <span className="text-[11px] uppercase tracking-widest text-muted">
               Browse:
@@ -194,7 +238,7 @@ export default async function Home({
               return (
                 <a
                   key={m.key}
-                  href={m.key === months[0].key ? "/" : `/?month=${m.key}`}
+                  href={buildHref(m.key, validCat, defaultMonthKey)}
                   className={
                     active
                       ? "font-serif font-bold text-accent border-b-2 border-accent pb-0.5"
@@ -216,13 +260,73 @@ export default async function Home({
           </nav>
         )}
 
+        <nav
+          aria-label="Filter by category"
+          className="flex flex-wrap gap-x-4 gap-y-2 items-baseline border-b border-rule pb-4 mb-8 text-sm"
+        >
+          <span className="text-[11px] uppercase tracking-widest text-muted">
+            Filter:
+          </span>
+          <a
+            href={buildHref(validMonth, null, defaultMonthKey)}
+            className={
+              !validCat
+                ? "font-bold text-accent border-b-2 border-accent pb-0.5"
+                : "text-foreground/80 hover:text-accent"
+            }
+          >
+            All
+            <span
+              className={
+                "ml-1 text-[11px] " +
+                (!validCat ? "text-accent/80" : "text-muted")
+              }
+            >
+              {monthEvents.length}
+            </span>
+          </a>
+          {CATEGORIES.map((cat) => {
+            const count = categoryCounts.get(cat) ?? 0;
+            if (count === 0) return null;
+            const active = validCat === cat;
+            return (
+              <a
+                key={cat}
+                href={buildHref(validMonth, cat, defaultMonthKey)}
+                className={
+                  active
+                    ? "font-bold text-accent border-b-2 border-accent pb-0.5"
+                    : "text-foreground/80 hover:text-accent"
+                }
+              >
+                {cat}
+                <span
+                  className={
+                    "ml-1 text-[11px] " +
+                    (active ? "text-accent/80" : "text-muted")
+                  }
+                >
+                  {count}
+                </span>
+              </a>
+            );
+          })}
+        </nav>
+
         <section className="mb-10">
           <h2 className="font-serif text-3xl font-bold border-b border-foreground/40 pb-2 mb-2">
             {formatMonthLabel(validMonth)}
+            {validCat && (
+              <span className="text-muted font-normal text-2xl">
+                {" "}
+                &middot; {validCat}
+              </span>
+            )}
           </h2>
           <p className="text-muted text-sm italic mb-6">
-            {monthEvents.length} events &middot; updated automatically every
-            6 hours.
+            {filteredEvents.length}{" "}
+            {validCat ? validCat.toLowerCase() : ""} events
+            &middot; updated automatically every 6 hours.
           </p>
         </section>
 
