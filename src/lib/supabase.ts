@@ -42,7 +42,8 @@ function rowToEvent(row: EventRow): Event {
 const SOURCE_PRIORITY: Array<[string, number]> = [
   ["tm-", 1],
   ["mi-", 2],
-  ["gs-", 3],
+  ["lib-", 3],
+  ["gs-", 4],
 ];
 function sourceScore(id: string): number {
   for (const [prefix, score] of SOURCE_PRIORITY) {
@@ -93,7 +94,32 @@ function dedupRows(rows: EventRow[]): EventRow[] {
   );
 }
 
-export async function fetchUpcomingEvents(limit = 300): Promise<Event[]> {
+// Prevent any single source from dominating a day. The library system has
+// hundreds of recurring storytimes/programs; without a cap, the page would
+// be entirely "Storytime at X Branch" for the next month and concerts would
+// vanish. 3 per source per day still surfaces real library highlights while
+// leaving room for everything else.
+function balancePerSourcePerDay(
+  rows: EventRow[],
+  perSourcePerDay: number
+): EventRow[] {
+  const counts = new Map<string, number>();
+  const result: EventRow[] = [];
+  for (const r of rows) {
+    const day = new Date(r.starts_at).toLocaleDateString("en-CA", {
+      timeZone: "America/Los_Angeles",
+    });
+    const prefix = /^([a-z]+)-/.exec(r.id)?.[1] ?? "curated";
+    const key = `${day}|${prefix}`;
+    const n = counts.get(key) ?? 0;
+    if (n >= perSourcePerDay) continue;
+    counts.set(key, n + 1);
+    result.push(r);
+  }
+  return result;
+}
+
+export async function fetchUpcomingEvents(): Promise<Event[]> {
   const nowIso = new Date().toISOString();
   const { data, error } = await supabase
     .from("events")
@@ -102,12 +128,14 @@ export async function fetchUpcomingEvents(limit = 300): Promise<Event[]> {
     )
     .or(`ends_at.gte.${nowIso},and(ends_at.is.null,starts_at.gte.${nowIso})`)
     .order("starts_at", { ascending: true })
-    .limit(limit);
+    .limit(2000);
 
   if (error) {
     console.error("Failed to fetch events from Supabase", error);
     return [];
   }
 
-  return dedupRows(data as EventRow[]).map(rowToEvent);
+  const deduped = dedupRows(data as EventRow[]);
+  const balanced = balancePerSourcePerDay(deduped, 3);
+  return balanced.map(rowToEvent);
 }
