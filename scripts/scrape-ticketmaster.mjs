@@ -28,6 +28,21 @@ const SEGMENT_TO_CATEGORY = {
   Miscellaneous: "Community",
 };
 
+// Pick the best-fit image: prefer 16:9 ratio, then largest width that's not
+// absurdly oversized. TM offers many sizes/ratios per event.
+function pickImage(images) {
+  if (!Array.isArray(images) || images.length === 0) return null;
+  const sixteenNine = images.filter((i) => i.ratio === "16_9" && i.width);
+  const candidates = sixteenNine.length ? sixteenNine : images.filter((i) => i.width);
+  candidates.sort((a, b) => {
+    // Prefer images between 600 and 1500 wide; fallback to largest otherwise
+    const score = (i) =>
+      i.width >= 600 && i.width <= 1500 ? 1000 + i.width : i.width;
+    return score(b) - score(a);
+  });
+  return candidates[0]?.url || null;
+}
+
 function mapEvent(e) {
   const venue = e._embedded?.venues?.[0];
   const segment = e.classifications?.[0]?.segment?.name;
@@ -61,6 +76,7 @@ function mapEvent(e) {
     source,
     source_url: sourceUrl,
     category,
+    image_url: pickImage(e.images),
   };
 }
 

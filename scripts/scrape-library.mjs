@@ -130,6 +130,9 @@ async function main() {
     const programTypeName = firstValue(e.program_type);
     const ageGroupName = firstValue(e.age_group);
 
+    // Library JSON returns image as a plain URL string when present, null otherwise.
+    const imageUrl = typeof e.image === "string" ? e.image : null;
+
     rows.push({
       id: `lib-${e.id}`,
       title: e.title.trim(),
@@ -143,6 +146,7 @@ async function main() {
       source: "SLO County Library",
       source_url: e.url,
       category: categorize(programTypeName, ageGroupName, e.title),
+      image_url: imageUrl,
     });
   }
 

@@ -165,6 +165,15 @@ async function main() {
     if (seen.has(id)) continue;
     seen.add(id);
 
+    // Visit SLO returns a sizes object with multiple variants. Prefer
+    // medium_large (~768w), then medium, then the original.
+    const img = e.image || {};
+    const imageUrl =
+      img.sizes?.medium_large?.url ||
+      img.sizes?.medium?.url ||
+      img.url ||
+      null;
+
     rows.push({
       id,
       title,
@@ -178,6 +187,7 @@ async function main() {
       source: "Visit SLO",
       source_url: e.url,
       category: categorize(e.categories || [], title),
+      image_url: imageUrl,
     });
   }
 

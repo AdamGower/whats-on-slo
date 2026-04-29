@@ -9,4 +9,5 @@ export type Event = {
   source: string;
   sourceUrl: string;
   category: "Music" | "Food & Drink" | "Arts" | "Community" | "Family" | "Outdoors";
+  imageUrl?: string;
 };

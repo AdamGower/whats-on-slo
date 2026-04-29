@@ -242,7 +242,11 @@ export default async function Home({
                   {events.map((ev) => (
                     <li
                       key={ev.id}
-                      className="grid grid-cols-1 md:grid-cols-[10rem_1fr] gap-x-6 gap-y-1"
+                      className={
+                        ev.imageUrl
+                          ? "grid grid-cols-1 md:grid-cols-[10rem_1fr_11rem] gap-x-6 gap-y-3"
+                          : "grid grid-cols-1 md:grid-cols-[10rem_1fr] gap-x-6 gap-y-1"
+                      }
                     >
                       <div className="text-sm">
                         <p className="font-semibold">
@@ -255,7 +259,7 @@ export default async function Home({
                           {ev.category}
                         </p>
                       </div>
-                      <div>
+                      <div className="md:order-2 order-3">
                         <h4 className="font-serif text-xl font-bold leading-snug">
                           <a
                             href={ev.sourceUrl}
@@ -284,6 +288,22 @@ export default async function Home({
                           </a>
                         </p>
                       </div>
+                      {ev.imageUrl && (
+                        <a
+                          href={ev.sourceUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="md:order-3 order-2 block"
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={ev.imageUrl}
+                            alt={ev.title}
+                            loading="lazy"
+                            className="w-full aspect-[4/3] object-cover rounded-sm border border-rule"
+                          />
+                        </a>
+                      )}
                     </li>
                   ))}
                 </ul>

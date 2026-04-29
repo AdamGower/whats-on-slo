@@ -17,6 +17,7 @@ type EventRow = {
   source: string;
   source_url: string;
   category: Event["category"];
+  image_url: string | null;
 };
 
 function rowToEvent(row: EventRow): Event {
@@ -31,6 +32,7 @@ function rowToEvent(row: EventRow): Event {
     source: row.source,
     sourceUrl: row.source_url,
     category: row.category,
+    imageUrl: row.image_url ?? undefined,
   };
 }
 
@@ -125,7 +127,7 @@ export async function fetchUpcomingEvents(): Promise<Event[]> {
   const { data, error } = await supabase
     .from("events")
     .select(
-      "id,title,starts_at,ends_at,venue,community,description,source,source_url,category"
+      "id,title,starts_at,ends_at,venue,community,description,source,source_url,category,image_url"
     )
     .or(`ends_at.gte.${nowIso},and(ends_at.is.null,starts_at.gte.${nowIso})`)
     .order("starts_at", { ascending: true })
