@@ -73,11 +73,22 @@ function formatTimeRange(start: Date, end?: Date) {
   return `${s} – ${formatTime(end)}`;
 }
 
+// Library staff write bilingual English-then-Spanish descriptions joined into
+// one paragraph. Cut at the first ¡ or ¿ — those characters are unique to
+// Spanish and never appear in English, so this is a safe, deterministic
+// language boundary.
+function stripBilingualSpanish(text: string) {
+  if (!text) return text;
+  const idx = text.search(/[¡¿]/);
+  return idx === -1 ? text : text.slice(0, idx).trim();
+}
+
 // Truncate at a word boundary near maxWords. Adds an ellipsis when truncated.
 function truncateWords(text: string, maxWords: number) {
   if (!text) return "";
-  const words = text.trim().split(/\s+/);
-  if (words.length <= maxWords) return text.trim();
+  const cleaned = stripBilingualSpanish(text).trim();
+  const words = cleaned.split(/\s+/);
+  if (words.length <= maxWords) return cleaned;
   // Try to break on the nearest sentence-ending punctuation in the last few
   // words of the cap so we don't dangle mid-clause.
   const slice = words.slice(0, maxWords);
