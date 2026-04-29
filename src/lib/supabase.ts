@@ -41,6 +41,7 @@ function rowToEvent(row: EventRow): Event {
 // only a date, not a time.
 const SOURCE_PRIORITY: Array<[string, number]> = [
   ["tm-", 1],
+  ["vs-", 2],
   ["mi-", 2],
   ["lib-", 3],
   ["gs-", 4],
