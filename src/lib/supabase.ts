@@ -34,7 +34,58 @@ function rowToEvent(row: EventRow): Event {
   };
 }
 
-export async function fetchUpcomingEvents(limit = 100): Promise<Event[]> {
+// Source priority for deduplication: lowest score wins. Hand-curated rows
+// (no source prefix) > Ticketmaster (`tm-`) — TM has real start times >
+// goslo.events (`gs-`) — goslo only gives us a date, not a time.
+function sourceScore(id: string): number {
+  if (id.startsWith("tm-")) return 1;
+  if (id.startsWith("gs-")) return 2;
+  return 0; // hand-curated
+}
+
+// Build a cross-source dedup key that catches "same event indexed by two
+// different scrapers." Title slug + Pacific calendar day + first word of venue
+// is robust against minor naming differences ("SLO Brew Rock" vs "Slo Brew",
+// "Fremont Theater" vs "Fremont") without falsely collapsing different events
+// that happen to share a generic title (e.g. "Live music").
+function dedupKey(row: EventRow): string {
+  const titleSlug = row.title.toLowerCase().replace(/[^a-z0-9]+/g, "");
+  const venueFirstWord = row.venue
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim()
+    .split(" ")[0];
+  const pacificDay = new Date(row.starts_at).toLocaleDateString("en-CA", {
+    timeZone: "America/Los_Angeles",
+  });
+  return `${pacificDay}|${titleSlug}|${venueFirstWord}`;
+}
+
+function dedupRows(rows: EventRow[]): EventRow[] {
+  const groups = new Map<string, EventRow[]>();
+  for (const row of rows) {
+    const k = dedupKey(row);
+    const list = groups.get(k);
+    if (list) list.push(row);
+    else groups.set(k, [row]);
+  }
+  const winners: EventRow[] = [];
+  for (const list of groups.values()) {
+    if (list.length === 1) {
+      winners.push(list[0]);
+      continue;
+    }
+    list.sort((a, b) => sourceScore(a.id) - sourceScore(b.id));
+    winners.push(list[0]);
+  }
+  // Re-sort by start time after dedup since we lost original order
+  return winners.sort(
+    (a, b) =>
+      new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime()
+  );
+}
+
+export async function fetchUpcomingEvents(limit = 300): Promise<Event[]> {
   const nowIso = new Date().toISOString();
   const { data, error } = await supabase
     .from("events")
@@ -50,5 +101,5 @@ export async function fetchUpcomingEvents(limit = 100): Promise<Event[]> {
     return [];
   }
 
-  return (data as EventRow[]).map(rowToEvent);
+  return dedupRows(data as EventRow[]).map(rowToEvent);
 }
