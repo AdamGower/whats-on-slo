@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Playfair_Display } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
@@ -73,6 +74,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         {children}
         <VercelAnalytics />
+        <SpeedInsights />
       </body>
       {GA_ENABLED && <GoogleAnalytics gaId={GA_ID!} />}
     </html>
