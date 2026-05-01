@@ -103,9 +103,7 @@ export default async function HikingPage({
       <header className="border-b-4 border-double border-foreground/80 px-6 pt-10 pb-6">
         <div className="mx-auto max-w-5xl">
           <p className="text-center text-[11px] uppercase tracking-[0.3em] text-muted">
-            <Link href="/" className="hover:text-accent">
-              ← What&rsquo;s On SLO
-            </Link>
+            A daily guide for the Central Coast
           </p>
           <h1
             className="font-serif text-center text-5xl sm:text-6xl md:text-7xl font-black tracking-tight mt-3"
