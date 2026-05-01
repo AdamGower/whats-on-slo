@@ -255,7 +255,28 @@ export default async function Home({
           <div className="mt-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs uppercase tracking-widest text-muted border-t border-rule pt-3">
             <span>San Luis Obispo &middot; The Central Coast</span>
             <span>{longDate}</span>
-            <span>Vol. 1 &middot; No. 1</span>
+            <span className="flex items-center gap-3">
+              <a
+                href="/about"
+                className="underline decoration-dotted underline-offset-2 hover:text-accent"
+              >
+                About
+              </a>
+              <span aria-hidden>&middot;</span>
+              <a
+                href="/hiking"
+                className="underline decoration-dotted underline-offset-2 hover:text-accent"
+              >
+                Hiking
+              </a>
+              <span aria-hidden>&middot;</span>
+              <a
+                href="/submit"
+                className="underline decoration-dotted underline-offset-2 hover:text-accent"
+              >
+                Submit your event
+              </a>
+            </span>
           </div>
         </div>
       </header>
