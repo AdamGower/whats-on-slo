@@ -11,3 +11,26 @@ export type Event = {
   category: "Music" | "Food & Drink" | "Arts" | "Community" | "Family" | "Outdoors";
   imageUrl?: string;
 };
+
+export type Difficulty = "Easy" | "Moderate" | "Hard" | "Strenuous";
+
+export type Trail = {
+  name: string;
+  area: string;
+  trailhead: string;
+  lat: number;
+  lng: number;
+  distance_miles: number;
+  elevation_gain_ft: number;
+  difficulty: Difficulty;
+  trail_type: string;
+  best_months: string;
+  features: string;
+  dogs: boolean;
+  bikes: boolean;
+  parking: string;
+  hazards: string;
+  tags: string[];
+  hikers_say: string;
+  source_url: string | null;
+};

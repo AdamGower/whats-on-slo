@@ -460,12 +460,17 @@ export default async function Home({
           <span>What&rsquo;s On SLO &middot; A preview edition</span>
           <span className="flex items-center gap-4">
             <a
+              href="/hiking"
+              className="underline decoration-dotted underline-offset-2 hover:text-accent"
+            >
+              Hiking
+            </a>
+            <a
               href="/submit"
               className="underline decoration-dotted underline-offset-2 hover:text-accent"
             >
               Submit your event
             </a>
-            <span>Aggregating 40+ Central Coast event sources.</span>
           </span>
         </div>
       </footer>
