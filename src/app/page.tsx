@@ -50,6 +50,16 @@ function formatDayLabel(d: Date) {
   });
 }
 
+// Compact per-card date stamp, e.g. "Fri, May 1"
+function formatCompactDate(d: Date) {
+  return d.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    timeZone: TIMEZONE,
+  });
+}
+
 function formatTime(d: Date) {
   return d
     .toLocaleTimeString("en-US", {
@@ -378,7 +388,10 @@ export default async function Home({
                       }
                     >
                       <div className="text-sm">
-                        <p className="font-semibold">
+                        <p className="text-muted text-[11px] uppercase tracking-wider">
+                          {formatCompactDate(eventDate(ev.startsAt))}
+                        </p>
+                        <p className="font-semibold mt-0.5">
                           {formatTimeRange(
                             eventDate(ev.startsAt),
                             ev.endsAt ? eventDate(ev.endsAt) : undefined
