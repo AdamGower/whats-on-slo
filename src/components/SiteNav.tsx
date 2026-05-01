@@ -12,7 +12,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Home", href: "/" },
   { label: "Events", href: "/" },
   { label: "Hiking", href: "/hiking" },
-  { label: "About", href: null },
+  { label: "About", href: "/about" },
 ];
 
 // Returns true for the single nav item that should be visually active for
