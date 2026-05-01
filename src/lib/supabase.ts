@@ -155,15 +155,17 @@ function startOfTodayPacificUtcIso(): string {
   return new Date(utcGuess.getTime() + offsetMs).toISOString();
 }
 
-// Prevent any single source from dominating a day. The library system has
-// hundreds of recurring storytimes/programs; without a cap, the page would
-// be entirely "Storytime at X Branch" for the next month and concerts would
-// vanish. 3 per source per day still surfaces real library highlights while
-// leaving room for everything else.
-function balancePerSourcePerDay(
-  rows: EventRow[],
-  perSourcePerDay: number
-): EventRow[] {
+// Per-source daily caps. Library is throttled hard because the system has
+// hundreds of recurring programs (storytimes, etc.) that would otherwise
+// dominate the page. Every other source is curated enough that its natural
+// volume is fine — a high cap is just a safety net against future runaway
+// scrapers, not a real squeeze.
+const PER_SOURCE_DAILY_CAP: Record<string, number> = {
+  lib: 3,
+};
+const DEFAULT_DAILY_CAP = 15;
+
+function balancePerSourcePerDay(rows: EventRow[]): EventRow[] {
   const counts = new Map<string, number>();
   const result: EventRow[] = [];
   for (const r of rows) {
@@ -171,9 +173,10 @@ function balancePerSourcePerDay(
       timeZone: "America/Los_Angeles",
     });
     const prefix = /^([a-z]+)-/.exec(r.id)?.[1] ?? "curated";
+    const cap = PER_SOURCE_DAILY_CAP[prefix] ?? DEFAULT_DAILY_CAP;
     const key = `${day}|${prefix}`;
     const n = counts.get(key) ?? 0;
-    if (n >= perSourcePerDay) continue;
+    if (n >= cap) continue;
     counts.set(key, n + 1);
     result.push(r);
   }
@@ -201,6 +204,6 @@ export async function fetchUpcomingEvents(): Promise<Event[]> {
 
   const sameSourceCollapsed = collapseSameSourceMultiVenue(data as EventRow[]);
   const deduped = dedupRows(sameSourceCollapsed);
-  const balanced = balancePerSourcePerDay(deduped, 3);
+  const balanced = balancePerSourcePerDay(deduped);
   return balanced.map(rowToEvent);
 }
