@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { trails, DIFFICULTIES, directionsUrl, trailSlug } from "@/lib/trails";
 import type { Trail } from "@/types";
+import MapWrapper from "./MapWrapper";
 
 export const metadata = {
   title: "Hiking trails",
@@ -9,7 +10,12 @@ export const metadata = {
 };
 
 type DogsFilter = "all" | "yes" | "no";
-type SearchParams = Promise<{ difficulty?: string; dogs?: string }>;
+type ViewMode = "list" | "map";
+type SearchParams = Promise<{
+  difficulty?: string;
+  dogs?: string;
+  view?: string;
+}>;
 
 const DOGS_LABELS: Record<DogsFilter, string> = {
   all: "All",
@@ -19,11 +25,13 @@ const DOGS_LABELS: Record<DogsFilter, string> = {
 
 function buildHref(
   difficulty: Trail["difficulty"] | null,
-  dogs: DogsFilter
+  dogs: DogsFilter,
+  view: ViewMode
 ): string {
   const params = new URLSearchParams();
   if (difficulty) params.set("difficulty", difficulty);
   if (dogs !== "all") params.set("dogs", dogs);
+  if (view !== "list") params.set("view", view);
   const qs = params.toString();
   return qs ? `/hiking?${qs}` : "/hiking";
 }
@@ -71,6 +79,8 @@ export default async function HikingPage({
     requestedDogs === "yes" || requestedDogs === "no"
       ? (requestedDogs as DogsFilter)
       : "all";
+
+  const validView: ViewMode = params.view === "map" ? "map" : "list";
 
   const filtered = applyFilters(trails, validDifficulty, validDogs);
 
@@ -120,7 +130,7 @@ export default async function HikingPage({
             Difficulty:
           </span>
           <a
-            href={buildHref(null, validDogs)}
+            href={buildHref(null, validDogs, validView)}
             className={
               !validDifficulty
                 ? "font-bold text-accent border-b-2 border-accent pb-0.5"
@@ -138,7 +148,7 @@ export default async function HikingPage({
             return (
               <a
                 key={d}
-                href={buildHref(d, validDogs)}
+                href={buildHref(d, validDogs, validView)}
                 className={
                   active
                     ? "font-bold text-accent border-b-2 border-accent pb-0.5"
@@ -162,7 +172,7 @@ export default async function HikingPage({
         {/* Dogs filter */}
         <nav
           aria-label="Filter by dog-friendliness"
-          className="flex flex-wrap gap-x-4 gap-y-2 items-baseline border-b border-rule pb-4 mb-8 text-sm"
+          className="flex flex-wrap gap-x-4 gap-y-2 items-baseline border-b border-rule pb-4 mb-4 text-sm"
         >
           <span className="text-[11px] uppercase tracking-widest text-muted">
             Dogs:
@@ -178,7 +188,7 @@ export default async function HikingPage({
             return (
               <a
                 key={d}
-                href={buildHref(validDifficulty, d)}
+                href={buildHref(validDifficulty, d, validView)}
                 className={
                   active
                     ? "font-bold text-accent border-b-2 border-accent pb-0.5"
@@ -199,10 +209,40 @@ export default async function HikingPage({
           })}
         </nav>
 
+        {/* View toggle: list / map */}
+        <nav
+          aria-label="View mode"
+          className="flex flex-wrap gap-x-4 gap-y-2 items-baseline border-b border-rule pb-4 mb-8 text-sm"
+        >
+          <span className="text-[11px] uppercase tracking-widest text-muted">
+            View:
+          </span>
+          {(["list", "map"] as ViewMode[]).map((v) => {
+            const active = validView === v;
+            return (
+              <a
+                key={v}
+                href={buildHref(validDifficulty, validDogs, v)}
+                className={
+                  active
+                    ? "font-bold text-accent border-b-2 border-accent pb-0.5"
+                    : "text-foreground/80 hover:text-accent"
+                }
+              >
+                {v === "list" ? "List" : "Map"}
+              </a>
+            );
+          })}
+        </nav>
+
         <p className="text-muted text-sm italic mb-8">
           {filtered.length} trail{filtered.length === 1 ? "" : "s"} match
           {filtered.length === 1 ? "es" : ""} your filters.
         </p>
+
+        {validView === "map" && filtered.length > 0 && (
+          <MapWrapper trails={filtered} />
+        )}
 
         {filtered.length === 0 ? (
           <p className="text-muted italic">
@@ -215,7 +255,7 @@ export default async function HikingPage({
             </a>
             .
           </p>
-        ) : (
+        ) : validView === "list" ? (
           <ul className="space-y-12">
             {filtered.map((t) => (
               <li
@@ -347,7 +387,7 @@ export default async function HikingPage({
               </li>
             ))}
           </ul>
-        )}
+        ) : null}
       </main>
 
       <footer className="border-t border-rule mt-10 px-6 py-6">
