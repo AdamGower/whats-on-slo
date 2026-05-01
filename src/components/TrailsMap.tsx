@@ -13,7 +13,13 @@ import { directionsUrl, trailSlug } from "@/lib/trails";
 
 function TrailCard({ t, color }: { t: Trail; color: string }) {
   return (
-    <div style={{ maxWidth: 320, fontFamily: "Georgia, serif" }}>
+    <div
+      style={{
+        minWidth: 280,
+        maxWidth: 320,
+        fontFamily: "Georgia, serif",
+      }}
+    >
       <div style={{ fontSize: "1rem", fontWeight: 700, lineHeight: 1.25 }}>
         {t.name}
       </div>
@@ -141,7 +147,7 @@ export default function TrailsMap({ trails }: { trails: Trail[] }) {
                   the mouse moves from pin to tooltip. The custom class is
                   styled in globals.css to match the popup card. */}
               <Tooltip
-                direction="top"
+                direction="auto"
                 offset={[0, -6]}
                 opacity={1}
                 interactive
