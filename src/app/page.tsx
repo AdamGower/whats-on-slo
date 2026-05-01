@@ -419,15 +419,14 @@ export default async function Home({
                         <p className="mt-2 leading-relaxed">
                           {truncateWords(ev.description, DESCRIPTION_WORD_LIMIT)}
                         </p>
-                        <p className="mt-2 text-xs text-muted">
-                          Source:{" "}
+                        <p className="mt-2 text-xs">
                           <a
                             href={ev.sourceUrl}
                             className="underline decoration-dotted underline-offset-2 hover:text-accent"
                             target="_blank"
                             rel="noreferrer"
                           >
-                            {ev.source}
+                            Learn more &raquo;
                           </a>
                         </p>
                       </div>
