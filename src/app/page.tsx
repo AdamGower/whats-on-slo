@@ -276,6 +276,13 @@ export default async function Home({
               >
                 Submit your event
               </a>
+              <span aria-hidden>&middot;</span>
+              <a
+                href="/comments"
+                className="underline decoration-dotted underline-offset-2 hover:text-accent"
+              >
+                Contact
+              </a>
             </span>
           </div>
         </div>

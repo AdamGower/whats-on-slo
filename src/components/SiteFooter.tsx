@@ -26,6 +26,12 @@ export default function SiteFooter() {
           >
             Submit your event
           </Link>
+          <Link
+            href="/comments"
+            className="underline decoration-dotted underline-offset-2 hover:text-accent"
+          >
+            Contact
+          </Link>
         </span>
       </div>
     </footer>
