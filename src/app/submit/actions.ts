@@ -163,6 +163,11 @@ export async function submitEvent(formData: FormData) {
   if (!community) errors.push("Community / city is required.");
   if (!description) errors.push("Description is required.");
   if (!startsAtRaw) errors.push("Start date and time are required.");
+  if (!sourceUrl) errors.push("A link to the event page or tickets is required.");
+  else if (!/^https?:\/\//i.test(sourceUrl)) {
+    errors.push("Link must start with http:// or https://.");
+  }
+  if (!submitterName) errors.push("Your name is required.");
   if (!submitterEmail) errors.push("Your email is required.");
   else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(submitterEmail)) {
     errors.push("That email doesn't look right.");

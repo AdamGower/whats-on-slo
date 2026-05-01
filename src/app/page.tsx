@@ -1,5 +1,6 @@
 import { fetchUpcomingEvents } from "@/lib/supabase";
 import type { Event } from "@/types";
+import SiteFooter from "@/components/SiteFooter";
 
 export const revalidate = 60;
 
@@ -455,25 +456,7 @@ export default async function Home({
         )}
       </main>
 
-      <footer className="border-t border-rule mt-10 px-6 py-6">
-        <div className="mx-auto max-w-5xl text-xs text-muted flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>What&rsquo;s On SLO &middot; A preview edition</span>
-          <span className="flex items-center gap-4">
-            <a
-              href="/hiking"
-              className="underline decoration-dotted underline-offset-2 hover:text-accent"
-            >
-              Hiking
-            </a>
-            <a
-              href="/submit"
-              className="underline decoration-dotted underline-offset-2 hover:text-accent"
-            >
-              Submit your event
-            </a>
-          </span>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

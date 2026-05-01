@@ -97,6 +97,64 @@ function dedupRows(rows: EventRow[]): EventRow[] {
   );
 }
 
+// When the SAME source posts the SAME title on the SAME day at multiple
+// venues, collapse them into one row with a venue label that reflects the
+// count. The library system does this routinely — a system-wide "Book
+// Giveaway" gets posted at every branch, which read as duplicates on the
+// page even though they're technically distinct events.
+function collapseSameSourceMultiVenue(rows: EventRow[]): EventRow[] {
+  const groups = new Map<string, EventRow[]>();
+  for (const row of rows) {
+    const sourcePrefix = /^([a-z]+)-/.exec(row.id)?.[1] ?? "curated";
+    const titleSlug = row.title.toLowerCase().replace(/[^a-z0-9]+/g, "");
+    const day = new Date(row.starts_at).toLocaleDateString("en-CA", {
+      timeZone: "America/Los_Angeles",
+    });
+    const k = `${sourcePrefix}|${day}|${titleSlug}`;
+    if (!groups.has(k)) groups.set(k, []);
+    groups.get(k)!.push(row);
+  }
+  const out: EventRow[] = [];
+  for (const group of groups.values()) {
+    if (group.length === 1) {
+      out.push(group[0]);
+      continue;
+    }
+    // Pick a representative (alphabetical by venue) and rewrite venue to
+    // reflect the count. Library is the common case; "library branches"
+    // reads naturally there. Other sources fall back to "venues".
+    group.sort((a, b) => a.venue.localeCompare(b.venue));
+    const representative = { ...group[0] };
+    representative.venue = representative.id.startsWith("lib-")
+      ? `${group.length} library branches`
+      : `${group.length} venues`;
+    out.push(representative);
+  }
+  return out.sort(
+    (a, b) =>
+      new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime()
+  );
+}
+
+// Compute "start of today, Pacific time" as a UTC ISO string. Used to filter
+// out events whose Pacific calendar day is already in the past — even if
+// their ends_at extends into the future. (A multi-day event that started
+// last week would otherwise still appear under last week's date header.)
+function startOfTodayPacificUtcIso(): string {
+  const todayPacific = new Date().toLocaleDateString("en-CA", {
+    timeZone: "America/Los_Angeles",
+  });
+  // Try Pacific midnight as if it were UTC, then shift by the Pacific
+  // offset for that instant (handles DST automatically).
+  const utcGuess = new Date(`${todayPacific}T00:00:00Z`);
+  const laFormat = utcGuess.toLocaleString("sv-SE", {
+    timeZone: "America/Los_Angeles",
+  });
+  const laDate = new Date(laFormat.replace(" ", "T") + "Z");
+  const offsetMs = utcGuess.getTime() - laDate.getTime();
+  return new Date(utcGuess.getTime() + offsetMs).toISOString();
+}
+
 // Prevent any single source from dominating a day. The library system has
 // hundreds of recurring storytimes/programs; without a cap, the page would
 // be entirely "Storytime at X Branch" for the next month and concerts would
@@ -123,13 +181,16 @@ function balancePerSourcePerDay(
 }
 
 export async function fetchUpcomingEvents(): Promise<Event[]> {
-  const nowIso = new Date().toISOString();
+  const startOfToday = startOfTodayPacificUtcIso();
   const { data, error } = await supabase
     .from("events")
     .select(
       "id,title,starts_at,ends_at,venue,community,description,source,source_url,category,image_url"
     )
-    .or(`ends_at.gte.${nowIso},and(ends_at.is.null,starts_at.gte.${nowIso})`)
+    // Show only events whose Pacific calendar date is today or later.
+    // Drops yesterday's events even if their ends_at is in the future —
+    // matches the "current and future dates only" UX intent.
+    .gte("starts_at", startOfToday)
     .order("starts_at", { ascending: true })
     .limit(2000);
 
@@ -138,7 +199,8 @@ export async function fetchUpcomingEvents(): Promise<Event[]> {
     return [];
   }
 
-  const deduped = dedupRows(data as EventRow[]);
+  const sameSourceCollapsed = collapseSameSourceMultiVenue(data as EventRow[]);
+  const deduped = dedupRows(sameSourceCollapsed);
   const balanced = balancePerSourcePerDay(deduped, 3);
   return balanced.map(rowToEvent);
 }

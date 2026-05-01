@@ -1,4 +1,5 @@
 import Link from "next/link";
+import SiteFooter from "@/components/SiteFooter";
 
 export const metadata = {
   title: "About",
@@ -151,14 +152,7 @@ export default function AboutPage() {
         </article>
       </main>
 
-      <footer className="border-t border-rule mt-10 px-6 py-6">
-        <div className="mx-auto max-w-3xl text-xs text-muted flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>What&rsquo;s On SLO &middot; About</span>
-          <Link href="/" className="hover:text-accent">
-            ← Back to events
-          </Link>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

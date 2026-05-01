@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { trails, DIFFICULTIES, directionsUrl, trailSlug } from "@/lib/trails";
 import type { Trail } from "@/types";
 import MapWrapper from "./MapWrapper";
+import SiteFooter from "@/components/SiteFooter";
 
 export const metadata = {
   title: "Hiking trails",
@@ -388,14 +388,7 @@ export default async function HikingPage({
         ) : null}
       </main>
 
-      <footer className="border-t border-rule mt-10 px-6 py-6">
-        <div className="mx-auto max-w-5xl text-xs text-muted flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>What&rsquo;s On SLO &middot; Hiking</span>
-          <Link href="/" className="hover:text-accent">
-            ← Back to events
-          </Link>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }
