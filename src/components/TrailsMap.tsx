@@ -138,12 +138,14 @@ export default function TrailsMap({ trails }: { trails: Trail[] }) {
             >
               {/* Hover preview (desktop). Interactive=true so the Get
                   directions link inside the tooltip stays clickable when
-                  the mouse moves from pin to tooltip. */}
+                  the mouse moves from pin to tooltip. The custom class is
+                  styled in globals.css to match the popup card. */}
               <Tooltip
                 direction="top"
                 offset={[0, -6]}
                 opacity={1}
                 interactive
+                className="trail-tooltip"
               >
                 <TrailCard t={t} color={color} />
               </Tooltip>

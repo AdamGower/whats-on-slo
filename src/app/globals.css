@@ -23,3 +23,24 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), Georgia, serif;
 }
+
+/* Make the Leaflet hover tooltip on /hiking look like its click popup —
+   white card, padded, wraps text, fixed max width. Leaflet's default
+   tooltip is single-line and narrow; that's why the Hikers-say narrative
+   was overflowing the box before this. */
+.leaflet-tooltip.trail-tooltip {
+  background: #ffffff;
+  color: var(--foreground);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.25);
+  padding: 12px 14px;
+  white-space: normal;
+  max-width: 340px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+/* Hide the default tooltip arrow — looks better as a clean card. */
+.leaflet-tooltip.trail-tooltip::before {
+  display: none;
+}
