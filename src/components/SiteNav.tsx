@@ -33,6 +33,9 @@ export default function SiteNav() {
   return (
     <nav
       aria-label="Site"
+      // z-index must beat Leaflet's map controls (which top out around 1000)
+      // so the nav stays above the map when scrolling /hiking?view=map.
+      className="sticky top-0 z-[1100]"
       style={{ background: "#2C2416", color: "#F5F0E8" }}
     >
       <div className="mx-auto max-w-5xl px-6 py-3 flex items-center gap-8 text-[11px] uppercase tracking-[0.2em] font-sans">
