@@ -12,6 +12,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Home", href: "/" },
   { label: "Events", href: "/" },
   { label: "Hiking", href: "/hiking" },
+  { label: "Subscribe", href: "/subscribe" },
   { label: "About", href: "/about" },
 ];
 
@@ -21,6 +22,7 @@ const NAV_ITEMS: NavItem[] = [
 // landing page exists, give it its own route and update this rule.
 function activeLabel(pathname: string): string | null {
   if (pathname.startsWith("/hiking")) return "Hiking";
+  if (pathname.startsWith("/subscribe")) return "Subscribe";
   if (pathname.startsWith("/about")) return "About";
   if (pathname === "/" || pathname.startsWith("/?")) return "Events";
   return null;

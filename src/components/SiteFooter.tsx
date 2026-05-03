@@ -21,6 +21,12 @@ export default function SiteFooter() {
             Hiking
           </Link>
           <Link
+            href="/subscribe"
+            className="underline decoration-dotted underline-offset-2 hover:text-accent"
+          >
+            Subscribe
+          </Link>
+          <Link
             href="/submit"
             className="underline decoration-dotted underline-offset-2 hover:text-accent"
           >
