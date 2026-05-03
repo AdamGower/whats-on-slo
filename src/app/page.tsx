@@ -253,14 +253,20 @@ export default async function Home({
             What&rsquo;s On SLO
           </h1>
           <div className="mt-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs uppercase tracking-widest text-muted border-t border-rule pt-3">
-            <span>San Luis Obispo &middot; The Central Coast</span>
-            <span>{longDate}</span>
+            <span>San Luis Obispo &middot; {longDate}</span>
             <span className="flex items-center gap-3">
               <a
                 href="/about"
                 className="underline decoration-dotted underline-offset-2 hover:text-accent"
               >
                 About
+              </a>
+              <span aria-hidden>&middot;</span>
+              <a
+                href="/"
+                className="underline decoration-dotted underline-offset-2 hover:text-accent"
+              >
+                Events
               </a>
               <span aria-hidden>&middot;</span>
               <a

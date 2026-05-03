@@ -15,6 +15,12 @@ export default function SiteFooter() {
             About
           </Link>
           <Link
+            href="/"
+            className="underline decoration-dotted underline-offset-2 hover:text-accent"
+          >
+            Events
+          </Link>
+          <Link
             href="/hiking"
             className="underline decoration-dotted underline-offset-2 hover:text-accent"
           >
