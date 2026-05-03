@@ -42,7 +42,7 @@ export async function submitComment(formData: FormData) {
   }
 
   const resend = new Resend(apiKey);
-  const fromAddress = "What's On SLO <onboarding@resend.dev>";
+  const fromAddress = "What's On SLO <hello@whatsonslo.com>";
 
   try {
     await resend.emails.send({

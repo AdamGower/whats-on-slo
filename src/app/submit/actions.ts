@@ -78,8 +78,7 @@ async function sendNotifications(submission: SubmissionPayload) {
   }
 
   const resend = new Resend(apiKey);
-  // Use Resend's shared sandbox sender until we verify a custom domain.
-  const fromAddress = "What's On SLO <onboarding@resend.dev>";
+  const fromAddress = "What's On SLO <hello@whatsonslo.com>";
 
   const lines = [
     `Title:        ${submission.title}`,
