@@ -283,6 +283,13 @@ export default async function Home({
               >
                 Contact
               </a>
+              <span aria-hidden>&middot;</span>
+              <a
+                href="/subscribe"
+                className="underline decoration-dotted underline-offset-2 hover:text-accent"
+              >
+                Subscribe
+              </a>
             </span>
           </div>
         </div>

@@ -10,21 +10,20 @@ type NavItem = {
 
 const NAV_ITEMS: NavItem[] = [
   { label: "Home", href: "/" },
-  { label: "Events", href: "/" },
-  { label: "Hiking", href: "/hiking" },
-  { label: "Subscribe", href: "/subscribe" },
   { label: "About", href: "/about" },
+  { label: "Hiking", href: "/hiking" },
+  { label: "Submit your event", href: "/submit" },
+  { label: "Contact", href: "/comments" },
+  { label: "Subscribe", href: "/subscribe" },
 ];
 
-// Returns true for the single nav item that should be visually active for
-// the current path. Home and Events both point at "/" today; we mark Events
-// as the active one (the page IS the events listing). Once a separate
-// landing page exists, give it its own route and update this rule.
 function activeLabel(pathname: string): string | null {
   if (pathname.startsWith("/hiking")) return "Hiking";
   if (pathname.startsWith("/subscribe")) return "Subscribe";
   if (pathname.startsWith("/about")) return "About";
-  if (pathname === "/" || pathname.startsWith("/?")) return "Events";
+  if (pathname.startsWith("/submit")) return "Submit your event";
+  if (pathname.startsWith("/comments")) return "Contact";
+  if (pathname === "/" || pathname.startsWith("/?")) return "Home";
   return null;
 }
 
