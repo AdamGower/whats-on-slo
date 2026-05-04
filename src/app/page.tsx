@@ -268,7 +268,7 @@ export default async function Home({
           </h1>
           <div className="mt-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs uppercase tracking-widest text-muted border-t border-rule pt-3">
             <span>San Luis Obispo &middot; {longDate}</span>
-            <span className="flex items-center gap-3">
+            <span className="hidden md:flex items-center gap-3">
               <a
                 href="/about"
                 className="underline decoration-dotted underline-offset-2 hover:text-accent"
