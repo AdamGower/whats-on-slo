@@ -1,0 +1,94 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Test//rideshare-bikemonth fixture//EN
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:include-1@whats-on-slo-test
+SUMMARY:Sunday Cruiser Ride
+DTSTART:20260510T160000Z
+DTEND:20260510T180000Z
+LOCATION:Mission Plaza\, San Luis Obispo\, CA 93401\, USA
+DESCRIPTION:Casual social ride along the creek path. All abilities welcome.
+URL:https://example.com/sunday-cruiser
+END:VEVENT
+BEGIN:VEVENT
+UID:include-2@whats-on-slo-test
+SUMMARY:Bike Month Kickoff Festival
+DTSTART:20260515T220000Z
+DTEND:20260516T010000Z
+LOCATION:Downtown City Hall\, San Luis Obispo\, CA
+DESCRIPTION:Live music\, food trucks\, bike valet\, and a community ride. More info at https://example.com/kickoff page.
+END:VEVENT
+BEGIN:VEVENT
+UID:include-3@whats-on-slo-test
+SUMMARY:Family Bike Parade
+DTSTART:20260520T230000Z
+DTEND:20260521T010000Z
+LOCATION:Pismo Beach Pier\, Pismo Beach\, CA
+DESCRIPTION:Decorated bikes\, prizes\, and a slow loop along the boardwalk.
+END:VEVENT
+BEGIN:VEVENT
+UID:exclude-towork@whats-on-slo-test
+SUMMARY:Bike to Work Week Breakfast
+DTSTART:20260511T140000Z
+DTEND:20260511T160000Z
+LOCATION:Various employer sites
+DESCRIPTION:Free coffee for commuters who bike to work this week.
+END:VEVENT
+BEGIN:VEVENT
+UID:exclude-toschool@whats-on-slo-test
+SUMMARY:Bike to School Day
+DTSTART:20260513T140000Z
+DTEND:20260513T160000Z
+LOCATION:Various locations
+DESCRIPTION:Annual ride-to-school morning event.
+END:VEVENT
+BEGIN:VEVENT
+UID:exclude-employee@whats-on-slo-test
+SUMMARY:Employee Cycling Breakfast
+DTSTART:20260514T140000Z
+DTEND:20260514T160000Z
+LOCATION:County Government Center
+DESCRIPTION:Coffee and pastries for county employees who biked in.
+END:VEVENT
+BEGIN:VEVENT
+UID:exclude-workshop@whats-on-slo-test
+SUMMARY:Tire Maintenance Workshop
+DTSTART:20260516T180000Z
+DTEND:20260516T200000Z
+LOCATION:SLO Bike Kitchen
+DESCRIPTION:Hands-on session covering flats and basic tire care.
+END:VEVENT
+BEGIN:VEVENT
+UID:exclude-tuneup@whats-on-slo-test
+SUMMARY:Mobile Tune-Up Clinic
+DTSTART:20260517T180000Z
+DTEND:20260517T200000Z
+LOCATION:Mitchell Park
+DESCRIPTION:Bring your bike for a free quick tune-up by volunteer mechanics.
+END:VEVENT
+BEGIN:VEVENT
+UID:exclude-register@whats-on-slo-test
+SUMMARY:Advanced Group Ride
+DTSTART:20260518T150000Z
+DTEND:20260518T180000Z
+LOCATION:Cuesta Grade Trailhead
+DESCRIPTION:Fast-paced ride for experienced cyclists. Registration required\; space limited.
+END:VEVENT
+BEGIN:VEVENT
+UID:exclude-wallace@whats-on-slo-test
+SUMMARY:Open Group Ride
+DTSTART:20260519T150000Z
+DTEND:20260519T170000Z
+LOCATION:Wallace Group Office\, San Luis Obispo\, CA
+DESCRIPTION:Casual group ride departing from the office parking lot.
+END:VEVENT
+BEGIN:VEVENT
+UID:exclude-elementary@whats-on-slo-test
+SUMMARY:Bike Rodeo
+DTSTART:20260521T180000Z
+DTEND:20260521T200000Z
+LOCATION:Sinsheimer Elementary\, San Luis Obispo\, CA
+DESCRIPTION:Skill drills and safety stations for kids.
+END:VEVENT
+END:VCALENDAR

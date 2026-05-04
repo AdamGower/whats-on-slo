@@ -40,11 +40,13 @@ function rowToEvent(row: EventRow): Event {
 // (no source prefix) sit at the top, Ticketmaster wins ties for ticketed
 // shows (it has the real ticket-purchase URL), Madonna Inn iCal is similar
 // quality but loses the tie to TM, goslo.events is last because it gives us
-// only a date, not a time.
+// only a date, not a time. Rideshare Bike Month sits with the library tier:
+// real start times but a generic fallback URL more often than not.
 const SOURCE_PRIORITY: Array<[string, number]> = [
   ["tm-", 1],
   ["vs-", 2],
   ["mi-", 2],
+  ["rs-", 3],
   ["lib-", 3],
   ["gs-", 4],
 ];

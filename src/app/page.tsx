@@ -102,6 +102,20 @@ function fixPunctuationSpacing(text: string) {
   return text.replace(/([.!?)])([A-Z])/g, "$1 $2");
 }
 
+// A scraper may end its description with a final "Source: ..." line that
+// should render below the body in muted italic styling rather than be
+// truncated as part of the body text. This is a lightweight convention —
+// any source can opt in by appending "\n\nSource: ..." to the description.
+function splitSourceAttribution(text: string): {
+  body: string;
+  source: string | null;
+} {
+  if (!text) return { body: "", source: null };
+  const m = text.match(/\n\s*(Source:\s*[^\n]+?)\s*$/);
+  if (!m) return { body: text, source: null };
+  return { body: text.slice(0, m.index!).trimEnd(), source: m[1] };
+}
+
 // Truncate at a word boundary near maxWords. Adds an ellipsis when truncated.
 function truncateWords(text: string, maxWords: number) {
   if (!text) return "";
@@ -455,11 +469,37 @@ export default async function Home({
                           </a>
                         </h4>
                         <p className="text-sm text-muted mt-0.5">
-                          {ev.venue} &middot; {ev.community}
+                          {ev.source === "rideshare.org" ? (
+                            <a
+                              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${ev.venue}, ${ev.community}`)}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="underline decoration-dotted underline-offset-2 hover:text-accent"
+                            >
+                              {ev.venue}
+                            </a>
+                          ) : (
+                            ev.venue
+                          )}{" "}
+                          &middot; {ev.community}
                         </p>
-                        <p className="mt-2 leading-relaxed">
-                          {truncateWords(ev.description, DESCRIPTION_WORD_LIMIT)}
-                        </p>
+                        {(() => {
+                          const { body, source } = splitSourceAttribution(
+                            ev.description
+                          );
+                          return (
+                            <>
+                              <p className="mt-2 leading-relaxed">
+                                {truncateWords(body, DESCRIPTION_WORD_LIMIT)}
+                              </p>
+                              {source && (
+                                <p className="mt-1 text-xs italic text-muted">
+                                  {source}
+                                </p>
+                              )}
+                            </>
+                          );
+                        })()}
                         <p className="mt-2 text-xs">
                           <a
                             href={ev.sourceUrl}
