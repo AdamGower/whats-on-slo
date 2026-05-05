@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { logRun } from "./_log-run.mjs";
 
 const SUPABASE_URL =
   process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -127,6 +128,7 @@ async function main() {
 
   if (rows.length === 0) {
     console.log("No valid events to write.");
+    await logRun(supabase, "Ticketmaster", 0, "no-data");
     return;
   }
 
@@ -141,6 +143,7 @@ async function main() {
     process.exit(1);
   }
 
+  await logRun(supabase, "Ticketmaster", rows.length, "success");
   console.log(`Done. ${rows.length} events upserted.`);
 }
 

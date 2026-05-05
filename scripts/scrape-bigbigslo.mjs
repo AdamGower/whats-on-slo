@@ -14,6 +14,7 @@
 // the GitHub Actions run.
 
 import { createClient } from "@supabase/supabase-js";
+import { logRun } from "./_log-run.mjs";
 
 const PORTAL_URL =
   "https://portalv2.cityspark.com/PortalScripts/BigBigSLO";
@@ -262,6 +263,7 @@ async function main() {
       "Zero-events alarm: 0 SLO County events after filter. " +
         `Got ${events.length} raw events; whitelist may need updating, or portal may have rotated to non-SLO content.`
     );
+    await logRun(supabase, "BigBigSLO", 0, "no-data");
     process.exit(1);
   }
 
@@ -272,6 +274,7 @@ async function main() {
     console.error("Supabase upsert failed:", error);
     process.exit(1);
   }
+  await logRun(supabase, "BigBigSLO", rows.length, "success");
   console.log(`Done. ${rows.length} events upserted.`);
 }
 

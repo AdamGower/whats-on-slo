@@ -8,6 +8,7 @@
 
 import * as cheerio from "cheerio";
 import { createClient } from "@supabase/supabase-js";
+import { logRun } from "./_log-run.mjs";
 
 const SUPABASE_URL =
   process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -160,6 +161,7 @@ async function main() {
   console.log(`Collected ${rows.length} upcoming events.`);
   if (rows.length === 0) {
     console.log("Nothing to upsert.");
+    await logRun(supabase, "Madonna Inn", 0, "no-data");
     return;
   }
 
@@ -171,6 +173,7 @@ async function main() {
     console.error("Upsert failed:", error);
     process.exit(1);
   }
+  await logRun(supabase, "Madonna Inn", rows.length, "success");
   console.log(`Done. ${rows.length} events upserted.`);
 }
 

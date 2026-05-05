@@ -5,6 +5,7 @@
 // the overall volume on the page.
 
 import { createClient } from "@supabase/supabase-js";
+import { logRun } from "./_log-run.mjs";
 
 const SUPABASE_URL =
   process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -192,7 +193,10 @@ async function main() {
   }
 
   console.log(`Mapped ${rows.length} unique events.`);
-  if (rows.length === 0) return;
+  if (rows.length === 0) {
+    await logRun(supabase, "Visit SLO", 0, "no-data");
+    return;
+  }
 
   // Upsert in chunks to avoid request-size limits.
   const CHUNK = 200;
@@ -210,6 +214,7 @@ async function main() {
     console.log(`  Upserted ${upserted}/${rows.length}`);
   }
 
+  await logRun(supabase, "Visit SLO", rows.length, "success");
   console.log(`Done. ${rows.length} events upserted.`);
 }
 
