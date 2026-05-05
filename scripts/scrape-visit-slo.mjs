@@ -6,6 +6,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { logRun } from "./_log-run.mjs";
+import { cleanDescriptionHtml } from "./_clean-html.mjs";
 
 const SUPABASE_URL =
   process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -56,16 +57,6 @@ function decodeHtmlEntities(s) {
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
     .replace(/&nbsp;/g, " ");
-}
-
-function stripHtml(s) {
-  if (!s) return "";
-  return decodeHtmlEntities(
-    s
-      .replace(/<[^>]*>/g, " ")
-      .replace(/\s+/g, " ")
-      .trim()
-  );
 }
 
 const COMMUNITY_OVERRIDE = [
@@ -183,7 +174,7 @@ async function main() {
       venue: venueName,
       community,
       description:
-        stripHtml(e.description) ||
+        cleanDescriptionHtml(e.description) ||
         `Listed on Visit SLO. See source for full details.`,
       source: "Visit SLO",
       source_url: e.url,

@@ -1,16 +1,10 @@
-// Tests for scrape-goslo.mjs.
-// Run with: `node --test scripts/scrape-goslo.test.mjs`
-//
-// scrape-goslo.mjs validates env vars and creates the Supabase client at
-// import time, so we set fake values before dynamic-importing the module.
+// Tests for _clean-html.mjs.
+// Run with: `node --test scripts/_clean-html.test.mjs`
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-process.env.SUPABASE_URL = process.env.SUPABASE_URL || "https://example.invalid";
-process.env.SUPABASE_SECRET_KEY = process.env.SUPABASE_SECRET_KEY || "fake";
-
-const { cleanDescriptionHtml } = await import("./scrape-goslo.mjs");
+import { cleanDescriptionHtml } from "./_clean-html.mjs";
 
 test("cleanDescriptionHtml strips plain HTML tags", () => {
   const html = "<p>Live music at <b>The Siren</b> tonight.</p>";
@@ -81,8 +75,17 @@ test("cleanDescriptionHtml returns empty string for empty/null input", () => {
   assert.equal(cleanDescriptionHtml(undefined), "");
 });
 
-test("cleanDescriptionHtml exact regression case from production", () => {
-  // The actual offending row (gs-star-wars-public-fun-skate-sat-may-02-2026):
+test("cleanDescriptionHtml decodes HTML entities", () => {
+  // Cheerio's .text() decodes entities natively — useful for sources
+  // (library, visit-slo) whose feeds emit HTML-encoded apostrophes/quotes.
+  assert.equal(cleanDescriptionHtml("Bob &amp; Alice"), "Bob & Alice");
+  assert.equal(cleanDescriptionHtml("It&#39;s tonight"), "It's tonight");
+  assert.equal(cleanDescriptionHtml("&ldquo;hi&rdquo;"), "“hi”");
+  assert.equal(cleanDescriptionHtml("Caf&eacute;"), "Café");
+});
+
+test("cleanDescriptionHtml exact regression case from production (goslo)", () => {
+  // The actual offending row (gs-star-wars-public-fun-skate-2026-05-02):
   // descriptions in that family had a long CSS rule appended after the body text.
   const html =
     "In celebration of May the 4th, CCRD will be hosting a fun skate. " +
