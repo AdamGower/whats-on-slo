@@ -25,6 +25,7 @@ import crypto from "node:crypto";
 import ical from "node-ical";
 import { createClient } from "@supabase/supabase-js";
 import { logRun } from "./_log-run.mjs";
+import { cleanDescriptionHtml } from "./_clean-html.mjs";
 
 // ------------------------------------------------------------------ config
 
@@ -78,11 +79,6 @@ export function shouldExclude(title, description, location) {
 }
 
 // ---------------------------------------------------------- text utilities
-
-function stripHtml(s) {
-  if (!s) return "";
-  return s.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
-}
 
 export function truncateDescription(text, maxChars = DESCRIPTION_MAX_CHARS) {
   if (!text) return "";
@@ -202,7 +198,7 @@ export function buildRows(parsed, { now = new Date() } = {}) {
     if (!ev || ev.type !== "VEVENT") continue;
 
     const title = (ev.summary || "").trim();
-    const description = stripHtml(ev.description || "");
+    const description = cleanDescriptionHtml(ev.description || "");
     const location = (ev.location || "").trim();
 
     const dropReason = shouldExclude(title, description, location);

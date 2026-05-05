@@ -6,6 +6,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { logRun } from "./_log-run.mjs";
+import { cleanDescriptionHtml } from "./_clean-html.mjs";
 
 const SUPABASE_URL =
   process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -35,20 +36,6 @@ function laWallTimeToUtcIso(dateStr) {
   const la = new Date(laString.replace(" ", "T") + "Z");
   const offsetMs = utc.getTime() - la.getTime();
   return new Date(utc.getTime() + offsetMs).toISOString();
-}
-
-function stripHtml(s) {
-  if (!s) return "";
-  return s
-    .replace(/<[^>]*>/g, " ") // replace tags with a space so "</p><p>" doesn't smash sentences together
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&#0?39;/g, "'")
-    .replace(/&quot;/g, '"')
-    .replace(/\s+/g, " ") // collapse the multiple spaces this can introduce
-    .trim();
 }
 
 function firstValue(obj) {
@@ -142,7 +129,7 @@ async function main() {
       venue: branchName,
       community: communityFromBranch(branchName),
       description:
-        stripHtml(e.description) ||
+        cleanDescriptionHtml(e.description) ||
         `Library program at ${branchName}. Free, open to the public.`,
       source: "SLO County Library",
       source_url: e.url,
