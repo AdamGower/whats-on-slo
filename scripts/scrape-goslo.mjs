@@ -80,6 +80,23 @@ function communityFromVenue(venue) {
   return "San Luis Obispo";
 }
 
+// Many SLO venues sit on Squarespace, which inlines block CSS like
+// `#block-yui_3_17_2_1_... { --sqs-block-content-flex: 0; }` into event-detail
+// HTML via <style> tags. Cheerio's `.text()` would extract those CSS rules
+// as text content. We strip <style>/<script> first, then scrub residual
+// CSS-rule shapes and CSS-variable declarations defensively. Exported for tests.
+export function cleanDescriptionHtml(html) {
+  if (!html) return "";
+  const $ = cheerio.load(`<div id="root">${html}</div>`);
+  $("#root style, #root script").remove();
+  let text = $("#root").first().text();
+  // Strip residual `#selector { ... }` blocks that may have arrived as text.
+  text = text.replace(/#[a-zA-Z0-9_-]+\s*\{[^}]*\}/g, " ");
+  // Strip stray CSS custom-property declarations (--foo: bar;).
+  text = text.replace(/--[a-zA-Z][a-zA-Z0-9-]*\s*:[^;}\n]*[;}]?/g, " ");
+  return text.replace(/\s+/g, " ").trim();
+}
+
 async function main() {
   console.log("Fetching https://goslo.events/all ...");
   const res = await fetch("https://goslo.events/all", {
@@ -124,8 +141,9 @@ async function main() {
         }
       }
 
+      const detailsHtml = $ev.find(".event-details").first().html() || "";
       const description =
-        $ev.find(".event-details").first().text().trim() ||
+        cleanDescriptionHtml(detailsHtml) ||
         `Live event at ${venue}. Time TBA — see venue page for details.`;
 
       rows.push({
@@ -173,7 +191,14 @@ async function main() {
   console.log(`Done. ${unique.length} events upserted.`);
 }
 
-main().catch((err) => {
-  console.error("Scraper failed:", err);
-  process.exit(1);
-});
+// Only run main when invoked directly. The test imports this module for its
+// pure exports (cleanDescriptionHtml) and must not trigger a real scrape.
+const invokedDirectly =
+  import.meta.url === `file://${process.argv[1]?.replace(/\\/g, "/")}` ||
+  process.argv[1]?.endsWith("scrape-goslo.mjs");
+if (invokedDirectly) {
+  main().catch((err) => {
+    console.error("Scraper failed:", err);
+    process.exit(1);
+  });
+}
