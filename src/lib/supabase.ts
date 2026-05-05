@@ -41,14 +41,18 @@ function rowToEvent(row: EventRow): Event {
 // shows (it has the real ticket-purchase URL), Madonna Inn iCal is similar
 // quality but loses the tie to TM, goslo.events is last because it gives us
 // only a date, not a time. Rideshare Bike Month sits with the library tier:
-// real start times but a generic fallback URL more often than not.
+// real start times but a generic fallback URL more often than not. BigBigSLO
+// is an aggregator-of-aggregators (CitySpark): real start times but URLs
+// often resolve to slochamber.org / bandsintown rather than the venue,
+// so it beats goslo on time-of-day but loses to the venue-direct tier.
 const SOURCE_PRIORITY: Array<[string, number]> = [
   ["tm-", 1],
   ["vs-", 2],
   ["mi-", 2],
   ["rs-", 3],
   ["lib-", 3],
-  ["gs-", 4],
+  ["bbs-", 4],
+  ["gs-", 5],
 ];
 function sourceScore(id: string): number {
   for (const [prefix, score] of SOURCE_PRIORITY) {
