@@ -24,6 +24,7 @@
 import crypto from "node:crypto";
 import ical from "node-ical";
 import { createClient } from "@supabase/supabase-js";
+import { logRun } from "./_log-run.mjs";
 
 // ------------------------------------------------------------------ config
 
@@ -308,6 +309,7 @@ async function main() {
 
   if (res.status === 304) {
     console.log("Not modified since last run. Exiting cleanly.");
+    await logRun(supabase, SOURCE_LABEL, 0, "not-modified");
     return;
   }
   if (res.status !== 200) {
@@ -345,6 +347,9 @@ async function main() {
       }
     }
     console.log(`Upserted ${rows.length} events.`);
+    await logRun(supabase, SOURCE_LABEL, rows.length, "success");
+  } else {
+    await logRun(supabase, SOURCE_LABEL, 0, "no-data");
   }
 
   // Persist new validators only after a successful processing run, so a

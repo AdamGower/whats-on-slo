@@ -5,6 +5,7 @@
 
 import * as cheerio from "cheerio";
 import { createClient } from "@supabase/supabase-js";
+import { logRun } from "./_log-run.mjs";
 
 const SUPABASE_URL =
   process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -154,6 +155,7 @@ async function main() {
 
   if (unique.length === 0) {
     console.log("No events to write.");
+    await logRun(supabase, "goslo.events", 0, "no-data");
     return;
   }
 
@@ -167,6 +169,7 @@ async function main() {
     process.exit(1);
   }
 
+  await logRun(supabase, "goslo.events", unique.length, "success");
   console.log(`Done. ${unique.length} events upserted.`);
 }
 

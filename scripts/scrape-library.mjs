@@ -5,6 +5,7 @@
 // systematically missed by tourism-oriented sources.
 
 import { createClient } from "@supabase/supabase-js";
+import { logRun } from "./_log-run.mjs";
 
 const SUPABASE_URL =
   process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -151,7 +152,10 @@ async function main() {
   }
 
   console.log(`Filtered to ${rows.length} upcoming events.`);
-  if (rows.length === 0) return;
+  if (rows.length === 0) {
+    await logRun(supabase, "SLO County Library", 0, "no-data");
+    return;
+  }
 
   console.log("Upserting into Supabase...");
   const { error } = await supabase
@@ -161,6 +165,7 @@ async function main() {
     console.error("Upsert failed:", error);
     process.exit(1);
   }
+  await logRun(supabase, "SLO County Library", rows.length, "success");
   console.log(`Done. ${rows.length} events upserted.`);
 }
 
