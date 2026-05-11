@@ -16,6 +16,7 @@ import {
   isSloCounty,
   buildRows,
   categoryFromText,
+  dedupeBatch,
 } from "./scrape-bigbigslo.mjs";
 
 // Build a synthetic CitySpark-style bundle. The surrounding noise contains
@@ -206,6 +207,53 @@ test("categoryFromText routes common cases", () => {
   assert.equal(categoryFromText("Page to Stage: The Rainbow Fish"), "Family");
   assert.equal(categoryFromText("Central Coast Cooking Show"), "Food & Drink");
   assert.equal(categoryFromText("Trivia Night"), "Community");
+});
+
+test("dedupeBatch collapses rows that share a dedupe_key", () => {
+  // Two different PIds resolve to the same (Pacific day, title slug, venue
+  // first word) — the case that fires the DB unique-constraint and breaks
+  // the whole upsert batch.
+  const synthetic = [
+    {
+      PId: 2001,
+      Name: "Live Music Friday",
+      Venue: "SLO Brew Rock",
+      CityState: "San Luis Obispo, CA",
+      DateStart: "2026-06-12T19:30:00Z",
+    },
+    {
+      PId: 2002,
+      Name: "Live Music Friday!",
+      Venue: "SLO Brew",
+      CityState: "San Luis Obispo, CA",
+      DateStart: "2026-06-12T20:00:00Z",
+    },
+    {
+      PId: 2003,
+      Name: "Unrelated Show",
+      Venue: "Fremont Theater",
+      CityState: "San Luis Obispo, CA",
+      DateStart: "2026-06-12T20:00:00Z",
+    },
+  ];
+  const { rows } = buildRows(synthetic);
+  assert.equal(rows.length, 3);
+  const { unique, duplicates } = dedupeBatch(rows);
+  assert.equal(unique.length, 2);
+  assert.equal(duplicates.length, 1);
+  assert.match(duplicates[0].id, /^bbs-2002-/);
+  assert.match(duplicates[0].keptId, /^bbs-2001-/);
+  // The earlier row survives; the unrelated row passes through.
+  const survivorIds = unique.map((r) => r.id).sort();
+  assert.match(survivorIds[0], /^bbs-2001-/);
+  assert.match(survivorIds[1], /^bbs-2003-/);
+});
+
+test("dedupeBatch is a no-op when every row has a distinct key", () => {
+  const { rows } = buildRows(SAMPLE_EVENTS);
+  const { unique, duplicates } = dedupeBatch(rows);
+  assert.equal(unique.length, rows.length);
+  assert.equal(duplicates.length, 0);
 });
 
 test("end-to-end: bundle string → SLO-County rows", () => {

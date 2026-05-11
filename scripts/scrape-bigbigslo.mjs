@@ -142,6 +142,43 @@ export function categoryFromText(name) {
   return "Music";
 }
 
+// Match the DB-side `events.dedupe_key` formula: Pacific calendar day +
+// title slug + first word of venue. BigBigSLO occasionally publishes the
+// same show under two PIds (different listing IDs, same event), which gives
+// us two rows that round-trip to identical dedupe_keys and breaks the
+// whole upsert batch on the DB's unique constraint. Dedup before the
+// upsert so a single duplicated listing doesn't sink the entire run.
+export function dedupKey(row) {
+  const titleSlug = row.title.toLowerCase().replace(/[^a-z0-9]+/g, "");
+  const venueFirstWord = row.venue
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim()
+    .split(" ")[0];
+  const pacificDay = new Date(row.starts_at).toLocaleDateString("en-CA", {
+    timeZone: "America/Los_Angeles",
+  });
+  return `${pacificDay}|${titleSlug}|${venueFirstWord}`;
+}
+
+// Pure: drop later rows that collide with an earlier row on dedupKey().
+// Returns { unique, duplicates } so callers can log what was collapsed.
+export function dedupeBatch(rows) {
+  const seen = new Map();
+  const duplicates = [];
+  for (const row of rows) {
+    const k = dedupKey(row);
+    if (seen.has(k)) {
+      duplicates.push({ id: row.id, key: k, keptId: seen.get(k) });
+      continue;
+    }
+    seen.set(k, row.id);
+  }
+  const keptIds = new Set(seen.values());
+  const unique = rows.filter((r) => keptIds.has(r.id));
+  return { unique, duplicates };
+}
+
 // Pure: turn the parsed Events array into upsert rows. Returns
 // { rows, drops } so the caller can log / alarm on the drop reasons.
 export function buildRows(events) {
@@ -267,15 +304,22 @@ async function main() {
     process.exit(1);
   }
 
+  const { unique, duplicates } = dedupeBatch(rows);
+  if (duplicates.length > 0) {
+    console.log(
+      `Collapsed ${duplicates.length} in-batch dedupe_key duplicate(s): ${JSON.stringify(duplicates)}`
+    );
+  }
+
   const { error } = await supabase
     .from("events")
-    .upsert(rows, { onConflict: "id" });
+    .upsert(unique, { onConflict: "id" });
   if (error) {
     console.error("Supabase upsert failed:", error);
     process.exit(1);
   }
-  await logRun(supabase, "BigBigSLO", rows.length, "success");
-  console.log(`Done. ${rows.length} events upserted.`);
+  await logRun(supabase, "BigBigSLO", unique.length, "success");
+  console.log(`Done. ${unique.length} events upserted.`);
 }
 
 // Allow `node scripts/scrape-bigbigslo.mjs` execution but skip when imported
