@@ -256,6 +256,46 @@ test("dedupeBatch is a no-op when every row has a distinct key", () => {
   assert.equal(duplicates.length, 0);
 });
 
+test("dedupeBatch collapses recurring events with same id but different dates", () => {
+  // Regression: the CitySpark portal expands a recurring event into multiple
+  // entries that share PId and Name but differ on DateStart. These produce
+  // identical `id` values (the upsert conflict target) but DIFFERENT fuzzy
+  // dedupe keys (different Pacific days). The fuzzy-only dedupe missed
+  // them and the whole batch failed with Postgres 21000.
+  const synthetic = [
+    {
+      PId: 3001,
+      Name: "Weekly Trivia Night",
+      Venue: "SLO Brew",
+      CityState: "San Luis Obispo, CA",
+      DateStart: "2026-06-12T19:00:00Z",
+    },
+    {
+      PId: 3001,
+      Name: "Weekly Trivia Night",
+      Venue: "SLO Brew",
+      CityState: "San Luis Obispo, CA",
+      DateStart: "2026-06-19T19:00:00Z",
+    },
+    {
+      PId: 3001,
+      Name: "Weekly Trivia Night",
+      Venue: "SLO Brew",
+      CityState: "San Luis Obispo, CA",
+      DateStart: "2026-06-26T19:00:00Z",
+    },
+  ];
+  const { rows } = buildRows(synthetic);
+  assert.equal(rows.length, 3);
+  // All three share the same id, so the fuzzy second pass never sees rows 2/3.
+  assert.equal(rows[0].id, rows[1].id);
+  assert.equal(rows[0].id, rows[2].id);
+  const { unique, duplicates } = dedupeBatch(rows);
+  assert.equal(unique.length, 1);
+  assert.equal(duplicates.length, 2);
+  assert.match(unique[0].id, /^bbs-3001-/);
+});
+
 test("end-to-end: bundle string → SLO-County rows", () => {
   const bundle = makeBundle(SAMPLE_EVENTS);
   const events = extractEventsArray(bundle);
