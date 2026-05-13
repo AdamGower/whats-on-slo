@@ -142,12 +142,10 @@ export function categoryFromText(name) {
   return "Music";
 }
 
-// Match the DB-side `events.dedupe_key` formula: Pacific calendar day +
-// title slug + first word of venue. BigBigSLO occasionally publishes the
-// same show under two PIds (different listing IDs, same event), which gives
-// us two rows that round-trip to identical dedupe_keys and breaks the
-// whole upsert batch on the DB's unique constraint. Dedup before the
-// upsert so a single duplicated listing doesn't sink the entire run.
+// Fuzzy key used as a second-pass collapse below: Pacific calendar day +
+// title slug + first word of venue. Mirrors the read-time dedupe in
+// src/lib/supabase.ts so two near-identical listings (e.g. same show
+// published under two PIds) don't both make it to the DB.
 export function dedupKey(row) {
   const titleSlug = row.title.toLowerCase().replace(/[^a-z0-9]+/g, "");
   const venueFirstWord = row.venue
@@ -161,21 +159,36 @@ export function dedupKey(row) {
   return `${pacificDay}|${titleSlug}|${venueFirstWord}`;
 }
 
-// Pure: drop later rows that collide with an earlier row on dedupKey().
+// Pure: collapse duplicates in two passes so a single batch can't trip the
+// DB's ON CONFLICT machinery. First pass dedupes by `id` — that's the
+// upsert's conflict target, and it's the one that produces Postgres error
+// 21000 (`ON CONFLICT DO UPDATE command cannot affect row a second time`)
+// when the portal expands a recurring event into multiple occurrences with
+// the same PId + Name but different DateStart. Second pass dedupes by the
+// fuzzy dedupKey so two listings with different PIds for the same show
+// still collapse to one row.
 // Returns { unique, duplicates } so callers can log what was collapsed.
 export function dedupeBatch(rows) {
-  const seen = new Map();
+  const byId = new Map();
   const duplicates = [];
   for (const row of rows) {
-    const k = dedupKey(row);
-    if (seen.has(k)) {
-      duplicates.push({ id: row.id, key: k, keptId: seen.get(k) });
+    if (byId.has(row.id)) {
+      duplicates.push({ id: row.id, key: row.id, keptId: row.id });
       continue;
     }
-    seen.set(k, row.id);
+    byId.set(row.id, row);
   }
-  const keptIds = new Set(seen.values());
-  const unique = rows.filter((r) => keptIds.has(r.id));
+  const seenFuzzy = new Map();
+  const unique = [];
+  for (const row of byId.values()) {
+    const k = dedupKey(row);
+    if (seenFuzzy.has(k)) {
+      duplicates.push({ id: row.id, key: k, keptId: seenFuzzy.get(k) });
+      continue;
+    }
+    seenFuzzy.set(k, row.id);
+    unique.push(row);
+  }
   return { unique, duplicates };
 }
 
@@ -307,7 +320,7 @@ async function main() {
   const { unique, duplicates } = dedupeBatch(rows);
   if (duplicates.length > 0) {
     console.log(
-      `Collapsed ${duplicates.length} in-batch dedupe_key duplicate(s): ${JSON.stringify(duplicates)}`
+      `Collapsed ${duplicates.length} in-batch duplicate(s): ${JSON.stringify(duplicates)}`
     );
   }
 
