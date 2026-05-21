@@ -114,6 +114,24 @@ export function isSloCounty(cityState) {
   return SLO_COUNTY_CITIES.has(norm);
 }
 
+// CitySpark stamps Pacific wall-clock times with a bogus "Z" (UTC) suffix:
+// a 6:15 PM show is published as "2026-05-21T18:15:00Z". Taken at face value
+// that renders as 11:15 AM Pacific (7h early). Reinterpret the wall-clock
+// fields as America/Los_Angeles and return a correct UTC ISO string.
+// Intl-based offset detection keeps this right across the DST boundary.
+export function bbsWallTimeToUtcIso(raw) {
+  if (!raw || typeof raw !== "string") return raw ?? null;
+  const wall = raw.trim().replace(/(Z|[+-]\d{2}:?\d{2})$/, "");
+  const utc = new Date(wall + "Z");
+  if (isNaN(utc.getTime())) return raw;
+  const laString = utc.toLocaleString("sv-SE", {
+    timeZone: "America/Los_Angeles",
+  });
+  const la = new Date(laString.replace(" ", "T") + "Z");
+  const offsetMs = utc.getTime() - la.getTime();
+  return new Date(utc.getTime() + offsetMs).toISOString();
+}
+
 function slugify(s) {
   return s
     .toLowerCase()
@@ -249,8 +267,8 @@ export function buildRows(events) {
     rows.push({
       id: `bbs-${e.PId}-${slugify(e.Name)}`,
       title: e.Name.trim(),
-      starts_at: e.DateStart,
-      ends_at: e.DateEnd || null,
+      starts_at: bbsWallTimeToUtcIso(e.DateStart),
+      ends_at: e.DateEnd ? bbsWallTimeToUtcIso(e.DateEnd) : null,
       venue,
       community,
       description,

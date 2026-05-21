@@ -17,6 +17,7 @@ import {
   buildRows,
   categoryFromText,
   dedupeBatch,
+  bbsWallTimeToUtcIso,
 } from "./scrape-bigbigslo.mjs";
 
 // Build a synthetic CitySpark-style bundle. The surrounding noise contains
@@ -82,6 +83,31 @@ const SAMPLE_EVENTS = [
     DateStart: "2026-06-05T16:00:00Z",
   },
 ];
+
+test("bbsWallTimeToUtcIso reinterprets the bogus-Z wall time as Pacific", () => {
+  // Real case: "JUST SOME COOL JAZZ" doors at 6:15 PM published as 18:15Z.
+  // During PDT (May, UTC-7) the true UTC instant is the next day at 01:15Z.
+  assert.equal(bbsWallTimeToUtcIso("2026-05-21T18:15:00Z"), "2026-05-22T01:15:00.000Z");
+  // Winter / PST (UTC-8): a 7:00 PM show published as 19:00Z → 03:00Z next day.
+  assert.equal(bbsWallTimeToUtcIso("2026-01-10T19:00:00Z"), "2026-01-11T03:00:00.000Z");
+  // Null/garbage pass through without throwing.
+  assert.equal(bbsWallTimeToUtcIso(null), null);
+});
+
+test("buildRows shifts BigBigSLO times from fake-UTC wall time to real UTC", () => {
+  const { rows } = buildRows([
+    {
+      PId: 7001,
+      Name: "Evening Jazz",
+      Venue: "Region Winery Event Center",
+      CityState: "San Luis Obispo, CA",
+      DateStart: "2026-05-21T18:15:00Z",
+      DateEnd: "2026-05-21T21:00:00Z",
+    },
+  ]);
+  assert.equal(rows[0].starts_at, "2026-05-22T01:15:00.000Z");
+  assert.equal(rows[0].ends_at, "2026-05-22T04:00:00.000Z");
+});
 
 test("extractEventsArray finds and parses the Events array", () => {
   const bundle = makeBundle(SAMPLE_EVENTS);
