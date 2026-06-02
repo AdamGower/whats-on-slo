@@ -105,6 +105,20 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
 
+  runsignup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+      - run: npm ci
+      - run: node scripts/scrape-runsignup.mjs
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+
   monitor:
     needs:
       - ticketmaster
@@ -114,6 +128,7 @@ jobs:
       - visit-slo
       - rideshare-bikemonth
       - bigbigslo
+      - runsignup
     if: always()
     runs-on: ubuntu-latest
     steps:

@@ -628,6 +628,21 @@ The fragmentation is sufficient to justify a dedicated aggregator. The City of S
 - **User submissions:** No
 - **Usefulness:** High supplementary; evaluate as paid data partner
 
+## Source 044 — RunSignup Race Search API
+- **URL:** https://runsignup.com/Rest/races (endpoint); https://runsignup.com (site)
+- **Type:** Race registration platform — public REST API
+- **Geography:** All in-scope communities; US zipcode + radius search (93401, 25 mi)
+- **Events:** Running races, triathlons, bike races, walks — e.g. City to the Sea Half, Morro Bay Triathlon, Rock to Pier Run, Ryan's Ranch Run
+- **Current:** Yes — full 2026 calendar
+- **Long-tail:** Yes — local races appear on no other aggregator we ingest
+- **Breadth:** Narrow (races only) but the primary feeder for the Outdoors category
+- **Noise:** Low — ~5 races in radius; well-structured
+- **Metadata:** Strong — JSON with per-event start/end times, IANA timezone, full address, logo
+- **Automation:** Public REST API; no API key required for race search; `events=T` embeds event times so one request suffices
+- **User submissions:** No (organizers list their own races on the platform)
+- **Usefulness:** High for the Outdoors category
+- **Extraction note:** `GET /Rest/races?format=json&zipcode=93401&radius=25&events=T&start_date=&end_date=`. One row per race (earliest event start → latest end). Implemented in `scripts/scrape-runsignup.mjs` with `rsu-` id prefix.
+
 ---
 
 ## MVP Recommendation List (Initial 13 Sources)
