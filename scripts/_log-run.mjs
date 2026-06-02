@@ -4,9 +4,10 @@
 // reads this table and alerts on `status = 'no-data'`.
 //
 // Status values:
-//   'success'      — ingested >0 events
-//   'no-data'      — source returned, but zero events matched our filters
-//   'not-modified' — source returned HTTP 304 (no work needed)
+//   'success'        — ingested >0 events
+//   'no-data'        — source returned, but zero events matched our filters
+//   'not-modified'   — source returned HTTP 304 (no work needed)
+//   'out-of-season'  — seasonal source skipped: outside its active months
 
 export async function logRun(supabase, source, eventCount, status = "success") {
   const { error } = await supabase.from("scraper_logs").insert({

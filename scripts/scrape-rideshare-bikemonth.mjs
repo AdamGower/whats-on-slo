@@ -32,6 +32,12 @@ import { cleanDescriptionHtml } from "./_clean-html.mjs";
 const ICS_URL =
   "https://calendar.google.com/calendar/ical/9858449d917164fda5ddba0842449f283c1f25084a75c3a1c4d25a6906f7eee4%40group.calendar.google.com/public/basic.ics";
 const STATE_KEY = "rideshare-bikemonth";
+// SLOCOG only populates this calendar for the annual "Bike Month" in May;
+// the other eleven months it holds nothing but past events, which would
+// otherwise surface as a no-data alert every cycle. Treat it as seasonal:
+// outside these months the scraper skips entirely and logs `out-of-season`.
+// Months are 1-indexed (5 = May), evaluated in Pacific time.
+const ACTIVE_MONTHS = [5];
 const UA = "whats-on-slo/1.0 (+https://whatsonslo.com)";
 const LOOKAHEAD_DAYS = 90;
 const FALLBACK_LEARN_MORE = "https://rideshare.org/bike-month-calendar/";
@@ -148,6 +154,19 @@ export function pickLearnMore(ev) {
 
 function dateToPacificDayKey(date) {
   return date.toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" });
+}
+
+// True when `now` falls in one of the source's active months. Evaluated in
+// Pacific time because a late-April or early-June UTC instant can land in a
+// different calendar month locally.
+export function isInSeason(now = new Date()) {
+  const month = Number(
+    now.toLocaleDateString("en-US", {
+      timeZone: "America/Los_Angeles",
+      month: "numeric",
+    })
+  );
+  return ACTIVE_MONTHS.includes(month);
 }
 
 function uidHash(uid) {
@@ -292,6 +311,14 @@ async function main() {
     process.exit(1);
   }
   const supabase = createClient(SUPABASE_URL, SUPABASE_SECRET_KEY);
+
+  if (!isInSeason()) {
+    console.log(
+      "rideshare.org is a seasonal (May-only) source and is currently out of season. Skipping fetch."
+    );
+    await logRun(supabase, SOURCE_LABEL, 0, "out-of-season");
+    return;
+  }
 
   console.log("Loading scraper state...");
   const state = await loadState(supabase);
