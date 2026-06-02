@@ -643,6 +643,21 @@ The fragmentation is sufficient to justify a dedicated aggregator. The City of S
 - **Usefulness:** High for the Outdoors category
 - **Extraction note:** `GET /Rest/races?format=json&zipcode=93401&radius=25&events=T&start_date=&end_date=`. One row per race (earliest event start → latest end). Implemented in `scripts/scrape-runsignup.mjs` with `rsu-` id prefix.
 
+## Source 045 — Sea Pines Golf Resort Calendar
+- **URL:** https://www.seapinesgolfresort.com/calendar/rss (feed); https://www.seapinesgolfresort.com/calendar (site)
+- **Type:** Venue calendar — RSS 2.0 feed
+- **Geography:** Los Osos (single venue; community fixed to Los Osos)
+- **Events:** Live music — Concerts on the Green, Indoor Concert Series, Sunday Music on the Patio
+- **Current:** Yes — rolling next ~6 weeks
+- **Long-tail:** Yes — Los Osos concert series not aggregated elsewhere we ingest
+- **Breadth:** Narrow (one venue, mostly music)
+- **Noise:** Low — short, curated feed
+- **Metadata:** Weak — no per-item date fields or clock times; date lives in description prose, image via `<enclosure>`
+- **Automation:** Public RSS feed, no key required; conditional GET via ETag/Last-Modified
+- **User submissions:** No
+- **Usefulness:** High for Los Osos / Music coverage
+- **Extraction note:** RSS parsed with cheerio (xmlMode). Dates read from "Starting on MM/DD/YYYY [and ending on MM/DD/YYYY]" in the description; no clock time, so events anchor at 2pm Pacific. One row per item, `sp-{slug}-{YYYY-MM-DD}` id. Category defaults to Music. Implemented in `scripts/scrape-seapines.mjs`.
+
 ---
 
 ## MVP Recommendation List (Initial 13 Sources)

@@ -119,6 +119,20 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
 
+  seapines:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+      - run: npm ci
+      - run: node scripts/scrape-seapines.mjs
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+
   monitor:
     needs:
       - ticketmaster
@@ -129,6 +143,7 @@ jobs:
       - rideshare-bikemonth
       - bigbigslo
       - runsignup
+      - seapines
     if: always()
     runs-on: ubuntu-latest
     steps:
