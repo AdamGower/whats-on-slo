@@ -14,6 +14,7 @@ import {
   parseLocation,
   pickLearnMore,
   truncateDescription,
+  isInSeason,
 } from "./scrape-rideshare-bikemonth.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -141,6 +142,18 @@ test("pickLearnMore prefers VEVENT URL, then description URL, then fallback", ()
     url: "https://rideshare.org/bike-month-calendar/",
     level: "fallback",
   });
+});
+
+test("isInSeason is true only during May (Pacific time)", () => {
+  // Mid-May, unambiguous in any timezone.
+  assert.equal(isInSeason(new Date("2026-05-15T12:00:00Z")), true);
+  // April and June are off-season.
+  assert.equal(isInSeason(new Date("2026-04-15T12:00:00Z")), false);
+  assert.equal(isInSeason(new Date("2026-06-15T12:00:00Z")), false);
+  // June 1 at 00:30 UTC is still May 31 in Pacific (UTC-7) → in season.
+  assert.equal(isInSeason(new Date("2026-06-01T00:30:00Z")), true);
+  // June 1 mid-morning Pacific is out of season.
+  assert.equal(isInSeason(new Date("2026-06-01T17:00:00Z")), false);
 });
 
 test("truncateDescription respects the cap and prefers sentence breaks", () => {

@@ -55,10 +55,12 @@ const latest = Array.from(latestBySource.values());
 const zeroEvents = latest.filter((r) => r.status === "no-data");
 const successes = latest.filter((r) => r.status === "success");
 const notModified = latest.filter((r) => r.status === "not-modified");
+const outOfSeason = latest.filter((r) => r.status === "out-of-season");
 
 console.log(
   `Sources reporting in last ${WINDOW_MINUTES}m: ${latest.length} ` +
-    `(success=${successes.length}, no-data=${zeroEvents.length}, not-modified=${notModified.length}).`
+    `(success=${successes.length}, no-data=${zeroEvents.length}, ` +
+    `not-modified=${notModified.length}, out-of-season=${outOfSeason.length}).`
 );
 
 if (zeroEvents.length === 0) {
@@ -84,6 +86,11 @@ if (successes.length) {
 if (notModified.length) {
   lines.push("Not-modified (HTTP 304) sources, no work to do:");
   for (const r of notModified) lines.push(`  • ${r.source}`);
+  lines.push("");
+}
+if (outOfSeason.length) {
+  lines.push("Out-of-season (seasonal) sources, skipped:");
+  for (const r of outOfSeason) lines.push(`  • ${r.source}`);
   lines.push("");
 }
 lines.push(
