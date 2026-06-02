@@ -45,10 +45,13 @@ function rowToEvent(row: EventRow): Event {
 // is an aggregator-of-aggregators (CitySpark): real start times but URLs
 // often resolve to slochamber.org / bandsintown rather than the venue,
 // so it beats goslo on time-of-day but loses to the venue-direct tier.
+// RunSignup (rsu-) races carry the official organizer URL and real start
+// times, so they sit in the venue-direct tier alongside Visit SLO.
 const SOURCE_PRIORITY: Array<[string, number]> = [
   ["tm-", 1],
   ["vs-", 2],
   ["mi-", 2],
+  ["rsu-", 2],
   ["rs-", 3],
   ["lib-", 3],
   ["bbs-", 4],
