@@ -125,6 +125,15 @@ test("cleanTitle strips a leading edition year", () => {
   assert.equal(cleanTitle("Rock to Pier Run"), "Rock to Pier Run");
 });
 
+test("cleanTitle drops a pipe-delimited tagline", () => {
+  assert.equal(
+    cleanTitle("The Sober Endurance 2-4-6 | A public movement"),
+    "The Sober Endurance 2-4-6"
+  );
+  // Year prefix and pipe tagline together.
+  assert.equal(cleanTitle("2026 Foo Run | raising funds"), "Foo Run");
+});
+
 test("description HTML is stripped and the venue comes from the address", () => {
   const { rows } = buildRows(fixture(), { now: FIXED_NOW });
   const city = rows.find((r) => r.id === "rsu-206950");

@@ -61,7 +61,12 @@ export function cleanTitle(name) {
   // Year must be 19xx/20xx at a word boundary so we never bite into a
   // longer leading number (e.g. "10000 Steps"). Consume any trailing
   // separators/whitespace ("2026 - " and "2026 " both collapse away).
-  return (name || "").replace(/^\s*(?:19|20)\d{2}\b[\s:–—-]*/, "").trim();
+  let title = (name || "").replace(/^\s*(?:19|20)\d{2}\b[\s:–—-]*/, "").trim();
+  // RunSignup names sometimes carry a "Race Name | tagline" suffix. Keep
+  // only the part before the first pipe so the card title stays tight.
+  const pipe = title.indexOf("|");
+  if (pipe !== -1) title = title.slice(0, pipe).trim();
+  return title;
 }
 
 // ---------------------------------------------------------- date handling
