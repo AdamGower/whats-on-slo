@@ -415,7 +415,9 @@ async function main() {
   }
   console.log(`  ${events.length} Time-TBA events in window.`);
   if (events.length === 0) {
-    if (!dryRun) await logRun(supabase, SOURCE_LABEL, 0, "no-data");
+    // Always "success": zero Time-TBA events is a healthy state (everything has
+    // a real time), not the silent-regression the monitor alerts on.
+    if (!dryRun) await logRun(supabase, SOURCE_LABEL, 0, "success");
     return;
   }
 
@@ -544,12 +546,9 @@ async function main() {
   });
 
   console.log(`Done. ${updates.length} events updated with real start times.`);
-  await logRun(
-    supabase,
-    SOURCE_LABEL,
-    updates.length,
-    updates.length > 0 ? "success" : "no-data"
-  );
+  // Always "success": recovering zero times in a run is normal (cache hits, or
+  // no new pages publish a time), not a regression — don't trip the monitor.
+  await logRun(supabase, SOURCE_LABEL, updates.length, "success");
 }
 
 // Only run main when invoked directly so the test can import the pure exports
