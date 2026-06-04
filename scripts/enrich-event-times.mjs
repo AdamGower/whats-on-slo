@@ -228,7 +228,11 @@ const LABELLED_RE = new RegExp(
 // don't latch onto bare numbers like prices or addresses).
 const STRICT_AMPM_RE = /\b(\d{1,2})(?::(\d{2}))?\s*(a\.?m\.?|p\.?m\.?)\b/i;
 
+const PM_RE = /\b(\d{1,2})(?::(\d{2}))?\s*(p\.?m\.?)\b/i;
+
 function buildTime(hourStr, minStr, ampm) {
+  // A meridiem on an hour > 12 ("20:00 Am") is garbled page text, not a time.
+  if (ampm && Number(hourStr) > 12) return null;
   const hh = to24Hour(hourStr, ampm);
   const mm = minStr ? Number(minStr) : 0;
   if (hh < 0 || hh > 23 || mm < 0 || mm > 59) return null;
@@ -236,36 +240,40 @@ function buildTime(hourStr, minStr, ampm) {
 }
 
 // Find a start time in free text. Returns { method, hh, mm } (Pacific
-// wall-clock) or null. Prefers a show/start-labelled time, then a doors time,
-// then any unambiguous am/pm time.
+// wall-clock) or null. Priority is tuned for this evening-heavy events dataset
+// and to avoid the failure modes seen in the wild:
+//   1. A show/start-labelled time — the most authoritative ("Show 8:00 PM").
+//   2. The first explicit PM time — on a concert/show page the first p.m. time
+//      is almost always the start; this beats a doors time so a labelled
+//      "Doors 6:30 AM" box-office artifact can't outrank the real "8:00 PM".
+//   3. A doors-labelled time — fallback when there's no plain PM time.
+//   4. Any explicit am/pm time — last resort.
 export function extractFromText(text) {
   if (!text) return null;
+  const labelled = [...text.matchAll(new RegExp(LABELLED_RE.source, "gi"))];
 
-  // 1. Labelled time. Run the regex globally and prefer show/start labels over
-  //    doors (doors is earlier than the actual start, but still better than
-  //    nothing if it's all the page gives).
-  const labelled = [
-    ...text.matchAll(
-      new RegExp(LABELLED_RE.source, "gi")
-    ),
-  ];
-  let doorsHit = null;
+  // 1. show/start label (never doors).
   for (const m of labelled) {
-    const label = m[1].toLowerCase();
+    if (/door/i.test(m[1])) continue;
     const t = buildTime(m[2], m[3], m[4]);
-    if (!t) continue;
-    if (/door/.test(label)) {
-      doorsHit = doorsHit || t;
-    } else {
-      return { method: "text", ...t };
-    }
+    if (t) return { method: "text", ...t };
   }
-  if (doorsHit) return { method: "text", ...doorsHit };
-
-  // 2. First explicit am/pm time anywhere.
-  const m = text.match(STRICT_AMPM_RE);
-  if (m) {
-    const t = buildTime(m[1], m[2], m[3]);
+  // 2. first explicit PM time anywhere.
+  const pm = text.match(PM_RE);
+  if (pm) {
+    const t = buildTime(pm[1], pm[2], pm[3]);
+    if (t) return { method: "text", ...t };
+  }
+  // 3. doors label.
+  for (const m of labelled) {
+    if (!/door/i.test(m[1])) continue;
+    const t = buildTime(m[2], m[3], m[4]);
+    if (t) return { method: "text", ...t };
+  }
+  // 4. any explicit am/pm time.
+  const any = text.match(STRICT_AMPM_RE);
+  if (any) {
+    const t = buildTime(any[1], any[2], any[3]);
     if (t) return { method: "text", ...t };
   }
   return null;
@@ -273,30 +281,35 @@ export function extractFromText(text) {
 
 // ---------------------------------------------------------- orchestration
 
-// Run the full priority chain against a page. `knownDay` is the event's Pacific
-// calendar day (from its sentinel starts_at). Returns { method, iso } or null.
-export function extractStartTime(html, { knownDay } = {}) {
+// Run the priority chain against a page. `knownDay` is the event's Pacific
+// calendar day (from its sentinel starts_at). `allowText` is set false for
+// pages that list multiple events (a shared source_url): JSON-LD and meta are
+// day-validated so they attribute to the right event, but free-text time
+// matching can't tell which event a "8:00 PM" belongs to, so we skip it there.
+// Returns { method, iso } or null.
+export function extractStartTime(html, { knownDay, allowText = true } = {}) {
   return (
     extractFromJsonLd(html, knownDay) ||
     extractFromMeta(html, knownDay) ||
-    extractFromTextToIso(html, knownDay)
+    (allowText ? extractFromTextToIso(html, knownDay) : null)
   );
 }
 
 function extractFromTextToIso(html, knownDay) {
+  // Text gives only a time-of-day; we must anchor it to the event's known day.
+  if (!knownDay) return null;
   const t = extractFromText(htmlToVisibleText(html));
   if (!t) return null;
-  // Text gives only a time-of-day; anchor it to the event's known day.
-  if (!knownDay) return null;
   const iso = pacificPartsToUtcIso({ ...knownDay, hh: t.hh, mm: t.mm });
   return { method: "text", iso };
 }
 
 // Pure: given an event row (with starts_at + source_url) and the fetched HTML,
-// compute the enrichment result. Exported for tests.
-export function resolveEventTime(event, html) {
+// compute the enrichment result. Pass { allowText: false } for listing pages.
+// Exported for tests.
+export function resolveEventTime(event, html, { allowText = true } = {}) {
   const knownDay = pacificDateParts(new Date(event.starts_at));
-  const res = extractStartTime(html, { knownDay });
+  const res = extractStartTime(html, { knownDay, allowText });
   if (!res || !res.iso) return { found: false, method: null, startsAt: null };
   return { found: true, method: res.method, startsAt: res.iso };
 }
@@ -345,18 +358,18 @@ async function fetchHtml(url) {
   }
 }
 
-async function loadCache(supabase, urls) {
+async function loadCache(supabase, eventIds) {
   const map = new Map();
-  for (const part of chunk(urls, 200)) {
+  for (const part of chunk(eventIds, 200)) {
     const { data, error } = await supabase
       .from("event_time_cache")
-      .select("source_url,starts_at,time_found,checked_at")
-      .in("source_url", part);
+      .select("event_id,starts_at,time_found,checked_at")
+      .in("event_id", part);
     if (error) {
       console.warn(`event_time_cache lookup failed: ${error.message}`);
       continue;
     }
-    for (const row of data) map.set(row.source_url, row);
+    for (const row of data) map.set(row.event_id, row);
   }
   return map;
 }
@@ -406,77 +419,99 @@ async function main() {
     return;
   }
 
-  // Dedup by source_url: many events can share a page, and the cache + fetch
-  // are keyed by URL.
-  const urls = [...new Set(events.map((e) => e.source_url).filter(Boolean))];
-  const cache = await loadCache(supabase, urls);
+  // Cache is keyed per event, not per URL: a single listing page (one URL) can
+  // carry many events, each needing its own time. Track the distinct Pacific
+  // days each URL spans so we can fetch a page once and tell a true listing
+  // page (multiple days behind one URL → structured-data only) from a single
+  // event — including same-event duplicates the feed sometimes emits (same URL,
+  // same day), where free text is still safe to use.
+  const cache = await loadCache(supabase, events.map((e) => e.id));
+  const daysByUrl = new Map();
+  for (const e of events) {
+    if (!e.source_url) continue;
+    const p = pacificDateParts(new Date(e.starts_at));
+    const key = `${p.y}-${p.mo}-${p.d}`;
+    if (!daysByUrl.has(e.source_url)) daysByUrl.set(e.source_url, new Set());
+    daysByUrl.get(e.source_url).add(key);
+  }
 
-  // Decide per URL: use a fresh cache entry, or queue a fetch (up to the cap).
-  const toFetch = [];
-  const resultByUrl = new Map();
-  for (const url of urls) {
-    const cached = cache.get(url);
+  // Split events into fresh-from-cache vs needing a fetch, grouping the latter
+  // by URL so each page is fetched only once even when several events share it.
+  const resultByEventId = new Map();
+  const needByUrl = new Map();
+  for (const e of events) {
+    const cached = cache.get(e.id);
     if (isFresh(cached, now)) {
-      resultByUrl.set(url, {
+      resultByEventId.set(e.id, {
         found: cached.time_found,
         startsAt: cached.starts_at,
-        fromCache: true,
       });
-    } else {
-      toFetch.push(url);
+    } else if (e.source_url) {
+      if (!needByUrl.has(e.source_url)) needByUrl.set(e.source_url, []);
+      needByUrl.get(e.source_url).push(e);
     }
   }
 
-  const fetchUrls = toFetch.slice(0, MAX_FETCHES);
-  const skipped = toFetch.length - fetchUrls.length;
+  const fetchUrls = [...needByUrl.keys()].slice(0, MAX_FETCHES);
+  const deferred = needByUrl.size - fetchUrls.length;
   console.log(
-    `  ${resultByUrl.size} fresh from cache, ${fetchUrls.length} to fetch` +
-      (skipped > 0 ? `, ${skipped} deferred (MAX_FETCHES=${MAX_FETCHES})` : "")
+    `  ${resultByEventId.size} fresh from cache, ${fetchUrls.length} page(s) to fetch` +
+      (deferred > 0 ? `, ${deferred} deferred (MAX_FETCHES=${MAX_FETCHES})` : "")
   );
 
-  // One representative event per URL gives us the known day for text anchoring.
-  const eventByUrl = new Map();
-  for (const e of events) {
-    if (!eventByUrl.has(e.source_url)) eventByUrl.set(e.source_url, e);
-  }
-
-  const cacheUpserts = [];
+  // Fetch each unique page once.
+  const htmlByUrl = new Map();
   await pool(fetchUrls, FETCH_CONCURRENCY, async (url) => {
     const r = await fetchHtml(url);
-    if (!r.ok) {
-      // Transient/error: don't poison the cache; we'll retry next run.
-      console.log(`  FETCH-FAIL [${r.status || "ERR"}] ${url}`);
-      resultByUrl.set(url, { found: false, startsAt: null, skipped: true });
-      return;
-    }
-    const result = resolveEventTime(eventByUrl.get(url), r.html);
-    resultByUrl.set(url, { found: result.found, startsAt: result.startsAt });
-    cacheUpserts.push({
-      source_url: url,
-      starts_at: result.startsAt,
-      time_found: result.found,
-      method: result.method,
-      checked_at: new Date().toISOString(),
-    });
-    console.log(
-      `  ${result.found ? `FOUND [${result.method}] ${result.startsAt}` : "none"} — ${url}`
-    );
+    if (r.ok) htmlByUrl.set(url, r.html);
+    else console.log(`  FETCH-FAIL [${r.status || "ERR"}] ${url}`);
   });
 
-  // Persist cache rows for everything we actually fetched.
+  // Resolve every event that needed a fetch against its page, per event. On a
+  // multi-event (listing) page we disable text matching — only day-validated
+  // structured data can be safely attributed to the right event.
+  const cacheUpserts = [];
+  for (const url of fetchUrls) {
+    const html = htmlByUrl.get(url);
+    const evs = needByUrl.get(url);
+    if (!html) {
+      // Fetch failed: don't poison the cache; we'll retry next run.
+      for (const e of evs) {
+        resultByEventId.set(e.id, { found: false, startsAt: null });
+      }
+      continue;
+    }
+    const allowText = (daysByUrl.get(url)?.size ?? 1) === 1;
+    for (const e of evs) {
+      const res = resolveEventTime(e, html, { allowText });
+      resultByEventId.set(e.id, { found: res.found, startsAt: res.startsAt });
+      cacheUpserts.push({
+        event_id: e.id,
+        starts_at: res.startsAt,
+        time_found: res.found,
+        method: res.method,
+        checked_at: new Date().toISOString(),
+      });
+      console.log(
+        `  ${res.found ? `FOUND [${res.method}] ${res.startsAt}` : "none"} — ${e.id}`
+      );
+    }
+  }
+
+  // Persist cache rows for everything we actually resolved this run.
   if (cacheUpserts.length && !dryRun) {
     for (const part of chunk(cacheUpserts, 200)) {
       const { error: cErr } = await supabase
         .from("event_time_cache")
-        .upsert(part, { onConflict: "source_url" });
+        .upsert(part, { onConflict: "event_id" });
       if (cErr) console.warn(`event_time_cache upsert failed: ${cErr.message}`);
     }
   }
 
-  // Apply found times to every event sharing a resolved URL.
+  // Apply found times per event.
   const updates = [];
   for (const e of events) {
-    const r = resultByUrl.get(e.source_url);
+    const r = resultByEventId.get(e.id);
     if (r && r.found && r.startsAt) {
       updates.push({ id: e.id, from: e.starts_at, starts_at: r.startsAt });
     }

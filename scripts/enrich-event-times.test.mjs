@@ -97,6 +97,23 @@ test("extractFromJsonLd finds the Event inside an @graph array", () => {
   assert.equal(res.iso, "2026-06-15T02:30:00.000Z");
 });
 
+test("extractFromJsonLd picks the day-matching event on a multi-event listing page", () => {
+  // A listing page (one URL, many events). Each event must resolve to ITS OWN
+  // day, never another event's time — this is what keeps a shared source_url
+  // from contaminating every event with the first one's time.
+  const html = `<script type="application/ld+json">
+    [{"@type":"Event","name":"A","startDate":"2026-06-13T16:00:00-07:00"},
+     {"@type":"Event","name":"B","startDate":"2026-08-15T19:00:00-07:00"}]</script>`;
+  assert.equal(
+    extractFromJsonLd(html, { y: 2026, mo: 6, d: 13 }).iso,
+    "2026-06-13T23:00:00.000Z"
+  );
+  assert.equal(
+    extractFromJsonLd(html, { y: 2026, mo: 8, d: 15 }).iso,
+    "2026-08-16T02:00:00.000Z"
+  );
+});
+
 test("extractFromJsonLd ignores a date-only startDate (no time to recover)", () => {
   const html = `<script type="application/ld+json">
     {"@type":"Event","startDate":"2026-06-14"}</script>`;
@@ -186,6 +203,21 @@ test("extractFromText does not latch onto an unrelated number after a label", ()
   assert.deepEqual(out, { method: "text", hh: 20, mm: 0 });
 });
 
+test("extractFromText prefers the first PM time over a labelled AM artifact", () => {
+  // Real failure mode (Vina Robles): an "8:00 PM" show whose page also lists a
+  // "Doors 6:30 AM" box-office line. The show time must win, not the AM doors.
+  assert.deepEqual(extractFromText("Doors 6:30 AM. Tickets. 8:00 PM"), {
+    method: "text",
+    hh: 20,
+    mm: 0,
+  });
+});
+
+test("extractFromText rejects a garbled meridiem on a >12 hour", () => {
+  // Mangled page text like "20:00 Am" is not a real time.
+  assert.equal(extractFromText("20:00 Am"), null);
+});
+
 test("extractFromText returns null when there is no time", () => {
   assert.equal(extractFromText("Join us this summer for a great show!"), null);
 });
@@ -231,4 +263,22 @@ test("resolveEventTime reports not-found when the page has no time", () => {
   const event = { id: "gs-x", starts_at: SENTINEL, source_url: "https://x.test" };
   const out = resolveEventTime(event, `<body>No time here.</body>`);
   assert.deepEqual(out, { found: false, method: null, startsAt: null });
+});
+
+test("resolveEventTime with allowText:false skips text on listing pages", () => {
+  const event = { id: "gs-x", starts_at: SENTINEL, source_url: "https://x.test" };
+  const html = `<body>Some show at 8:00 PM</body>`; // text-only, no structured data
+  // With text allowed it would find 8 PM; disabled (listing page) it must not,
+  // since a bare "8:00 PM" can't be attributed to a specific event.
+  assert.equal(resolveEventTime(event, html).found, true);
+  assert.equal(resolveEventTime(event, html, { allowText: false }).found, false);
+});
+
+test("resolveEventTime still uses day-validated structured data when text is off", () => {
+  const event = { id: "gs-x", starts_at: SENTINEL, source_url: "https://x.test" };
+  const html = `<script type="application/ld+json">
+    {"@type":"Event","startDate":"2026-06-14T20:00:00-07:00"}</script>`;
+  const out = resolveEventTime(event, html, { allowText: false });
+  assert.equal(out.found, true);
+  assert.equal(out.startsAt, "2026-06-15T03:00:00.000Z");
 });

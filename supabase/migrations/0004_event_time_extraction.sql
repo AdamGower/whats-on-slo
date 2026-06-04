@@ -17,13 +17,21 @@
 alter table public.events
   add column if not exists time_tba boolean not null default false;
 
--- 2. Cache extraction results per source URL so we don't re-fetch the same
---    event page every sync. `starts_at` holds the recovered UTC instant (null
---    when no time was found); `time_found` distinguishes "checked, none on the
---    page" from "found one"; `method` records which signal won (json-ld /
---    opengraph / text) for debugging; `checked_at` drives the freshness TTL.
-create table if not exists public.event_time_cache (
-  source_url text primary key,
+-- 2. Cache extraction results PER EVENT so we don't re-fetch source pages every
+--    sync. Keyed by event id rather than URL because one listing page (a single
+--    URL) can carry many events, each needing its own time. `starts_at` holds
+--    the recovered UTC instant (null when no time was found); `time_found`
+--    distinguishes "checked, none on the page" from "found one"; `method`
+--    records which signal won (json-ld / opengraph / text) for debugging;
+--    `checked_at` drives the freshness TTL. The FK cascades so cache rows clean
+--    up when an event is re-keyed or removed.
+--
+--    This holds only disposable cache data, so we drop-and-recreate: re-running
+--    this migration safely replaces an earlier (URL-keyed) version of the table.
+drop table if exists public.event_time_cache;
+create table public.event_time_cache (
+  event_id text primary key
+    references public.events (id) on delete cascade,
   starts_at timestamptz,
   time_found boolean not null default false,
   method text,
