@@ -18,6 +18,7 @@ type EventRow = {
   source_url: string;
   category: Event["category"];
   image_url: string | null;
+  time_tba: boolean | null;
 };
 
 function rowToEvent(row: EventRow): Event {
@@ -33,6 +34,7 @@ function rowToEvent(row: EventRow): Event {
     sourceUrl: row.source_url,
     category: row.category,
     imageUrl: row.image_url ?? undefined,
+    timeTba: row.time_tba ?? false,
   };
 }
 
@@ -197,7 +199,7 @@ export async function fetchUpcomingEvents(): Promise<Event[]> {
   const { data, error } = await supabase
     .from("events")
     .select(
-      "id,title,starts_at,ends_at,venue,community,description,source,source_url,category,image_url"
+      "id,title,starts_at,ends_at,venue,community,description,source,source_url,category,image_url,time_tba"
     )
     // Show only events whose Pacific calendar date is today or later.
     // Drops yesterday's events even if their ends_at is in the future —

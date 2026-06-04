@@ -236,6 +236,9 @@ export function buildRows(items, { now = new Date() } = {}) {
       source_url: item.link || FALLBACK_LEARN_MORE,
       category: guessCategory(seriesLabel, title),
       image_url: item.image || null,
+      // The feed never carries a clock time, so starts_at is anchored at the
+      // fallback hour. Flag it for "Time TBA" display and time enrichment.
+      time_tba: true,
     });
   }
 
