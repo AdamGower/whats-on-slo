@@ -10,6 +10,10 @@ export type Event = {
   sourceUrl: string;
   category: "Music" | "Food & Drink" | "Arts" | "Community" | "Family" | "Outdoors";
   imageUrl?: string;
+  // True when starts_at carries only a sentinel hour (the feed gave no clock
+  // time and enrichment found none): the date is real, the time is not, so the
+  // UI shows "Time TBA" instead of the placeholder hour.
+  timeTba?: boolean;
 };
 
 export type Difficulty = "Easy" | "Moderate" | "Hard" | "Strenuous";

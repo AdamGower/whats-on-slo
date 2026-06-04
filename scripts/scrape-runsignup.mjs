@@ -150,6 +150,9 @@ export function buildRows(parsed, { now = new Date() } = {}) {
 
     let startsAt;
     let endsAt = null;
+    // True when we anchor at the fallback hour because the race carried no
+    // event-level clock time; drives "Time TBA" display and time enrichment.
+    let timeTba = false;
     if (starts.length) {
       starts.sort();
       startsAt = starts[0];
@@ -164,6 +167,7 @@ export function buildRows(parsed, { now = new Date() } = {}) {
         drops.push({ reason: "no-date", name: race.name });
         continue;
       }
+      timeTba = true;
       startsAt = pacificPartsToUtcIso({ ...np, hh: FALLBACK_START_HOUR, mm: 0 });
       const ep = parseRsuDate(race.next_end_date);
       if (ep && (ep.hh != null || ep.d !== np.d)) {
@@ -212,6 +216,7 @@ export function buildRows(parsed, { now = new Date() } = {}) {
       source_url: sourceUrl,
       category: "Outdoors",
       image_url: race.logo_url || null,
+      time_tba: timeTba,
     });
   }
 
