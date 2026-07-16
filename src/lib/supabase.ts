@@ -18,6 +18,7 @@ type EventRow = {
   source_url: string;
   category: Event["category"];
   image_url: string | null;
+  time_tba: boolean | null;
 };
 
 function rowToEvent(row: EventRow): Event {
@@ -33,6 +34,7 @@ function rowToEvent(row: EventRow): Event {
     sourceUrl: row.source_url,
     category: row.category,
     imageUrl: row.image_url ?? undefined,
+    timeTba: row.time_tba ?? false,
   };
 }
 
@@ -193,7 +195,7 @@ function balancePerSourcePerDay(rows: EventRow[]): EventRow[] {
 }
 
 const EVENT_COLUMNS =
-  "id,title,starts_at,ends_at,venue,community,description,source,source_url,category,image_url";
+  "id,title,starts_at,ends_at,venue,community,description,source,source_url,category,image_url,time_tba";
 
 // The Data API caps any single response at 1000 rows, and it does so
 // silently: ask for more and you still get 1000, with no error and no flag.

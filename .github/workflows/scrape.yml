@@ -133,6 +133,35 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
 
+  # Recover real start times for events the feeds gave only a date for. Runs
+  # after every scraper (if: always() so one scraper failing doesn't block it —
+  # it enriches whatever is flagged in the DB) and re-applies cached times the
+  # scrapers reset to their noon/fallback sentinel on this run.
+  enrich-times:
+    needs:
+      - ticketmaster
+      - goslo
+      - madonna-inn
+      - library
+      - visit-slo
+      - rideshare-bikemonth
+      - bigbigslo
+      - runsignup
+      - seapines
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+      - run: npm ci
+      - run: node scripts/enrich-event-times.mjs
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+
   monitor:
     needs:
       - ticketmaster
@@ -144,6 +173,7 @@ jobs:
       - bigbigslo
       - runsignup
       - seapines
+      - enrich-times
     if: always()
     runs-on: ubuntu-latest
     steps:

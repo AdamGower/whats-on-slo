@@ -141,6 +141,10 @@ async function main() {
         source: "goslo.events",
         source_url: eventUrl,
         category: guessCategory(title, venue),
+        // goslo lists a date but never a clock time, so starts_at is always a
+        // noon sentinel. Flag it so the UI shows "Time TBA" and the
+        // enrichment pass knows to look for a real time on the event page.
+        time_tba: true,
       });
     });
   });
