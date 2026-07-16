@@ -192,26 +192,52 @@ function balancePerSourcePerDay(rows: EventRow[]): EventRow[] {
   return result;
 }
 
+const EVENT_COLUMNS =
+  "id,title,starts_at,ends_at,venue,community,description,source,source_url,category,image_url";
+
+// The Data API caps any single response at 1000 rows, and it does so
+// silently: ask for more and you still get 1000, with no error and no flag.
+// The upcoming-events count passed that mark in July 2026, so a one-shot
+// query would quietly drop the far end of the calendar. Page through instead.
+const PAGE_SIZE = 1000;
+const MAX_EVENTS = 10_000; // backstop so a bad cursor cannot loop forever
+
+async function fetchUpcomingRows(startOfToday: string): Promise<EventRow[]> {
+  const rows: EventRow[] = [];
+  for (let from = 0; from < MAX_EVENTS; from += PAGE_SIZE) {
+    const { data, error } = await supabase
+      .from("events")
+      .select(EVENT_COLUMNS)
+      // Show only events whose Pacific calendar date is today or later.
+      // Drops yesterday's events even if their ends_at is in the future —
+      // matches the "current and future dates only" UX intent.
+      .gte("starts_at", startOfToday)
+      .order("starts_at", { ascending: true })
+      // Tie-break on the primary key. Rows sharing a starts_at have no
+      // inherent order, so a tie straddling a page boundary could repeat some
+      // rows on one page and skip them on the next.
+      .order("id", { ascending: true })
+      .range(from, from + PAGE_SIZE - 1);
+
+    if (error) {
+      // Keep whatever we already have: a partial calendar beats an empty one,
+      // and the log surfaces the failure.
+      console.error("Failed to fetch events from Supabase", error);
+      return rows;
+    }
+    rows.push(...(data as EventRow[]));
+    if (data.length < PAGE_SIZE) return rows;
+  }
+  console.warn(
+    `Hit the ${MAX_EVENTS}-event ceiling; later events were not fetched.`
+  );
+  return rows;
+}
+
 export async function fetchUpcomingEvents(): Promise<Event[]> {
   const startOfToday = startOfTodayPacificUtcIso();
-  const { data, error } = await supabase
-    .from("events")
-    .select(
-      "id,title,starts_at,ends_at,venue,community,description,source,source_url,category,image_url"
-    )
-    // Show only events whose Pacific calendar date is today or later.
-    // Drops yesterday's events even if their ends_at is in the future —
-    // matches the "current and future dates only" UX intent.
-    .gte("starts_at", startOfToday)
-    .order("starts_at", { ascending: true })
-    .limit(2000);
-
-  if (error) {
-    console.error("Failed to fetch events from Supabase", error);
-    return [];
-  }
-
-  const sameSourceCollapsed = collapseSameSourceMultiVenue(data as EventRow[]);
+  const rows = await fetchUpcomingRows(startOfToday);
+  const sameSourceCollapsed = collapseSameSourceMultiVenue(rows);
   const deduped = dedupRows(sameSourceCollapsed);
   const balanced = balancePerSourcePerDay(deduped);
   return balanced.map(rowToEvent);

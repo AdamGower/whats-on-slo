@@ -7,6 +7,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { logRun } from "./_log-run.mjs";
 import { cleanDescriptionHtml } from "./_clean-html.mjs";
+import { firstPrunableDay, pruneMissing } from "./_prune-missing.mjs";
 
 const SUPABASE_URL =
   process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -152,6 +153,27 @@ async function main() {
     console.error("Upsert failed:", error);
     process.exit(1);
   }
+  // The feed is unpaginated, so it is the whole truth up to its own last day:
+  // anything we hold inside that span which the feed omits has been cancelled,
+  // unpublished, or reissued under a new id (the library renamed "SLO Library
+  // - 3d Printer" and did exactly that, stranding 141 rows). Past the feed's
+  // horizon we know nothing, so those rows stay.
+  const feedDays = events
+    .map((e) => (e.start_date || "").slice(0, 10))
+    .filter(Boolean)
+    .sort();
+  const feedHorizon = feedDays[feedDays.length - 1];
+  if (feedHorizon) {
+    await pruneMissing(supabase, {
+      idPrefix: "lib-",
+      seenIds: new Set(rows.map((r) => r.id)),
+      windowStartDay: firstPrunableDay(),
+      windowEndDay: feedHorizon,
+      label: "SLO County Library",
+      dryRun: process.env.PRUNE_DRY_RUN === "1",
+    });
+  }
+
   await logRun(supabase, "SLO County Library", rows.length, "success");
   console.log(`Done. ${rows.length} events upserted.`);
 }
