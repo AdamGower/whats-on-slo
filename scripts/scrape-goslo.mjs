@@ -6,6 +6,11 @@
 import * as cheerio from "cheerio";
 import { createClient } from "@supabase/supabase-js";
 import { logRun } from "./_log-run.mjs";
+import {
+  firstPrunableDay,
+  latestPacificDay,
+  pruneMissing,
+} from "./_prune-missing.mjs";
 import { cleanDescriptionHtml } from "./_clean-html.mjs";
 
 const SUPABASE_URL =
@@ -170,6 +175,20 @@ async function main() {
     console.error("Supabase upsert failed:", error);
     process.exit(1);
   }
+
+  // Drop rows goslo no longer lists. /all is a single page with no paging and
+  // no date range, so a successful parse is the source's whole calendar and
+  // its furthest event is the edge of what we can vouch for. Note the id is
+  // built from the title, so an upstream rename reads as a retraction — which
+  // is right: the old row is stale either way.
+  await pruneMissing(supabase, {
+    idPrefix: "gs-",
+    seenIds: new Set(unique.map((r) => r.id)),
+    windowStartDay: firstPrunableDay(),
+    windowEndDay: latestPacificDay(unique),
+    label: "goslo.events",
+    dryRun: process.env.PRUNE_DRY_RUN === "1",
+  });
 
   await logRun(supabase, "goslo.events", unique.length, "success");
   console.log(`Done. ${unique.length} events upserted.`);

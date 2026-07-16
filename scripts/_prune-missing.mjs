@@ -48,6 +48,20 @@ export function dayBefore(day) {
     .slice(0, 10);
 }
 
+// The last day this run actually saw, as a prune horizon. Most sources have no
+// declared window — Ticketmaster searches by radius, goslo returns one page,
+// the ICS feeds return whatever they hold — so their evidence simply runs out
+// at the furthest event they returned. Anything past that is unexamined, not
+// retracted. Returns null for an empty run, which planPrune already refuses.
+export function latestPacificDay(rows) {
+  let latest = null;
+  for (const row of rows) {
+    const day = pacificDay(row.starts_at);
+    if (latest === null || day > latest) latest = day;
+  }
+  return latest;
+}
+
 // Pure: decide what to delete. `existing` is every row we hold for the source;
 // `seenIds` is what the run just ingested.
 export function planPrune({
@@ -55,6 +69,7 @@ export function planPrune({
   seenIds,
   windowStartDay,
   windowEndDay,
+  covered = true,
   maxPruneFraction = 0.34,
 }) {
   const inWindow = existing.filter((row) => {
@@ -67,7 +82,12 @@ export function planPrune({
   let refusal = null;
   if (seenIds.size === 0) {
     refusal = "the run ingested no events at all";
-  } else if (windowEndDay < windowStartDay) {
+  } else if (!covered) {
+    // A page cap that cut the fetch short, or a per-event fetch that failed
+    // partway: rows we never looked at are indistinguishable from retracted
+    // ones, so the whole pass is void.
+    refusal = "the run did not fully cover its window";
+  } else if (windowEndDay == null || windowEndDay < windowStartDay) {
     refusal = "the covered window is empty";
   } else if (fraction > maxPruneFraction) {
     refusal =
@@ -111,6 +131,7 @@ export async function pruneMissing(
     seenIds,
     windowStartDay,
     windowEndDay,
+    covered,
     label,
     dryRun = false,
     maxPruneFraction,
@@ -122,6 +143,7 @@ export async function pruneMissing(
     seenIds,
     windowStartDay,
     windowEndDay,
+    covered,
     maxPruneFraction,
   });
 

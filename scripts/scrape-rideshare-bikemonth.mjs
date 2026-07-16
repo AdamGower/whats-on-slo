@@ -25,6 +25,11 @@ import crypto from "node:crypto";
 import ical from "node-ical";
 import { createClient } from "@supabase/supabase-js";
 import { logRun } from "./_log-run.mjs";
+import {
+  firstPrunableDay,
+  latestPacificDay,
+  pruneMissing,
+} from "./_prune-missing.mjs";
 import { cleanDescriptionHtml } from "./_clean-html.mjs";
 
 // ------------------------------------------------------------------ config
@@ -374,6 +379,21 @@ async function main() {
   } else {
     await logRun(supabase, SOURCE_LABEL, 0, "no-data");
   }
+
+  // Drop rows the feed no longer carries. Both early returns above matter
+  // here: out of season we never fetch, and a 304 means "unchanged", not
+  // "empty" — pruning on either would delete the whole May calendar on no
+  // evidence. Events dropped by the SLO/bike-month filters stay unseen and so
+  // get pruned, which is intended; if a filter later proves too aggressive the
+  // next in-season run re-adds them from the feed.
+  await pruneMissing(supabase, {
+    idPrefix: "rs-",
+    seenIds: new Set(rows.map((r) => r.id)),
+    windowStartDay: firstPrunableDay(),
+    windowEndDay: latestPacificDay(rows),
+    label: SOURCE_LABEL,
+    dryRun: process.env.PRUNE_DRY_RUN === "1",
+  });
 
   // Persist new validators only after a successful processing run, so a
   // mid-run failure doesn't poison the cache and skip the next attempt.

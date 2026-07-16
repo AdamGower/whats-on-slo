@@ -26,6 +26,11 @@ import crypto from "node:crypto";
 import * as cheerio from "cheerio";
 import { createClient } from "@supabase/supabase-js";
 import { logRun } from "./_log-run.mjs";
+import {
+  firstPrunableDay,
+  latestPacificDay,
+  pruneMissing,
+} from "./_prune-missing.mjs";
 import { cleanDescriptionHtml } from "./_clean-html.mjs";
 
 // ------------------------------------------------------------------ config
@@ -340,6 +345,21 @@ async function main() {
   } else {
     await logRun(supabase, SOURCE_LABEL, 0, "no-data");
   }
+
+  // Drop rows the feed no longer carries. We only reach here on a real 200 —
+  // a 304 returns above without parsing, and pruning on it would delete the
+  // whole calendar on the strength of "nothing changed". The RSS is a single
+  // unpaginated document, so what we parsed is the feed in full; buildRows
+  // drops items past the lookahead, which is why the horizon is the furthest
+  // row we kept rather than the lookahead itself.
+  await pruneMissing(supabase, {
+    idPrefix: "sp-",
+    seenIds: new Set(rows.map((r) => r.id)),
+    windowStartDay: firstPrunableDay(),
+    windowEndDay: latestPacificDay(rows),
+    label: SOURCE_LABEL,
+    dryRun: process.env.PRUNE_DRY_RUN === "1",
+  });
 
   // Persist new validators only after a successful processing run, so a
   // mid-run failure doesn't poison the cache and skip the next attempt.

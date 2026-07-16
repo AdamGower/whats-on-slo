@@ -15,6 +15,11 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { logRun } from "./_log-run.mjs";
+import {
+  firstPrunableDay,
+  latestPacificDay,
+  pruneMissing,
+} from "./_prune-missing.mjs";
 
 const PORTAL_URL =
   "https://portalv2.cityspark.com/PortalScripts/BigBigSLO";
@@ -349,6 +354,20 @@ async function main() {
     console.error("Supabase upsert failed:", error);
     process.exit(1);
   }
+  // Drop rows the portal no longer carries. The bundle is a single fetch of
+  // the whole Events array, so a successful parse is complete by construction;
+  // the zero-events alarm above already exits before we could prune on a bad
+  // one. Rows dropped as non-SLO or as in-batch duplicates stay unseen on
+  // purpose — they should not be on the site, so pruning them is the point.
+  await pruneMissing(supabase, {
+    idPrefix: "bbs-",
+    seenIds: new Set(unique.map((r) => r.id)),
+    windowStartDay: firstPrunableDay(),
+    windowEndDay: latestPacificDay(unique),
+    label: "BigBigSLO",
+    dryRun: process.env.PRUNE_DRY_RUN === "1",
+  });
+
   await logRun(supabase, "BigBigSLO", unique.length, "success");
   console.log(`Done. ${unique.length} events upserted.`);
 }
