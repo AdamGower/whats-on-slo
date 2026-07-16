@@ -21,6 +21,11 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { logRun } from "./_log-run.mjs";
+import {
+  firstPrunableDay,
+  latestPacificDay,
+  pruneMissing,
+} from "./_prune-missing.mjs";
 import { cleanDescriptionHtml } from "./_clean-html.mjs";
 
 // ------------------------------------------------------------------ config
@@ -264,12 +269,22 @@ async function main() {
   );
 
   const allRaces = [];
+  let truncated = false;
   for (let page = 1; page <= MAX_PAGES; page++) {
     const data = await fetchPage(page, startDate, endDate);
     const races = Array.isArray(data.races) ? data.races : [];
     allRaces.push(...races);
     console.log(`  Page ${page}: ${races.length} races`);
     if (races.length < PAGE_SIZE) break;
+    // A full page on the last allowed iteration means there is probably more
+    // behind the cap. Short of that we ran out of races, not out of pages.
+    if (page === MAX_PAGES) {
+      truncated = true;
+      console.warn(
+        `Stopped at the ${MAX_PAGES}-page cap with a full page — more races ` +
+          `likely exist. Raise MAX_PAGES.`
+      );
+    }
   }
 
   const { rows, drops } = buildRows({ races: allRaces }, { now });
@@ -291,6 +306,19 @@ async function main() {
     console.error("Upsert failed:", error);
     process.exit(1);
   }
+  // Drop races RunSignup no longer lists. buildRows also drops races for its
+  // own reasons (out of window, missing data); those rows should not be on the
+  // site either, so letting the prune take them is correct.
+  await pruneMissing(supabase, {
+    idPrefix: "rsu-",
+    seenIds: new Set(rows.map((r) => r.id)),
+    windowStartDay: firstPrunableDay(now),
+    windowEndDay: latestPacificDay(rows),
+    covered: !truncated,
+    label: SOURCE_LABEL,
+    dryRun: process.env.PRUNE_DRY_RUN === "1",
+  });
+
   await logRun(supabase, SOURCE_LABEL, rows.length, "success");
   console.log(`Upserted ${rows.length} races.`);
 }

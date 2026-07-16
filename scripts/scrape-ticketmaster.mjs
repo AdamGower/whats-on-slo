@@ -143,6 +143,22 @@ async function main() {
     process.exit(1);
   }
 
+  // No prune pass here, deliberately. Every other source answers "what do you
+  // still list for this stretch of calendar?", so absence from the answer means
+  // retracted. This search cannot answer that: it has no date range, no sort,
+  // and it only returns events whose *start* is still in the future. A run
+  // that spans days — the 2026 California Mid-State Fair Season Pass, which
+  // starts 2026-07-15 and runs to the 26th — drops out of the search the day
+  // after it opens while staying live and on sale, and our row still carries a
+  // future date. A prune would read that as a retraction and delete a real
+  // event. A dry run on 2026-07-16 flagged exactly that row and nothing else,
+  // so there is no staleness here worth the risk.
+  if (totalPages > MAX_PAGES) {
+    console.warn(
+      `Only fetched ${MAX_PAGES} of ${totalPages} pages — raise MAX_PAGES.`
+    );
+  }
+
   await logRun(supabase, "Ticketmaster", rows.length, "success");
   console.log(`Done. ${rows.length} events upserted.`);
 }

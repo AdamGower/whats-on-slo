@@ -9,6 +9,11 @@
 import * as cheerio from "cheerio";
 import { createClient } from "@supabase/supabase-js";
 import { logRun } from "./_log-run.mjs";
+import {
+  firstPrunableDay,
+  latestPacificDay,
+  pruneMissing,
+} from "./_prune-missing.mjs";
 
 const SUPABASE_URL =
   process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -104,6 +109,10 @@ async function main() {
 
   const rows = [];
   const now = new Date();
+  // Each event is a separate iCal fetch, so a single failure leaves a real
+  // event unseen — indistinguishable from one the calendar dropped. Count
+  // them; any failure voids the prune below rather than risking a deletion.
+  let fetchFailures = 0;
 
   for (const path of paths) {
     const icsUrl = `https://www.madonnainn.com${path}`;
@@ -114,11 +123,13 @@ async function main() {
       const r = await fetch(icsUrl, { headers: { "User-Agent": UA } });
       if (!r.ok) {
         console.warn(`  ${r.status} for ${icsUrl}, skipping`);
+        fetchFailures++;
         continue;
       }
       icsText = await r.text();
     } catch (err) {
       console.warn(`  fetch error for ${icsUrl}:`, err.message);
+      fetchFailures++;
       continue;
     }
 
@@ -173,6 +184,24 @@ async function main() {
     console.error("Upsert failed:", error);
     process.exit(1);
   }
+  // Drop events the calendar no longer lists — but only if every iCal fetch
+  // succeeded, since a failed one looks exactly like a removed event.
+  if (fetchFailures > 0) {
+    console.warn(
+      `${fetchFailures} iCal fetch(es) failed; skipping the prune so a ` +
+        `transient error cannot delete real events.`
+    );
+  }
+  await pruneMissing(supabase, {
+    idPrefix: "mi-",
+    seenIds: new Set(rows.map((r) => r.id)),
+    windowStartDay: firstPrunableDay(now),
+    windowEndDay: latestPacificDay(rows),
+    covered: fetchFailures === 0,
+    label: "Madonna Inn",
+    dryRun: process.env.PRUNE_DRY_RUN === "1",
+  });
+
   await logRun(supabase, "Madonna Inn", rows.length, "success");
   console.log(`Done. ${rows.length} events upserted.`);
 }

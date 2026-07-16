@@ -7,6 +7,7 @@ import assert from "node:assert/strict";
 import {
   dayBefore,
   firstPrunableDay,
+  latestPacificDay,
   pacificDay,
   planPrune,
 } from "./_prune-missing.mjs";
@@ -142,4 +143,41 @@ test("dayBefore steps back one calendar day", () => {
 
 test("pacificDay reports the Pacific day, not the UTC one", () => {
   assert.equal(pacificDay("2026-08-14T23:30:00-07:00"), "2026-08-14");
+});
+
+test("refuses when the run did not fully cover its window", () => {
+  // A page cap cut the fetch short, or a per-event fetch failed: rows we never
+  // looked at are indistinguishable from retracted ones.
+  const { existing, seenIds } = windowOf(["vs-7"]);
+  const plan = planPrune({ existing, seenIds, ...WINDOW, covered: false });
+  assert.deepEqual(plan.stale, []);
+  assert.match(plan.refusal, /did not fully cover/);
+  assert.equal(plan.candidates.length, 1); // reported, not acted on
+});
+
+test("latestPacificDay finds the furthest day a run saw", () => {
+  const rows = [
+    row("a", "2026-08-01"),
+    row("b", "2026-09-15"),
+    row("c", "2026-08-20"),
+  ];
+  assert.equal(latestPacificDay(rows), "2026-09-15");
+});
+
+test("latestPacificDay is null for an empty run", () => {
+  // planPrune refuses on an empty seenIds anyway, but the horizon has to be
+  // something rather than crash.
+  assert.equal(latestPacificDay([]), null);
+});
+
+test("a null horizon is refused, not treated as an open window", () => {
+  const { existing, seenIds } = windowOf(["vs-7"]);
+  const plan = planPrune({
+    existing,
+    seenIds,
+    windowStartDay: "2026-07-17",
+    windowEndDay: null,
+  });
+  assert.deepEqual(plan.stale, []);
+  assert.match(plan.refusal, /empty/);
 });
