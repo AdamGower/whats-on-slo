@@ -448,10 +448,12 @@ export default async function Home({
                           {formatCompactDate(eventDate(ev.startsAt))}
                         </p>
                         <p className="font-semibold mt-0.5">
-                          {formatTimeRange(
-                            eventDate(ev.startsAt),
-                            ev.endsAt ? eventDate(ev.endsAt) : undefined
-                          )}
+                          {ev.timeTba
+                            ? "Time TBA"
+                            : formatTimeRange(
+                                eventDate(ev.startsAt),
+                                ev.endsAt ? eventDate(ev.endsAt) : undefined
+                              )}
                         </p>
                         <p className="text-muted uppercase text-[11px] tracking-wider mt-1">
                           {ev.category}
