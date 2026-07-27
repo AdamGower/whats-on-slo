@@ -147,23 +147,45 @@ function collapseSameSourceMultiVenue(rows: EventRow[]): EventRow[] {
   );
 }
 
-// Compute "start of today, Pacific time" as a UTC ISO string. Used to filter
-// out events whose Pacific calendar day is already in the past — even if
-// their ends_at extends into the future. (A multi-day event that started
-// last week would otherwise still appear under last week's date header.)
-function startOfTodayPacificUtcIso(): string {
-  const todayPacific = new Date().toLocaleDateString("en-CA", {
-    timeZone: "America/Los_Angeles",
-  });
-  // Try Pacific midnight as if it were UTC, then shift by the Pacific
-  // offset for that instant (handles DST automatically).
-  const utcGuess = new Date(`${todayPacific}T00:00:00Z`);
+// Convert a Pacific calendar date ("YYYY-MM-DD") to the UTC instant of
+// midnight Pacific on that date. Anchors Pacific midnight as if it were UTC,
+// then shifts by the zone's offset at that instant, so it lands on the right
+// absolute time whether the date falls in PST or PDT. This is the single place
+// the Pacific-day cutoff is derived; every other cutoff (today, month bounds)
+// goes through it.
+function pacificMidnightUtcIso(pacificDate: string): string {
+  const utcGuess = new Date(`${pacificDate}T00:00:00Z`);
   const laFormat = utcGuess.toLocaleString("sv-SE", {
     timeZone: "America/Los_Angeles",
   });
   const laDate = new Date(laFormat.replace(" ", "T") + "Z");
   const offsetMs = utcGuess.getTime() - laDate.getTime();
   return new Date(utcGuess.getTime() + offsetMs).toISOString();
+}
+
+// "Start of today, Pacific time" as a UTC ISO string. The default view's
+// cutoff: events whose Pacific calendar day is already past drop off, even if
+// an ends_at extends into the future. Rolls over on its own each midnight
+// because it reads the wall clock on every call.
+function startOfTodayPacificUtcIso(): string {
+  const todayPacific = new Date().toLocaleDateString("en-CA", {
+    timeZone: "America/Los_Angeles",
+  });
+  return pacificMidnightUtcIso(todayPacific);
+}
+
+// UTC [start, end) bounds for a Pacific calendar month ("YYYY-MM"). Backs the
+// on-demand past-month view. Both edges go through pacificMidnightUtcIso, so a
+// month that straddles a DST change still gets the correct offset on each side.
+function pacificMonthWindowUtcIso(month: string): { start: string; end: string } {
+  const [year, mon] = month.split("-").map(Number);
+  const nextYear = mon === 12 ? year + 1 : year;
+  const nextMon = mon === 12 ? 1 : mon + 1;
+  const nextStart = `${nextYear}-${String(nextMon).padStart(2, "0")}-01`;
+  return {
+    start: pacificMidnightUtcIso(`${month}-01`),
+    end: pacificMidnightUtcIso(nextStart),
+  };
 }
 
 // Per-source daily caps. Library is throttled hard because the system has
@@ -204,16 +226,19 @@ const EVENT_COLUMNS =
 const PAGE_SIZE = 1000;
 const MAX_EVENTS = 10_000; // backstop so a bad cursor cannot loop forever
 
-async function fetchUpcomingRows(startOfToday: string): Promise<EventRow[]> {
+// Page through events in the half-open range [gte, lt) ordered by start time.
+// `lt` is optional: the upcoming view leaves the far edge open, a month view
+// bounds it. The Data API caps any single response at 1000 rows and does so
+// silently, so we page rather than one-shot.
+async function fetchEventRows(gte: string, lt?: string): Promise<EventRow[]> {
   const rows: EventRow[] = [];
   for (let from = 0; from < MAX_EVENTS; from += PAGE_SIZE) {
-    const { data, error } = await supabase
+    let query = supabase
       .from("events")
       .select(EVENT_COLUMNS)
-      // Show only events whose Pacific calendar date is today or later.
-      // Drops yesterday's events even if their ends_at is in the future —
-      // matches the "current and future dates only" UX intent.
-      .gte("starts_at", startOfToday)
+      .gte("starts_at", gte);
+    if (lt) query = query.lt("starts_at", lt);
+    const { data, error } = await query
       .order("starts_at", { ascending: true })
       // Tie-break on the primary key. Rows sharing a starts_at have no
       // inherent order, so a tie straddling a page boundary could repeat some
@@ -236,11 +261,58 @@ async function fetchUpcomingRows(startOfToday: string): Promise<EventRow[]> {
   return rows;
 }
 
-export async function fetchUpcomingEvents(): Promise<Event[]> {
-  const startOfToday = startOfTodayPacificUtcIso();
-  const rows = await fetchUpcomingRows(startOfToday);
+// Shared post-processing: collapse same-source multi-venue dupes, dedup across
+// sources, cap per-source-per-day, map to the UI shape. Applied identically to
+// the upcoming view and any single-month view, so a past month renders exactly
+// the way today's calendar does.
+function assembleEvents(rows: EventRow[]): Event[] {
   const sameSourceCollapsed = collapseSameSourceMultiVenue(rows);
   const deduped = dedupRows(sameSourceCollapsed);
   const balanced = balancePerSourcePerDay(deduped);
   return balanced.map(rowToEvent);
+}
+
+export async function fetchUpcomingEvents(): Promise<Event[]> {
+  // Events whose Pacific calendar day is today or later. Drops yesterday's
+  // events even if their ends_at is in the future — the "current and future
+  // dates only" default view.
+  const rows = await fetchEventRows(startOfTodayPacificUtcIso());
+  return assembleEvents(rows);
+}
+
+// Fetch a single Pacific calendar month ("YYYY-MM") in full, including days
+// already past. Backs the direct-URL past-month view; the month rail never
+// links here because it only lists upcoming months.
+export async function fetchEventsForMonth(month: string): Promise<Event[]> {
+  const { start, end } = pacificMonthWindowUtcIso(month);
+  const rows = await fetchEventRows(start, end);
+  return assembleEvents(rows);
+}
+
+// Distinct Pacific months that have at least one event, past and future, for
+// the sitemap. Selects only starts_at (cheap) and buckets by Pacific month, so
+// search engines can reach archived months the default view hides.
+export async function fetchAllEventMonths(): Promise<string[]> {
+  const months = new Set<string>();
+  for (let from = 0; from < MAX_EVENTS; from += PAGE_SIZE) {
+    const { data, error } = await supabase
+      .from("events")
+      .select("starts_at")
+      .order("starts_at", { ascending: true })
+      .order("id", { ascending: true })
+      .range(from, from + PAGE_SIZE - 1);
+
+    if (error) {
+      console.error("Failed to fetch event months from Supabase", error);
+      break;
+    }
+    for (const row of data as { starts_at: string }[]) {
+      const key = new Date(row.starts_at)
+        .toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" })
+        .slice(0, 7);
+      months.add(key);
+    }
+    if (data.length < PAGE_SIZE) break;
+  }
+  return Array.from(months).sort();
 }

@@ -1,4 +1,4 @@
-import { fetchUpcomingEvents } from "@/lib/supabase";
+import { fetchUpcomingEvents, fetchEventsForMonth } from "@/lib/supabase";
 import type { Event } from "@/types";
 import SiteFooter from "@/components/SiteFooter";
 
@@ -191,7 +191,12 @@ export async function generateMetadata({
   searchParams: SearchParams;
 }) {
   const params = await searchParams;
-  const monthLabel = params.month ? formatMonthLabel(params.month) : null;
+  // Only title by month for a well-formed YYYY-MM; a malformed param renders
+  // the default view, so it shouldn't produce an "Events in Invalid Date" tag.
+  const monthLabel =
+    params.month && /^\d{4}-\d{2}$/.test(params.month)
+      ? formatMonthLabel(params.month)
+      : null;
   const cat = params.cat;
 
   const title =
@@ -219,16 +224,29 @@ export default async function Home({
   const events = await fetchUpcomingEvents();
   const months = buildMonthIndex(events);
 
-  // Default to the first month with events (the current/upcoming one).
+  // The month rail lists current/upcoming months only. A past month is
+  // reachable by direct ?month= URL but never advertised as a button, and its
+  // events aren't in the upcoming fetch, so it's pulled on demand below.
   const requestedMonth = params.month;
-  const validMonth =
-    requestedMonth && months.some((m) => m.key === requestedMonth)
-      ? requestedMonth
-      : months[0]?.key ?? monthKey(new Date());
+  const currentMonth = monthKey(new Date());
+  const isUpcomingMonth =
+    !!requestedMonth && months.some((m) => m.key === requestedMonth);
+  const isPastMonth =
+    !!requestedMonth &&
+    /^\d{4}-\d{2}$/.test(requestedMonth) &&
+    requestedMonth < currentMonth;
 
-  const monthEvents = events.filter(
-    (ev) => monthKey(eventDate(ev.startsAt)) === validMonth
-  );
+  // Default to the first month with events (the current/upcoming one). An
+  // unrecognized or empty future month falls back here too.
+  const validMonth = isUpcomingMonth
+    ? requestedMonth!
+    : isPastMonth
+    ? requestedMonth!
+    : months[0]?.key ?? currentMonth;
+
+  const monthEvents = isPastMonth
+    ? await fetchEventsForMonth(validMonth)
+    : events.filter((ev) => monthKey(eventDate(ev.startsAt)) === validMonth);
 
   // Category filter — applied within the selected month
   const requestedCat = params.cat;

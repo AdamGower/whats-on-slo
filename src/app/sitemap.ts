@@ -1,23 +1,12 @@
-import { fetchUpcomingEvents } from "@/lib/supabase";
+import { fetchAllEventMonths } from "@/lib/supabase";
 import type { MetadataRoute } from "next";
 
 const BASE = "https://whatsonslo.com";
-const TIMEZONE = "America/Los_Angeles";
-
-function monthKey(d: Date) {
-  const dateStr = d.toLocaleDateString("en-CA", { timeZone: TIMEZONE });
-  return dateStr.slice(0, 7); // YYYY-MM
-}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const events = await fetchUpcomingEvents();
-
-  const monthSet = new Set<string>();
-  for (const ev of events) {
-    monthSet.add(monthKey(new Date(ev.startsAt)));
-  }
-
-  const months = Array.from(monthSet).sort();
+  // Every month that has events, past and future — so search engines can reach
+  // archived months the default homepage view hides.
+  const months = await fetchAllEventMonths();
   const now = new Date();
 
   return [
