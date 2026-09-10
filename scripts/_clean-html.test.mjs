@@ -250,19 +250,31 @@ test("fromMarkdownFeedText preserves paragraphs when asked", () => {
 // comment: exactly one module may unescape, and it may only ever be handed a
 // raw feed field.
 
-test("GUARD: only scrape-bigbigslo.mjs imports the non-idempotent helpers", () => {
-  const offenders = fs
+test("GUARD: the set of modules that may unescape is exactly the allowlist", () => {
+  // Asserting the EXACT set, not merely "no unknown offenders": a new consumer
+  // has to be added here deliberately, with a reason, instead of appearing by
+  // accident. The two entries are safe for different reasons --
+  //   scrape-bigbigslo.mjs           sees each feed field exactly once (pinned
+  //                                  by the call-site guard below)
+  //   backfill-unescape-markdown.mjs is content-addressed: it writes a field
+  //                                  only while that field still hashes to its
+  //                                  recorded pre-state, so a re-run is a no-op
+  const ALLOWED = ["backfill-unescape-markdown.mjs", "scrape-bigbigslo.mjs"];
+
+  const importers = fs
     .readdirSync(SCRIPTS_DIR)
     .filter((f) => f.endsWith(".mjs") && !f.endsWith(".test.mjs"))
-    .filter((f) => f !== "_clean-html.mjs" && f !== "scrape-bigbigslo.mjs")
+    .filter((f) => f !== "_clean-html.mjs")
     .filter((f) => {
       const src = fs.readFileSync(path.join(SCRIPTS_DIR, f), "utf8");
       return /\b(unescapeMarkdown|fromMarkdownFeedText)\b/.test(src);
-    });
+    })
+    .sort();
+
   assert.deepEqual(
-    offenders,
-    [],
-    `non-idempotent unescaping must stay confined to scrape-bigbigslo.mjs; found in: ${offenders.join(", ")}`
+    importers,
+    ALLOWED,
+    `unescaping is non-idempotent and must stay confined. Expected exactly [${ALLOWED.join(", ")}], got [${importers.join(", ")}]`
   );
 });
 
