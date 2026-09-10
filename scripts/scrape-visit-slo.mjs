@@ -6,7 +6,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { logRun } from "./_log-run.mjs";
-import { cleanDescriptionHtml } from "./_clean-html.mjs";
+import { cleanDescriptionHtml, cleanText } from "./_clean-html.mjs";
 import {
   dayBefore,
   firstPrunableDay,
@@ -39,19 +39,6 @@ function laWallTimeToUtcIso(dateStr) {
   const la = new Date(laString.replace(" ", "T") + "Z");
   const offsetMs = utc.getTime() - la.getTime();
   return new Date(utc.getTime() + offsetMs).toISOString();
-}
-
-function decodeHtmlEntities(s) {
-  if (!s) return "";
-  return s
-    .replace(/&#0?39;/g, "'")
-    .replace(/&#8216;|&#8217;/g, "’")
-    .replace(/&#8220;|&#8221;/g, "”")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&nbsp;/g, " ");
 }
 
 const COMMUNITY_OVERRIDE = [
@@ -241,12 +228,12 @@ async function main() {
   for (const e of all) {
     const startsAt = laWallTimeToUtcIso(e.start_date);
     const endsAt = laWallTimeToUtcIso(e.end_date);
-    const title = decodeHtmlEntities(e.title || "").trim();
+    const title = cleanText(e.title);
     if (!startsAt || !title) continue;
 
     const venueName =
-      decodeHtmlEntities(e.venue?.venue || "").trim() || "TBA";
-    const city = decodeHtmlEntities(e.venue?.city || "").trim();
+      cleanText(e.venue?.venue) || "TBA";
+    const city = cleanText(e.venue?.city);
     const community = communityFromCity(city);
 
     // Visit SLO assigns a unique numeric id per occurrence (recurring events

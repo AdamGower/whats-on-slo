@@ -15,6 +15,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { logRun } from "./_log-run.mjs";
+import { cleanText, cleanTextPreservingBreaks } from "./_clean-html.mjs";
 import {
   firstPrunableDay,
   latestPacificDay,
@@ -260,7 +261,8 @@ export function buildRows(events) {
       FALLBACK_LEARN_MORE;
 
     const description =
-      (typeof e.Description === "string" && e.Description.trim()) ||
+      (typeof e.Description === "string" &&
+        cleanTextPreservingBreaks(e.Description)) ||
       (typeof e.Short === "string" && e.Short.trim()) ||
       `${e.Name} at ${venue} in ${community}.`;
 
@@ -271,7 +273,7 @@ export function buildRows(events) {
 
     rows.push({
       id: `bbs-${e.PId}-${slugify(e.Name)}`,
-      title: e.Name.trim(),
+      title: cleanText(e.Name),
       starts_at: bbsWallTimeToUtcIso(e.DateStart),
       ends_at: e.DateEnd ? bbsWallTimeToUtcIso(e.DateEnd) : null,
       venue,

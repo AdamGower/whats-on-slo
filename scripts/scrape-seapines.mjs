@@ -31,7 +31,7 @@ import {
   latestPacificDay,
   pruneMissing,
 } from "./_prune-missing.mjs";
-import { cleanDescriptionHtml } from "./_clean-html.mjs";
+import { cleanDescriptionHtml, cleanText } from "./_clean-html.mjs";
 
 // ------------------------------------------------------------------ config
 
@@ -175,7 +175,7 @@ export function buildRows(items, { now = new Date() } = {}) {
   const seenIds = new Set();
 
   for (const item of items) {
-    const title = cleanTitle(item.title);
+    const title = cleanTitle(cleanText(item.title));
     if (!title) {
       drops.push({ reason: "no-title", title: item.title || "" });
       continue;

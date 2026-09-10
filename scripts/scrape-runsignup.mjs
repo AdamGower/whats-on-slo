@@ -26,7 +26,7 @@ import {
   latestPacificDay,
   pruneMissing,
 } from "./_prune-missing.mjs";
-import { cleanDescriptionHtml } from "./_clean-html.mjs";
+import { cleanDescriptionHtml, cleanText } from "./_clean-html.mjs";
 
 // ------------------------------------------------------------------ config
 
@@ -190,7 +190,7 @@ export function buildRows(parsed, { now = new Date() } = {}) {
       continue;
     }
 
-    const title = cleanTitle(race.name);
+    const title = cleanTitle(cleanText(race.name));
     if (!title) {
       drops.push({ reason: "no-title", name: race.name });
       continue;
@@ -198,9 +198,7 @@ export function buildRows(parsed, { now = new Date() } = {}) {
 
     const addr = race.address || {};
     const venue =
-      (addr.street && addr.street.trim()) ||
-      (addr.city && addr.city.trim()) ||
-      "TBA";
+      cleanText(addr.street) || cleanText(addr.city) || "TBA";
     const community = (addr.city && addr.city.trim()) || DEFAULT_COMMUNITY;
 
     const description = truncateDescription(

@@ -9,6 +9,7 @@
 import * as cheerio from "cheerio";
 import { createClient } from "@supabase/supabase-js";
 import { logRun } from "./_log-run.mjs";
+import { cleanText } from "./_clean-html.mjs";
 import {
   firstPrunableDay,
   latestPacificDay,
@@ -136,14 +137,14 @@ async function main() {
     const ev = parseIcsEvent(icsText);
     const startsAt = parseIcsDate(ev.DTSTART);
     const endsAt = parseIcsDate(ev.DTEND);
-    const title = unescapeIcalText(ev.SUMMARY);
+    const title = cleanText(unescapeIcalText(ev.SUMMARY));
 
     if (!startsAt || !title) continue;
     if (new Date(startsAt) < now && (!endsAt || new Date(endsAt) < now)) {
       continue; // already over
     }
 
-    const location = unescapeIcalText(ev.LOCATION);
+    const location = cleanText(unescapeIcalText(ev.LOCATION));
     // "Madonna Inn, 100 Madonna Road, San Luis Obispo, CA, ..."
     const locParts = location.split(",").map((s) => s.trim());
     const venue = locParts[0] || "Madonna Inn";

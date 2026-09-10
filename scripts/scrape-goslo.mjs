@@ -11,7 +11,7 @@ import {
   latestPacificDay,
   pruneMissing,
 } from "./_prune-missing.mjs";
-import { cleanDescriptionHtml } from "./_clean-html.mjs";
+import { cleanDescriptionHtml, cleanText } from "./_clean-html.mjs";
 
 const SUPABASE_URL =
   process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -113,9 +113,9 @@ async function main() {
       const $titleLink = links.eq(0);
       const $venueLink = links.length > 1 ? links.eq(links.length - 1) : null;
 
-      const title = $titleLink.text().trim();
+      const title = cleanText($titleLink.text());
       const eventUrl = $titleLink.attr("href");
-      const venue = $venueLink ? $venueLink.text().trim() : "TBA";
+      const venue = $venueLink ? cleanText($venueLink.text()) : "TBA";
 
       if (!title || !eventUrl) return;
 

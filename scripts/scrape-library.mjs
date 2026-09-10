@@ -6,7 +6,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { logRun } from "./_log-run.mjs";
-import { cleanDescriptionHtml } from "./_clean-html.mjs";
+import { cleanDescriptionHtml, cleanText } from "./_clean-html.mjs";
 import { firstPrunableDay, pruneMissing } from "./_prune-missing.mjs";
 
 const SUPABASE_URL =
@@ -124,10 +124,10 @@ async function main() {
 
     rows.push({
       id: `lib-${e.id}`,
-      title: e.title.trim(),
+      title: cleanText(e.title),
       starts_at: startsAt,
       ends_at: endsAt,
-      venue: branchName,
+      venue: cleanText(branchName),
       community: communityFromBranch(branchName),
       description:
         cleanDescriptionHtml(e.description) ||

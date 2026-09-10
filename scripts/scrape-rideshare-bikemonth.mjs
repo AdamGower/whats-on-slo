@@ -30,7 +30,7 @@ import {
   latestPacificDay,
   pruneMissing,
 } from "./_prune-missing.mjs";
-import { cleanDescriptionHtml } from "./_clean-html.mjs";
+import { cleanDescriptionHtml, cleanText } from "./_clean-html.mjs";
 
 // ------------------------------------------------------------------ config
 
@@ -221,9 +221,9 @@ export function buildRows(parsed, { now = new Date() } = {}) {
   for (const ev of Object.values(parsed)) {
     if (!ev || ev.type !== "VEVENT") continue;
 
-    const title = (ev.summary || "").trim();
+    const title = cleanText(ev.summary);
     const description = cleanDescriptionHtml(ev.description || "");
-    const location = (ev.location || "").trim();
+    const location = cleanText(ev.location);
 
     const dropReason = shouldExclude(title, description, location);
     if (dropReason) {

@@ -4,7 +4,11 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { cleanDescriptionHtml } from "./_clean-html.mjs";
+import {
+  cleanDescriptionHtml,
+  cleanText,
+  cleanTextPreservingBreaks,
+} from "./_clean-html.mjs";
 
 test("cleanDescriptionHtml strips plain HTML tags", () => {
   const html = "<p>Live music at <b>The Siren</b> tonight.</p>";
@@ -104,4 +108,80 @@ test("cleanDescriptionHtml exact regression case from production (goslo)", () =>
     out,
     "In celebration of May the 4th, CCRD will be hosting a fun skate. Buy tickets now"
   );
+});
+
+// --- entity decoding -------------------------------------------------------
+// Titles and venues arrive tag-free but entity-encoded, and never passed
+// through cheerio, so nothing decoded them. The hand-rolled map this replaced
+// covered &amp; but not its numeric twin &#038;, which is the form Visit SLO
+// actually sends -- hence literal "&#038;" reaching the live site.
+
+test("cleanText decodes NUMERIC entities (the bug: &#038; missing from old map)", () => {
+  assert.equal(cleanText("Buffalo Pub &#038; Grill"), "Buffalo Pub & Grill");
+  assert.equal(cleanText("Weekly Docent Tours &#8211; SLOMA"), "Weekly Docent Tours \u2013 SLOMA");
+});
+
+test("cleanText decodes NAMED entities the old map missed", () => {
+  assert.equal(cleanText("A &mdash; B"), "A \u2014 B");
+  assert.equal(cleanText("&bull; item"), "\u2022 item");
+  assert.equal(cleanText("Cendr&eacute;"), "Cendr\u00e9");
+  assert.equal(cleanText("Ni&ntilde;os"), "Ni\u00f1os");
+});
+
+test("cleanText decodes HEX entities", () => {
+  assert.equal(cleanText("A &#x26; B"), "A & B");
+});
+
+test("cleanText still handles everything the old map did", () => {
+  assert.equal(cleanText("Tom &amp; Jerry"), "Tom & Jerry");
+  assert.equal(cleanText("&quot;quoted&quot;"), '"quoted"');
+  assert.equal(cleanText("a&nbsp;b"), "a b");
+  assert.equal(cleanText("&#039;apostrophe&#039;"), "'apostrophe'");
+});
+
+test("cleanText collapses whitespace and trims", () => {
+  assert.equal(cleanText("  spaced   out \n title "), "spaced out title");
+});
+
+test("cleanText leaves non-entity ampersands alone", () => {
+  assert.equal(cleanText("AT&T"), "AT&T");
+  assert.equal(cleanText("Rock & Roll"), "Rock & Roll");
+});
+
+test("cleanText is idempotent (re-running cannot progressively mangle)", () => {
+  const once = cleanText("Buffalo Pub &#038; Grill");
+  assert.equal(cleanText(once), once);
+});
+
+test("cleanText returns empty string for empty/null input", () => {
+  assert.equal(cleanText(""), "");
+  assert.equal(cleanText(null), "");
+  assert.equal(cleanText(undefined), "");
+});
+
+test("cleanTextPreservingBreaks keeps paragraph breaks while decoding", () => {
+  assert.equal(
+    cleanTextPreservingBreaks("Para one &amp; more\n\nPara two"),
+    "Para one & more\n\nPara two"
+  );
+});
+
+test("cleanTextPreservingBreaks caps runs of blank lines at one", () => {
+  assert.equal(cleanTextPreservingBreaks("a\n\n\n\n\nb"), "a\n\nb");
+});
+
+test("cleanDescriptionHtml decodes entities AFTER tag stripping", () => {
+  assert.equal(cleanDescriptionHtml("<p>Tom &amp; Jerry</p>"), "Tom & Jerry");
+});
+
+test("cleanDescriptionHtml recovers DOUBLE-encoded input", () => {
+  // Source sends &amp;eacute;. Cheerio's .text() decodes one layer to
+  // &eacute;; the post-strip pass turns it into the real character.
+  assert.equal(cleanDescriptionHtml("<p>Caf&amp;eacute;</p>"), "Caf\u00e9");
+  assert.equal(cleanDescriptionHtml("<p>Paso &amp;ndash; Robles</p>"), "Paso \u2013 Robles");
+});
+
+test("cleanDescriptionHtml does not resurrect text from removed <style> blocks", () => {
+  const out = cleanDescriptionHtml("<style>#a{content:'&amp;'}</style><p>Body &amp; text</p>");
+  assert.equal(out, "Body & text");
 });

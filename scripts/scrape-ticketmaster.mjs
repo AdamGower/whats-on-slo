@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { logRun } from "./_log-run.mjs";
+import { cleanText } from "./_clean-html.mjs";
 
 const SUPABASE_URL =
   process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -68,10 +69,10 @@ function mapEvent(e) {
 
   return {
     id: `tm-${e.id}`,
-    title: e.name,
+    title: cleanText(e.name),
     starts_at: e.dates?.start?.dateTime ?? null,
     ends_at: null,
-    venue: venue?.name || "TBA",
+    venue: cleanText(venue?.name) || "TBA",
     community: venue?.city?.name || "San Luis Obispo Area",
     description,
     source,
