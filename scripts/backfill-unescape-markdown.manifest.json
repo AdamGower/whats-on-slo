@@ -1,0 +1,1345 @@
+{
+  "note": "Per-field SHA-256 of pre-backfill state. A field is written only if its current value still hashes to `before`, which makes a re-run a no-op.",
+  "generated_rows": 222,
+  "generated_fields": 223,
+  "entries": [
+    {
+      "id": "bbs-18722003-performing-arts-recital-supplemental",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "402f82223475774b6a2ed64868bbf120ca5cbf0b9494ed833aeb5cae0aa3d302"
+    },
+    {
+      "id": "bbs-17834896-electric-six-tragedy-all-metal-bee-gees-tribute",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "1d4657cd8095b03445d2a797d3624eb8ef2704a965aefa457e647fec108dc09b"
+    },
+    {
+      "id": "bbs-18595075-2026-concert-series-5th-alarm-band",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "4c37fb9fb50e9ed6412a3a9da61265f4764d6e003b05831a078074ddfe5980b9"
+    },
+    {
+      "id": "bbs-18407054-daring-greatly",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "be11932154b1e1c4bb54da2a1a3f842b887310fdb791f85dd070ec76d69da569"
+    },
+    {
+      "id": "bbs-18575303-swing-shift-band-free-afternoon-show",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "1d49d59a89d60ae6392835a4bae1ffae191d9677c6eac54cfe8bd286c3b4342c"
+    },
+    {
+      "id": "bbs-18575258-mother-s-day-concert-sheryl-the-pretenders-tribute-band",
+      "field": "title",
+      "source": "BigBigSLO",
+      "before": "2217444c7a951c73a05e71dd88acd339c37a512f2a209af8280d1e5273b2a118"
+    },
+    {
+      "id": "bbs-18575258-mother-s-day-concert-sheryl-the-pretenders-tribute-band",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "d9c0d7952468cee19743229b577ed13ca6f0e6f51f35f9849fd73ed487215df2"
+    },
+    {
+      "id": "bbs-18010514-5th-annual-sheep-shearing-shindig",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "f8c1ba1e51783a3d715aa0f2263a6612daf6b1f77e02a4fa8383b7b9e7eed0b8"
+    },
+    {
+      "id": "bbs-18787205-thelma-louise",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "8d0122996be26b05799beafb8c72243da375ef68ebf463dfff0403458e43d242"
+    },
+    {
+      "id": "bbs-18781185-loren-radis",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "56a5a9b8e39d1710aae5b6fe3c572b88d5d59c64e2869e02b1d815354b374e61"
+    },
+    {
+      "id": "bbs-18595070-2026-concert-series-cassi-nicols",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "dfcc4e4a323a34c10a7439107036a78e405ddcd388fea0c7c19e8e07013d2c04"
+    },
+    {
+      "id": "bbs-18196724-kishi-bashi",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "9f8930b31380a005180d395770b6968606f10732bbc481bed314b7b2b495feaa"
+    },
+    {
+      "id": "bbs-18787204-rock-odyssey",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "8d0122996be26b05799beafb8c72243da375ef68ebf463dfff0403458e43d242"
+    },
+    {
+      "id": "bbs-19019714-the-randy-savages-punk-rock-time-machine",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "0355b5d53b3d9813324dde4b2cbe40c1b817d5108e2e5965dfc07d45c006f60f"
+    },
+    {
+      "id": "bbs-18811773-bravo",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "a42d7d60421fe82dac9a6277b935bd130f93c02e6c8f15a6e97a4ce2f3c5301c"
+    },
+    {
+      "id": "bbs-18811694-coloso-island-vibes-direct-from-maui",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "820debca397efc98dcf2e540306d10964a5b659121b885a0e5247738ecd80bc8"
+    },
+    {
+      "id": "bbs-18360037-nature-rhythms-at-crow-s-end-mindful-drumming-nature-connect",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "8602156a67f8b53e16b51a7aa36c964ac772d591468328df91a3adb0d7287ffe"
+    },
+    {
+      "id": "bbs-18976888-erin-the-earthquakes",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "8d0122996be26b05799beafb8c72243da375ef68ebf463dfff0403458e43d242"
+    },
+    {
+      "id": "bbs-18778692-sips-sounds-live-music-joy-bonner",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "be84fd384b1128cb53a22fbb1b5867c9ccb879eeacf49e3ee1f5b2499650f594"
+    },
+    {
+      "id": "bbs-18390393-hr-legendary-singer-from-bad-brains",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "2ba9d148414e8a35573b3de86c79a379e07c45ded8388209a1394819d82d908e"
+    },
+    {
+      "id": "bbs-18775572-sips-sounds-live-music-emilee-morrison",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "be84fd384b1128cb53a22fbb1b5867c9ccb879eeacf49e3ee1f5b2499650f594"
+    },
+    {
+      "id": "bbs-17770476-king-yellowman-featuring-special-guests-eric-cotton-one-love",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "b4f2f02f3bd3143566f52eafd1d8f8818edf5f044cfbbb5adc2588033b94437b"
+    },
+    {
+      "id": "bbs-18787207-brimstone",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "8d0122996be26b05799beafb8c72243da375ef68ebf463dfff0403458e43d242"
+    },
+    {
+      "id": "bbs-18787209-danny-white-band",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "8d0122996be26b05799beafb8c72243da375ef68ebf463dfff0403458e43d242"
+    },
+    {
+      "id": "bbs-18575398-live-on-the-rocks-concert-ft-zongo-all-stars",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "af0fa0d06ec0e2e7dd42e2c135b9fd7e0701b54c312518f33266ba75c459e015"
+    },
+    {
+      "id": "bbs-18482057-matt-maeson",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "d764bc9de1536a2df4b3255154b36c70eb25911075d1d87e1d3d19250cd1ea9b"
+    },
+    {
+      "id": "bbs-18466288-pulp-vixen-la-s-1-all-female-cover-band-live-at-the-pour-hou",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "9a7135fbc10c208473c65235efb629cafa9ca530f66a285f5f0911ac672657f5"
+    },
+    {
+      "id": "bbs-17796298-2026-expo-the-expo",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "61eb815a57980f532ea79df41d3fef5b5d6a8adb9a2220450570e51dcab266f3"
+    },
+    {
+      "id": "bbs-18826829-country-sunday-joe-the-jays-schooners-summer-concert-series",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "aa9fdf1aabeff03a9c9509a805cd6dc3e2ee0730eb1207915c74f1fb9d91d873"
+    },
+    {
+      "id": "bbs-18976893-cervantes",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "8d0122996be26b05799beafb8c72243da375ef68ebf463dfff0403458e43d242"
+    },
+    {
+      "id": "bbs-18991269-the-vibe-setters-the-rivalry-san-luis-obispo-concerts-in-the",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "21ed41ab5a62b62c88fe576e8e9b3a195947e426d5a560eb5a9a7c7beed7418b"
+    },
+    {
+      "id": "bbs-18979232-black-velvet",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "8d0122996be26b05799beafb8c72243da375ef68ebf463dfff0403458e43d242"
+    },
+    {
+      "id": "bbs-18888354-the-barrelhouse-wailers-raider-jazz-ensemble",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "00688026c59a3991925c7cfb63b1382a479879708cedb7a47a05557ebe98d56b"
+    },
+    {
+      "id": "bbs-18575264-firestone-walker-block-party",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "9431566279cf2a9cc61234ae5b350c51d5b7ed83f52fad94ec95a3a9a7de6083"
+    },
+    {
+      "id": "bbs-18976887-mad-about-you",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "8d0122996be26b05799beafb8c72243da375ef68ebf463dfff0403458e43d242"
+    },
+    {
+      "id": "bbs-18775578-cali-coast-duo-sea-shell-wines",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "67d7be46e6d73a81db821049d7766e6291bbed77d7aa11e4585224945543a4e9"
+    },
+    {
+      "id": "bbs-18702848-live-music-rolf-g",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "f5ad5fe67ac65bfc61d85b1e07fe6895fce48badb608d22bd68597e1a1208f28"
+    },
+    {
+      "id": "bbs-18309075-best-of-the-west-antique-equipment-show",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "14c300f21cbc54c9cc7205ce187ef2bb9b697d8f7418ac3d55923047f4775f26"
+    },
+    {
+      "id": "bbs-17872726-lazy-locals-free-concert-way-out-west-band",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "8a766d49734f7adb6018324d8eb2a37343d930a7c3819e3d8eefbd04949ae021"
+    },
+    {
+      "id": "bbs-19330986-serenity-sound-journey-at-la-lomita-ranch",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "5238c878c0eaa0a22b0f1a238032b7a3782b1d08ad4a2df59b6e0b53f74deea2"
+    },
+    {
+      "id": "bbs-19114700-rava-on-the-rocks-cali-coast-duo",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "3722a707190e9c27505729943a5beabaf7179dbae8c06336385ceb260147e192"
+    },
+    {
+      "id": "bbs-18976550-award-winning-film-screening-the-wrecking-crew",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "be1020a6e6876d69d2a78f1f19ad50c906399e70615937407263569e0fbdb7d3"
+    },
+    {
+      "id": "bbs-18826835-paddy-marsh-schooners-summer-concert-series",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "aa9fdf1aabeff03a9c9509a805cd6dc3e2ee0730eb1207915c74f1fb9d91d873"
+    },
+    {
+      "id": "bbs-18069271-event-slo-country-sheriff-s-rodeo",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "1500779e57dd38baaf2318f6dc97d2c38775ebfd000f1166a9e21289290c9e56"
+    },
+    {
+      "id": "bbs-18787235-uptown-jazz-night-gaile-gillaspie-and-her-big-city-band",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "9b5a21264afe8cca3be66f2b1a210f9f1e0753ad1b9075bf99ef15789dc60151"
+    },
+    {
+      "id": "bbs-18918225-rava-on-the-rocks-featuring-paso-libre",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "a588c33839d067d7ed09b80ec5dc69c9a7bd033c4e47847e2c5107e9702da6b6"
+    },
+    {
+      "id": "bbs-18714360-color-my-world-with-song",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "45055d915ba4173781f65449012b9a73c69ff729e0eb5b85acdda1c000a12e63"
+    },
+    {
+      "id": "bbs-18665547-the-dunes-center-2026-gala",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "360753a066f4150ccbd98edb4ef97c3f3c699aa9ca0141bf42a321636f9c24aa"
+    },
+    {
+      "id": "bbs-18714337-scott-amendola-trio",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "31cba1e0aa48d494da53d0fe716ede94f9610b6bd75f333414c279b47a79a5b5"
+    },
+    {
+      "id": "bbs-18787208-legends",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "8d0122996be26b05799beafb8c72243da375ef68ebf463dfff0403458e43d242"
+    },
+    {
+      "id": "bbs-19311895-rava-on-the-rocks-featuring-talie-copen",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "fee072de7e9d29ec009c94857feee02a67e68476cc1b974d989a56c7e8788fc3"
+    },
+    {
+      "id": "bbs-18665467-the-dance-movement",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "4d3912f89bc600b2ea0e5b8395f818452ec3fc7c2e64d29685eeeac0e654cb5b"
+    },
+    {
+      "id": "bbs-18976890-captain-morgan-the-fish",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "8d0122996be26b05799beafb8c72243da375ef68ebf463dfff0403458e43d242"
+    },
+    {
+      "id": "bbs-18575302-no-animals-were-harmed-with-sunwell-free-prog-rock-show-two-",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "9eeeae983765816ca244bff60498ad87a7da81f73c3293f9d9f1bf4d1aa0c6a5"
+    },
+    {
+      "id": "bbs-18826826-bret-harvell-cd-release-schooners-summer-concert-series",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "aa9fdf1aabeff03a9c9509a805cd6dc3e2ee0730eb1207915c74f1fb9d91d873"
+    },
+    {
+      "id": "bbs-19026370-soul-kool",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "8d0122996be26b05799beafb8c72243da375ef68ebf463dfff0403458e43d242"
+    },
+    {
+      "id": "bbs-17872678-lazy-locals-free-concert-b-the-hive",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "5b14295ca2654b0e04be2179160b0b120360fbd19598c49c928a4c75c88a6b07"
+    },
+    {
+      "id": "bbs-18299791-seeds-of-the-future",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "1eecf84b8945d1dc3c06893a46d7dfc0e0e3ef0d1e9f37d2a5df43d9375e0cd5"
+    },
+    {
+      "id": "bbs-18360048-nature-rhythms-mindful-drumming-song-nature-connection",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "ecd36df7a197d37999efce1c202fad7131b0c73d2b2682db86b6a741cfe4e7b1"
+    },
+    {
+      "id": "bbs-18918223-rava-on-the-rocks-featuring-talie-copen",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "fee072de7e9d29ec009c94857feee02a67e68476cc1b974d989a56c7e8788fc3"
+    },
+    {
+      "id": "bbs-18575263-memorial-weekend-concert",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "52bebf48d739b12e3966dbd5db92b05a6d961982529e5ceeaccd2c620d52484d"
+    },
+    {
+      "id": "bbs-18896123-cal-poly-winds-bands-journey-home-concert",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "9adb888582e9e8f0681488aad3f0030bffa103d48d086359e79c8b74b0cb55b5"
+    },
+    {
+      "id": "bbs-18595074-live-music-with-banjerdan",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "85f14cb12a4df9eeda2622519c37b1195f622802975830f2d309326cded18840"
+    },
+    {
+      "id": "bbs-18299798-rava-on-the-rocks-talie-copen",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "3722a707190e9c27505729943a5beabaf7179dbae8c06336385ceb260147e192"
+    },
+    {
+      "id": "bbs-18787210-donna-lu-band",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "8d0122996be26b05799beafb8c72243da375ef68ebf463dfff0403458e43d242"
+    },
+    {
+      "id": "bbs-18575244-bobby-rachel-santa-cruz-sea-shell-wines",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "4766d86444f4f8de3e942cfa24893164f2629ef7336e1cc95624ac69eae53f11"
+    },
+    {
+      "id": "bbs-19471959-open-mic-song-inspiration-circle",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "37466f85fe4a5afeb4e9fe222a9e1002e12ade3897e9f42d31ec375ae60cbc62"
+    },
+    {
+      "id": "bbs-18360037-nature-rhythms-mindful-drumming-song-nature-connection",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "df63a5c6361e7d9e636c9a6f4db310db39b3bfe6e0237fab1468db5e515f54b8"
+    },
+    {
+      "id": "bbs-18976896-grievance",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "8d0122996be26b05799beafb8c72243da375ef68ebf463dfff0403458e43d242"
+    },
+    {
+      "id": "bbs-18775586-sips-sounds-live-music-katie-chappell",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "be84fd384b1128cb53a22fbb1b5867c9ccb879eeacf49e3ee1f5b2499650f594"
+    },
+    {
+      "id": "bbs-19329091-sacred-sounds-portal",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "ea887b3f638a4d25cdc051b6544432bb5331bb9075d629a8c1239c80dbc1d3e6"
+    },
+    {
+      "id": "bbs-18257728-that-s-not-me-comedy-tour-live-at-fremont-theater",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "883f4c081a685f33044c409b2f91d8298d25560f9bb79321ad5f53db541735e1"
+    },
+    {
+      "id": "bbs-18976891-midnight-ride",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "8d0122996be26b05799beafb8c72243da375ef68ebf463dfff0403458e43d242"
+    },
+    {
+      "id": "bbs-18811749-just-some-cool-jazz",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "2f0132daa4210ab8e92839dcf27712705d08c1e3c5fbcfb0fe3f177f17a384c0"
+    },
+    {
+      "id": "bbs-19114691-rava-on-the-rocks-james-scoolis",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "3722a707190e9c27505729943a5beabaf7179dbae8c06336385ceb260147e192"
+    },
+    {
+      "id": "bbs-19332881-portal-rhythms-in-pismo-mindful-drumming-song",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "6a3a6a9faaf992b214a682d5780ceff1109d7106bcf2618c1edcf959c8ad21b9"
+    },
+    {
+      "id": "bbs-18991267-30th-anniversary-block-party-san-luis-obispo-concerts-in-the",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "21ed41ab5a62b62c88fe576e8e9b3a195947e426d5a560eb5a9a7c7beed7418b"
+    },
+    {
+      "id": "bbs-18747627-cyborg-octopus-fervence-nott",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "171be4f0d3fc3d2fe7a26e25639d5545dc46b70f6793386ca6307d3fc939a34a"
+    },
+    {
+      "id": "bbs-18482117-raised-on-real-tour",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "e616a243832f2557bbe6c90a70319b0209deb2fb8b5d2d438999b4428d22a68d"
+    },
+    {
+      "id": "bbs-19220519-k-pop-princess-dance-party",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "006fdb7e2fae841a8f3d28b8880ac04b7483860aa01d525bb675e7c7897c0110"
+    },
+    {
+      "id": "bbs-18782305-the-rivalry-band",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "30696c831fa33c5fbdc319f488653ffd07a6d53e22e8264c87283448df6a8fe3"
+    },
+    {
+      "id": "bbs-18991266-manuel-the-band-colleen-rhatigan-san-luis-obispo-concerts-in",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "21ed41ab5a62b62c88fe576e8e9b3a195947e426d5a560eb5a9a7c7beed7418b"
+    },
+    {
+      "id": "bbs-18826827-murder-hornets-schooners-summer-concert-series",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "aa9fdf1aabeff03a9c9509a805cd6dc3e2ee0730eb1207915c74f1fb9d91d873"
+    },
+    {
+      "id": "bbs-18826838-overnear-schooners-summer-concert-series",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "aa9fdf1aabeff03a9c9509a805cd6dc3e2ee0730eb1207915c74f1fb9d91d873"
+    },
+    {
+      "id": "bbs-18811652-hooray-for-hollywood",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "baf5daa9a549be6d894538400d8861ca23932e9f0db935bd20ab812e73e583de"
+    },
+    {
+      "id": "bbs-19170612-the-divided-times-tour-qwel-nightwalker",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "acffc59a0ad18eef6fa0ce022d4cc28049fb348990e0d990854c12359f2decc7"
+    },
+    {
+      "id": "bbs-18941212-joy-bonner-band-sea-shell-cellars-wine",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "2481896b56973dbfe13e6126f159fbf3c31c12a4a73da0345b7668c62c5a76f1"
+    },
+    {
+      "id": "bbs-18299740-rava-on-the-rocks-sami-rouissi",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "3722a707190e9c27505729943a5beabaf7179dbae8c06336385ceb260147e192"
+    },
+    {
+      "id": "bbs-18811753-brass-mash-first-friday-at-slo-brew-rock",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "13b7fdaafadf64e3e5346bc41b233bd916aec1c073bf55cc2746071fda06d05c"
+    },
+    {
+      "id": "bbs-18533497-glen-phillips-of-toad-the-wet-sprocket",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "6198317d3c00541c072f649d89c5be8c9540cd0df3958ee7b4dd6ba41cc9f74a"
+    },
+    {
+      "id": "bbs-18924226-off-the-charts",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "9d1730bf0be0c4b25de5cafca91b14650bb957c94138eeb60ef2c708d5b762b3"
+    },
+    {
+      "id": "bbs-18512455-megadeth-with-special-guest-exodus-live-at-the-california-mi",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "63e8a9567b332878845ab210023adc99669a0d653c7d39418758fd3a0cb72078"
+    },
+    {
+      "id": "bbs-18299803-rava-on-the-rocks-holly-lewis",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "3722a707190e9c27505729943a5beabaf7179dbae8c06336385ceb260147e192"
+    },
+    {
+      "id": "bbs-18575406-live-on-the-rocks-concert-ft-legion-of-groove",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "e6f07d652a811161224a47a445e32a7cb619dfc3e39b80528480b5f8a2c5db64"
+    },
+    {
+      "id": "bbs-18129254-slo-wine-mixer",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "90db3761e472fca6fbd082b9f747d0200700c7bebda5bfc4b3e8a03e23c1f5fe"
+    },
+    {
+      "id": "bbs-18575268-father-s-day-concert",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "8110b34d5233f1b08da41760f11b9350ea32e162419351bddc604a4fe388ccc2"
+    },
+    {
+      "id": "bbs-18390360-vino-vibes-bethel-rd-w-jambalaya",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "946f70f8773e57d852615be96393e6cca7b045aa67d8e82f6092288abf0a9806"
+    },
+    {
+      "id": "bbs-18826836-matthias-clark-trio-schooners-summer-concert-series",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "aa9fdf1aabeff03a9c9509a805cd6dc3e2ee0730eb1207915c74f1fb9d91d873"
+    },
+    {
+      "id": "bbs-19114694-rava-on-the-rocks-paul-kent",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "3722a707190e9c27505729943a5beabaf7179dbae8c06336385ceb260147e192"
+    },
+    {
+      "id": "bbs-19114713-sips-sounds-live-music-wednesday-josh-rosenblum",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "be84fd384b1128cb53a22fbb1b5867c9ccb879eeacf49e3ee1f5b2499650f594"
+    },
+    {
+      "id": "bbs-18956143-roots-resonance-radiance-sound-journey-at-la-lomita-ranch",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "77a3d180c3d6167fb8968acd01c1056d368d4e16554af7aec2e83c6de075194c"
+    },
+    {
+      "id": "bbs-18976894-sound-investment",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "8d0122996be26b05799beafb8c72243da375ef68ebf463dfff0403458e43d242"
+    },
+    {
+      "id": "bbs-18781203-kenny-g",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "01614552a040075bb17244b3babb6547e22856fcf2a5b88b69c48e8942c349f8"
+    },
+    {
+      "id": "bbs-18787202-dj-bran-nu",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "51fdd4ed7670f44071dee53331da4953a60dcbc7a3d8040499b028fd9b3f4a7c"
+    },
+    {
+      "id": "bbs-19077790-pretty-suspect",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "3c8e53bc391a0d65a1610f35345761a5941517d0c91e83f98640923f5033af96"
+    },
+    {
+      "id": "bbs-18693274-extortionist-brat-fr3ak-blind-equation",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "a5a3a0603e937f018dcc0aac22b429fc4df430dab4e31f2a1f99fa8fe950d57d"
+    },
+    {
+      "id": "bbs-19114702-sips-sounds-live-music-wednesday-jon-millsap",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "be84fd384b1128cb53a22fbb1b5867c9ccb879eeacf49e3ee1f5b2499650f594"
+    },
+    {
+      "id": "bbs-18299741-rava-on-the-rocks-painted-red-music",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "3722a707190e9c27505729943a5beabaf7179dbae8c06336385ceb260147e192"
+    },
+    {
+      "id": "bbs-18174627-taimane-festival-mozaic",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "75392a96d88570aecc546818fa8c224fbda28d4fb4b305babed36e5cc96bbe90"
+    },
+    {
+      "id": "bbs-19000752-elvis-in-person-june-10th-templeton-performing-arts-center",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "760ccdbea06fd7b506576835b253d8fd02f6f6ac1c22f126a3c17c8fed9ea2f3"
+    },
+    {
+      "id": "bbs-19522541-chico-detour-richard-tripps-matt-nice-the-derls",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "4cb714b747400ef553580ec21ab3ca3713fc0c9511b6c6d2b109c8469f0a3556"
+    },
+    {
+      "id": "bbs-19407058-bill-reiland-band",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "8d0122996be26b05799beafb8c72243da375ef68ebf463dfff0403458e43d242"
+    },
+    {
+      "id": "bbs-18991272-the-molly-ringwald-project-graybill-slo-concerts-in-the-plaz",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "21ed41ab5a62b62c88fe576e8e9b3a195947e426d5a560eb5a9a7c7beed7418b"
+    },
+    {
+      "id": "bbs-18319415-21st-annual-paso-pinot-paella-festival",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "33a86fb8d8e097ed9bfd196f402142f952b085ff352dc16a49b98a9a2f49094c"
+    },
+    {
+      "id": "bbs-18010513-slo-sheriff-s-rodeo-battle-of-the-bulls-concert-featuring-ca",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "44ff3723b1b10780a39e8fc881088af513f8bedebe8092efbe9d0f980b8196d8"
+    },
+    {
+      "id": "bbs-18880383-lefty-gunplay-bonafide-grammy-winning-hardcore-hip-hop",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "e144bdf86029c16ef095542f59fe07cf2cb25675ef52312d91111bde1dd17524"
+    },
+    {
+      "id": "bbs-18726056-howard-jones-things-can-only-get-better-tour",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "c24bc340339bbe031f7c58033b93b0b13cb150b01ac514cee5a850e6b426c08f"
+    },
+    {
+      "id": "bbs-18771535-rava-on-the-rocks-featuring-spooners-cove",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "4c59eda0640a9054f304adde6c0334c5a81c131e8be05cd02d84ab1e18389fc0"
+    },
+    {
+      "id": "bbs-19665354-big-wheel-cobra-1970-s-rock-tribute-live-at-schooners-cayuco",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "60b9ce5c0a5339142810a172001973640622b5901f66b750d60171a22a8b7157"
+    },
+    {
+      "id": "bbs-19376007-playhouse-at-sea",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "f25ae9f21f11e0c9d976d9bd7d0326385bedb97d36b3f6ae04ad29625f0c85ee"
+    },
+    {
+      "id": "bbs-19120824-the-blues-brothers-fundraiser-screening-for-the-rock-communi",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "f3a7dc15e5a285d13a636a1097778bb0b33afd6640f5ef450d8d5fe28d9b1f21"
+    },
+    {
+      "id": "bbs-18781221-cam-girl",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "18539c6893b2f6e0046f8e24d8f633e6f97c569c35d13a1bf46902a4141a07ef"
+    },
+    {
+      "id": "bbs-18174617-chamber-concert-1-opening-night-festival-mozaic",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "fc00e313668347dbd678247f220471336cdef930f0f9b4adbae69feb72cbf2fe"
+    },
+    {
+      "id": "bbs-18371621-old-dominion",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "c24bc340339bbe031f7c58033b93b0b13cb150b01ac514cee5a850e6b426c08f"
+    },
+    {
+      "id": "bbs-18811696-crystal-moon-wizard-free-show",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "7eb78cf313672fb69c28323362283f579d8a48ebb2582380b98b1187b52b30ae"
+    },
+    {
+      "id": "bbs-19376019-black-uhuru-grammy-winning-reggae-artists-with-nada-rasta",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "de1112319f992e137db5cdbe2dd256d2b1f5eac392c6c3b394b224d22c436667"
+    },
+    {
+      "id": "bbs-18360037-slo-nature-rhythms-at-crow-s-end-mindful-drumming-nature-con",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "019a428ed3b6b151a38c1b2e42f8b4e56f49175373113059207c473021c6e8a8"
+    },
+    {
+      "id": "bbs-18826839-school-of-rock-on-tour-schooners-summer-concert-series",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "aa9fdf1aabeff03a9c9509a805cd6dc3e2ee0730eb1207915c74f1fb9d91d873"
+    },
+    {
+      "id": "bbs-18482072-loren-radis",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "56a5a9b8e39d1710aae5b6fe3c572b88d5d59c64e2869e02b1d815354b374e61"
+    },
+    {
+      "id": "bbs-19326779-stereo-chickens-the-reunion-feat-maddie-flood-special-matine",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "8cbf55f47ac35eddd1d5dfbe2d4cc9b8ecfc0747a5711ca762de911d3df1b2ad"
+    },
+    {
+      "id": "bbs-19440041-w-i-t-c-h",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "7e99b84195bf4ad4f8ba39d390516c153087326638041a7c371c60d566f3ffa5"
+    },
+    {
+      "id": "bbs-19019715-international-day-of-yoga",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "1356470517a795dbfa6d2fde4d25c5f235aae4a348ac9e1ecb38e8d471561ee0"
+    },
+    {
+      "id": "bbs-18991276-imva-sami-rouissi-san-luis-obispo-concerts-in-the-plaza",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "21ed41ab5a62b62c88fe576e8e9b3a195947e426d5a560eb5a9a7c7beed7418b"
+    },
+    {
+      "id": "bbs-19085117-bobby-santa-cruz-lynda-tymchek-at-sea-shell",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "93fe7ae643076796161392078d0bfda6c93da6ba8196e8a3f30fc1480fedc843"
+    },
+    {
+      "id": "bbs-18010515-slo-sheriff-s-rodeo-gunnar-latham-concert",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "ee03cea87ec168f1e7827733c1ed980ca49272fb1eb099fe2e9c5c951b0a8618"
+    },
+    {
+      "id": "bbs-19266132-the-darbies-a-free-rock-n-roll-show",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "e8fc37f2ccdc9a5b755e436115992841a8dcfa47d8f284aaf5b7225b0ab2a9f3"
+    },
+    {
+      "id": "bbs-19539345-morro-bay-comedy-night-with-the-tommy-lama",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "b0aa5566e0deb6874a9ee4503459650806194cc7bb8581686a3a216c8cde0580"
+    },
+    {
+      "id": "bbs-18714335-the-wave-forward-women-accelerating-business-leadership-ment",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "63c955f1e1d16b90acb8844840a0a87e33a1943de7c21a6e343ff8522bc1d14d"
+    },
+    {
+      "id": "bbs-18390458-the-soda-crackers-w-archer-moze-live-at-club-car-bar",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "7cfe365bad7e3ae648879dfe6472a35cfbe4525d28a32b83b28c260906867e15"
+    },
+    {
+      "id": "bbs-18693276-gozu-restless-spirit",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "4ec8c54de5f0a3046e7a6b0b73f9c5c505c969c5afb16fa3c8a6db4f5b5b9c70"
+    },
+    {
+      "id": "bbs-18961343-grrrizzly-hot-tina",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "ee7ae89229b4a75138b184013c3904c4a68a71fdfa37f2a14374df3503b47be0"
+    },
+    {
+      "id": "bbs-19307193-saltwound-cultist",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "8c25e9316c464b8ce52327c0c05a77922d584839cedf08207fa424e4dfd7c296"
+    },
+    {
+      "id": "bbs-18466289-spring-wine-walk-2026",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "b62057f5c497f66ba76d8385097262e3a18f3e672c2c3807b5d1e168ecd391d1"
+    },
+    {
+      "id": "bbs-19544512-mom-s-reset-mini-retreat-for-mothers",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "33f5a13cf5b5ba37313eb03421666b3c5569f4efe6ccb99dcdc985685431fda0"
+    },
+    {
+      "id": "bbs-18512881-battle-of-the-central-coast",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "6cf6dc6fb2876cb0ac015234a6ccd30f7e19150cbd9544362532bbbabb622fe9"
+    },
+    {
+      "id": "bbs-19355920-brainsoil-ix-encore-seed-cycle",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "240a77476e67220c7db345bfc6628d158dfd0dc2d23cb6912dc791fc7c6703c2"
+    },
+    {
+      "id": "bbs-18826837-brenda-carsey-schooners-summer-concert-series",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "aa9fdf1aabeff03a9c9509a805cd6dc3e2ee0730eb1207915c74f1fb9d91d873"
+    },
+    {
+      "id": "bbs-19114744-rava-on-the-rocks-brock-van-pelt",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "3722a707190e9c27505729943a5beabaf7179dbae8c06336385ceb260147e192"
+    },
+    {
+      "id": "bbs-18781212-second-paloma",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "efe5337c7f3c9ea6b5bd7b23964e1fdc5d48842bacdfdbca766d5939f35f4b4d"
+    },
+    {
+      "id": "bbs-18091032-an-evening-with-zepparella",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "5e8bec0720ab1b00401fedc84ac7df9b197db5a844dc61723c972634b111a77b"
+    },
+    {
+      "id": "bbs-18991268-b-the-hive-kenny-taylor-san-luis-obispo-concerts-in-the-plaz",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "21ed41ab5a62b62c88fe576e8e9b3a195947e426d5a560eb5a9a7c7beed7418b"
+    },
+    {
+      "id": "bbs-18826834-40-feather-schooners-summer-concert-series",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "aa9fdf1aabeff03a9c9509a805cd6dc3e2ee0730eb1207915c74f1fb9d91d873"
+    },
+    {
+      "id": "bbs-19471980-that-s-so-drag-brunch",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "400bb8def40ef1fd0b5b1a8e9aaf86eb7f6f10fb94bc0195b1aa23a586f11a41"
+    },
+    {
+      "id": "bbs-18390457-out-savvy-bring-a-friend-become-a-friend",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "81e6f184a37d519868f73277c80aaac3c74f327bb4c94c1ffcab637c810abf95"
+    },
+    {
+      "id": "bbs-15770674-front-row-karaoke",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "8d0122996be26b05799beafb8c72243da375ef68ebf463dfff0403458e43d242"
+    },
+    {
+      "id": "bbs-19522542-iv-and-the-strange-band-w-clownvis-presley-hank-williams-the",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "d9baa8bb4e070b99723d993f25bb5bc591123c390b3bb3b732c645bcf56ce0b8"
+    },
+    {
+      "id": "bbs-19089270-james-garner-s-tribute-to-johnny-cash-live",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "cf01d1a3c71b3ea34419a1145f68bbac7b1d1b385564cfc4dfd7d0ba302c8f03"
+    },
+    {
+      "id": "bbs-19148766-san-lyon-the-true-stories-basin-street-regulars-jazz-concert",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "62bd6dbc2d7e2f1f98fa48d430c4518dad101368eaa8fdeed367d911caffc92d"
+    },
+    {
+      "id": "bbs-19795815-erin-the-earthquakes",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "8d0122996be26b05799beafb8c72243da375ef68ebf463dfff0403458e43d242"
+    },
+    {
+      "id": "bbs-19086950-live-free-music-with-kenny-taylor-trio-at-sculpterra-winery",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "f57c578762fb41c8ce790529bc75f6b5bfad4ac2f362386c8af31e116486127e"
+    },
+    {
+      "id": "bbs-18781207-asleep-at-the-wheel",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "7fb00396fd5ec60bf4bd8350f49b51774a7b56252fa0555d32b94b1742828072"
+    },
+    {
+      "id": "bbs-18575324-bodytraffic-2026-tour-of-thanks",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "7e26d0040877546a18249bf402e448c067e67c4174258dc3f96f9e8b07fd26e5"
+    },
+    {
+      "id": "bbs-18924242-sounding-arrow-gary-jules-the-breezers",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "58b49d078ea6315089ddee6973b2c447abca0461936c13c234c52c4566808842"
+    },
+    {
+      "id": "bbs-18826828-hazard-canyon-schooners-summer-concert-series",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "aa9fdf1aabeff03a9c9509a805cd6dc3e2ee0730eb1207915c74f1fb9d91d873"
+    },
+    {
+      "id": "bbs-18918224-rava-on-the-rocks-featuring-emily-smith",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "2af342f3a1c804f085f7a7a9b64fc4d54ae2a9037dfd4109c29f070145f7fc7e"
+    },
+    {
+      "id": "bbs-19049170-bhbc-event-singles-night",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "e2e41ed858c58c40cb838b5d4255eeb0c1659b3081138346fb01389c8d48e401"
+    },
+    {
+      "id": "bbs-18991270-resination-jineanne-coderre-san-luis-obispo-concerts-in-the-",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "21ed41ab5a62b62c88fe576e8e9b3a195947e426d5a560eb5a9a7c7beed7418b"
+    },
+    {
+      "id": "bbs-18482085-brent-cobb",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "431a60f54d77eca15c106d828d468e68e8b9bcbb70cc48296df13242c40ade03"
+    },
+    {
+      "id": "bbs-18828643-slofunny-comedy-show-at-dracaena-wines",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "69fc086a430b417654f0489002e6c717eca9b1ae878b5f96a4b595050d60530d"
+    },
+    {
+      "id": "bbs-18299802-rava-on-the-rocks-pricey-digs",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "3722a707190e9c27505729943a5beabaf7179dbae8c06336385ceb260147e192"
+    },
+    {
+      "id": "bbs-19032855-ingested",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "08b140d0f58c9e6a23eddacc6a5972ef587d101ff496dc065ac38db7c4657ee8"
+    },
+    {
+      "id": "bbs-17407857-silversun-pickups-live-at-fremont-theater",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "8220eae6c5f3bc6957a9ba7cdd2821e32260dc8b8b34aa0ff2e5795b7eece470"
+    },
+    {
+      "id": "bbs-18826832-funk-junket-schooners-summer-concert-series",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "aa9fdf1aabeff03a9c9509a805cd6dc3e2ee0730eb1207915c74f1fb9d91d873"
+    },
+    {
+      "id": "bbs-18826830-popravinas-schooners-summer-concert-series",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "aa9fdf1aabeff03a9c9509a805cd6dc3e2ee0730eb1207915c74f1fb9d91d873"
+    },
+    {
+      "id": "bbs-18714293-night-ridge-free-afternoon-show",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "d8a2f9f217909f565d8a6ae1b228c7cb27a4c34d7772c8b67a4ed23c88748207"
+    },
+    {
+      "id": "bbs-18826833-bobby-santa-cruz-band-schooners-summer-concert-series",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "aa9fdf1aabeff03a9c9509a805cd6dc3e2ee0730eb1207915c74f1fb9d91d873"
+    },
+    {
+      "id": "bbs-18826831-kingston-tree-duo-schooners-summer-concert-series",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "aa9fdf1aabeff03a9c9509a805cd6dc3e2ee0730eb1207915c74f1fb9d91d873"
+    },
+    {
+      "id": "bbs-18714348-greenspace-adventure-auction-2026",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "6c7dd88d8248a5149bec45e9aa55e79354bef62c1252cb140dd89fa0ca285db8"
+    },
+    {
+      "id": "bbs-18930529-that-s-so-drag-brunch-pride-2026",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "b9385d5d9ede74eded63de58416b5c0b68a38db2b5a8e6dc4844620b7aeda608"
+    },
+    {
+      "id": "bbs-19408813-bay-theater-screening-western-monarch-butterflies-protecting",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "8165118bcedc5b553483a78e790ad18afa7ede9d3ad5d2dd7f46008e9c5f3fc6"
+    },
+    {
+      "id": "bbs-18575402-live-on-the-rocks-concert-ft-the-tommy-moon-band",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "0d6414f9015fe006e1bcc6edd8d79c9d9332d91f81e62d8e904e677d8fa95b66"
+    },
+    {
+      "id": "bbs-18575182-buckethead-live-at-fremont-theater",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "eee159fc4c37d38ceddb51168fc07f5e9db3f6a19de58f44272ed2e321fc8e22"
+    },
+    {
+      "id": "bbs-18924240-back-pages-band-free-afternoon-dance-party",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "3df4c749cc79c7f4e8c27cb87b4bd16f41ae2b588f76713958c7fd77705d36f4"
+    },
+    {
+      "id": "bbs-18390311-zongo-yachting-cup-2026",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "e09f96b29db4f8238c4f1c021cde053cfce874bf12aa833c1363faac81dc11ca"
+    },
+    {
+      "id": "bbs-18595150-kendall-lujan",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "d54584f889b0d158b687b24ba9c775abf23639b0e927763c84d3918dc51537f3"
+    },
+    {
+      "id": "bbs-18991274-brass-mash-holding-pattern-slo-concerts-in-the-plaza",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "21ed41ab5a62b62c88fe576e8e9b3a195947e426d5a560eb5a9a7c7beed7418b"
+    },
+    {
+      "id": "bbs-19355916-moonshiner-collective-under-the-moon-concert",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "ced97c43a56e4d3357fab9d8f9371680a0abf4b0d58893ad5062c5d47574724e"
+    },
+    {
+      "id": "bbs-19643641-industry-mondays-live-music-at-the-anderson-castle",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "7637b13c2a8e3c5846d847c5d457784eb482f9fcd5043ae05e08bc8937a72c51"
+    },
+    {
+      "id": "bbs-19689056-wine-down-wednesdays",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "ab8999ada5f9595c8763e889066573c5f62d3f5873aa71b3edffc9e1dccd03eb"
+    },
+    {
+      "id": "bbs-18299795-last-thursday-happy-hour-caelesta",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "31df2d484493cf9e9a6b8ac8d0821948b421b55b06ec4fb1ed8e2bc860156eb0"
+    },
+    {
+      "id": "bbs-18992186-israel-vibrations-roots-radics-w-special-guest-rastan",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "04de5cda1ee9dffef4293d1ba3740abc440721cf9c015c5dde3966d49a3158dc"
+    },
+    {
+      "id": "bbs-18826840-strange-cake-schooners-summer-concert-series",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "aa9fdf1aabeff03a9c9509a805cd6dc3e2ee0730eb1207915c74f1fb9d91d873"
+    },
+    {
+      "id": "bbs-18575405-live-on-the-rocks-concert-ft-the-molly-ringwald-project",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "6607aafa5ceba19859de154a379bb8fbd8021140fb0c25a2a8174e6f8a387a9e"
+    },
+    {
+      "id": "bbs-19114739-rava-on-the-rocks-emily-smith",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "3722a707190e9c27505729943a5beabaf7179dbae8c06336385ceb260147e192"
+    },
+    {
+      "id": "bbs-18976897-wango-twango",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "d48add0dfc279de18acbd409e99d68bca63505964a8cd3803b9cc1763a04490c"
+    },
+    {
+      "id": "bbs-19114747-sips-sounds-live-music-wednesday-dave-tate",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "be84fd384b1128cb53a22fbb1b5867c9ccb879eeacf49e3ee1f5b2499650f594"
+    },
+    {
+      "id": "bbs-19343573-the-art-of-jazz",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "79385e2ba8909d1a24d35dc40b98d3b23aedce1f1162f86d68d12dad0044c461"
+    },
+    {
+      "id": "bbs-19376025-little-shop-of-horrors",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "01f4778d4900b6bd81385cf925dd0407bfc790dbfb3d7cd3c457b0480db54109"
+    },
+    {
+      "id": "bbs-19522539-morro-rock-the-bells-all-vinyl-dj-dance-party-throwbacks-old",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "38a466fdd7b99cd73e1e22fb7006e03d6634f823737da086eb5e9ce4d040282f"
+    },
+    {
+      "id": "bbs-18781213-the-rivalry-band",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "30696c831fa33c5fbdc319f488653ffd07a6d53e22e8264c87283448df6a8fe3"
+    },
+    {
+      "id": "bbs-19431912-brass-mash-first-friday-at-central-coast-brewing",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "6ccd48acdb7e6c8dc0543637ca96b326558478f4c5570b256ca5aa002d9c0c68"
+    },
+    {
+      "id": "bbs-18299744-rava-on-the-rocks-dave-tate",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "3722a707190e9c27505729943a5beabaf7179dbae8c06336385ceb260147e192"
+    },
+    {
+      "id": "bbs-19419435-ballet-theatre-summer-performances",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "edff82dc0318fa21c4880164e2cae92290652e8608969766cecd2ae4f7a61554"
+    },
+    {
+      "id": "bbs-19562552-smells-like-nirvana-tribute-to-nirvana-w-dead-original",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "632fa1c7e0cd47e9c7b4c8294852affae4fa4ec601559e80734da4af2484c83c"
+    },
+    {
+      "id": "bbs-18924224-kiwanis-presents-barkley-cove",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "6a63187034388870b0f57e9e14e62bac66a521c4f4b1d081f2010a5bb815f0ac"
+    },
+    {
+      "id": "bbs-18991273-the-mother-corn-shuckers-noach-tangeras-slo-concerts-in-the-",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "21ed41ab5a62b62c88fe576e8e9b3a195947e426d5a560eb5a9a7c7beed7418b"
+    },
+    {
+      "id": "bbs-19522543-quadratones-free-saturday-afternoon-show",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "1879721860a70276c62dd9b34c077afe8410eddab1ed016b493844eb18e7d607"
+    },
+    {
+      "id": "bbs-19114741-sips-sounds-live-music-wednesday-talie-copen",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "be84fd384b1128cb53a22fbb1b5867c9ccb879eeacf49e3ee1f5b2499650f594"
+    },
+    {
+      "id": "bbs-19761944-slo-rep-presents-best-of-broadway-magical-moments",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "acc2c8a1bcfcceee0cca49dd5adb0f302d274861d797e9a2fb55911596ae586d"
+    },
+    {
+      "id": "bbs-17907865-chris-stapleton-s-all-american-road-show",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "4a6d199045b7937a532488effc3e59dceafb91b0bb2770661f577dd1f85f6d61"
+    },
+    {
+      "id": "bbs-19795818-sips-sounds-live-music-wednesday-cassi-nicholls",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "4e32667fad26a633ee7b202c91b3241fdbb7082bc31575c66d293fe80ae711f8"
+    },
+    {
+      "id": "bbs-18575417-friday-concert-series",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "189f23d8e5fdf906194d6a243621aa5f10a672eaaad199f1761d99f43a417490"
+    },
+    {
+      "id": "bbs-19426023-plant-bingo-with-peaceful-plants",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "4baca8ceae5e23d2889ce3d1c6bacfc6d03d7dcf30fea62b8a7e9f5d724eaa80"
+    },
+    {
+      "id": "bbs-16530550-shut-up-and-dance-party-w-ultra",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "5a4aaf23215e8e3a409211e214b1a04436e99e97710dec4c873d7b72d278a195"
+    },
+    {
+      "id": "bbs-19539343-morro-bay-comedy-night-with-rick-izquieta",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "03b8ca1cb3824fa400d6dab910b4bc3e68fac85a7895132364e4102a639d908a"
+    },
+    {
+      "id": "bbs-19522545-the-sinners-free-labor-day-weeeknd-sunday-night-show",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "dfda45f688e8c00268baa2107dfe8ed4a1f0614e187466c4e5bdce6b3f132889"
+    },
+    {
+      "id": "bbs-19326780-mini-nova-kenny-lee-lewis-of-steve-miller-band-scott-martin-",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "56880a498fbeac337dd98ee98d778120abb60403530aa53935a2e21c5429d5b7"
+    },
+    {
+      "id": "bbs-18991275-damon-castillo-band-jamie-pennelly-slo-concerts-in-the-plaza",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "21ed41ab5a62b62c88fe576e8e9b3a195947e426d5a560eb5a9a7c7beed7418b"
+    },
+    {
+      "id": "bbs-18407142-stax-johnson",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "529da389fda84484dce1ab65b991ee89c601b3bf5b2400d594d6bc30add34064"
+    },
+    {
+      "id": "bbs-19803088-bonus-music-on-the-lawn-at-summerwood-polka",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "ec07a558b043bd82147fe70484791bb23fd94d8005972c979bfad75d6bc83885"
+    },
+    {
+      "id": "bbs-18238199-loren-radis",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "56a5a9b8e39d1710aae5b6fe3c572b88d5d59c64e2869e02b1d815354b374e61"
+    },
+    {
+      "id": "bbs-19619594-brass-mash-first-friday-at-slo-brew-rock",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "13b7fdaafadf64e3e5346bc41b233bd916aec1c073bf55cc2746071fda06d05c"
+    },
+    {
+      "id": "bbs-18991277-hot-45-forever-green-san-luis-obispo-concerts-in-the-plaza",
+      "field": "description",
+      "source": "BigBigSLO",
+      "before": "21ed41ab5a62b62c88fe576e8e9b3a195947e426d5a560eb5a9a7c7beed7418b"
+    }
+  ]
+}

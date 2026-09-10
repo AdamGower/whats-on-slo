@@ -15,7 +15,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { logRun } from "./_log-run.mjs";
-import { cleanText, cleanTextPreservingBreaks } from "./_clean-html.mjs";
+import { fromMarkdownFeedText } from "./_clean-html.mjs";
 import {
   firstPrunableDay,
   latestPacificDay,
@@ -243,13 +243,15 @@ export function buildRows(events) {
       continue;
     }
 
+    const title = fromMarkdownFeedText(e.Name);
+
     // Community = the city portion of "City, CA"
     const community = e.CityState.split(",")[0].trim();
     // Venue can be empty for some events (e.g. SLO Rep Page-to-Stage). Fall
     // back to the address line so the page still has a useful locator.
     const venue =
-      (e.Venue && e.Venue.trim()) ||
-      (e.Address && e.Address.split(",")[0].trim()) ||
+      fromMarkdownFeedText(e.Venue) ||
+      fromMarkdownFeedText((e.Address || "").split(",")[0]) ||
       "TBA";
 
     // Prefer the event's PrimaryUrl. TicketUrl is fine too but tends to
@@ -262,9 +264,9 @@ export function buildRows(events) {
 
     const description =
       (typeof e.Description === "string" &&
-        cleanTextPreservingBreaks(e.Description)) ||
-      (typeof e.Short === "string" && e.Short.trim()) ||
-      `${e.Name} at ${venue} in ${community}.`;
+        fromMarkdownFeedText(e.Description, { preserveBreaks: true })) ||
+      (typeof e.Short === "string" && fromMarkdownFeedText(e.Short)) ||
+      `${title} at ${venue} in ${community}.`;
 
     const imageUrl =
       (typeof e.LargeImg === "string" && /^https?:/.test(e.LargeImg) && e.LargeImg) ||
@@ -273,7 +275,7 @@ export function buildRows(events) {
 
     rows.push({
       id: `bbs-${e.PId}-${slugify(e.Name)}`,
-      title: cleanText(e.Name),
+      title,
       starts_at: bbsWallTimeToUtcIso(e.DateStart),
       ends_at: e.DateEnd ? bbsWallTimeToUtcIso(e.DateEnd) : null,
       venue,

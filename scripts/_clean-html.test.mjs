@@ -4,11 +4,19 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import {
   cleanDescriptionHtml,
   cleanText,
   cleanTextPreservingBreaks,
+  fromMarkdownFeedText,
+  unescapeMarkdown,
 } from "./_clean-html.mjs";
+
+const SCRIPTS_DIR = path.dirname(fileURLToPath(import.meta.url));
+const B = String.fromCharCode(92); // backslash, built to survive any tooling
 
 test("cleanDescriptionHtml strips plain HTML tags", () => {
   const html = "<p>Live music at <b>The Siren</b> tonight.</p>";
@@ -184,4 +192,112 @@ test("cleanDescriptionHtml recovers DOUBLE-encoded input", () => {
 test("cleanDescriptionHtml does not resurrect text from removed <style> blocks", () => {
   const out = cleanDescriptionHtml("<style>#a{content:'&amp;'}</style><p>Body &amp; text</p>");
   assert.equal(out, "Body & text");
+});
+
+// --- markdown unescaping ---------------------------------------------------
+
+test("unescapeMarkdown strips backslashes before ASCII punctuation", () => {
+  assert.equal(unescapeMarkdown("Tragedy " + B + "(all metal" + B + ")"), "Tragedy (all metal)");
+  assert.equal(unescapeMarkdown("21" + B + "+ to enter"), "21+ to enter");
+  assert.equal(unescapeMarkdown("a" + B + "_b"), "a_b");
+  assert.equal(unescapeMarkdown("loren" + B + "{at" + B + "}gmail.com"), "loren{at}gmail.com");
+  assert.equal(unescapeMarkdown("-" + B + "> Shale Oak"), "-> Shale Oak");
+});
+
+test("unescapeMarkdown collapses an escaped backslash to a literal one", () => {
+  // "ghost\monster" in the feed is the band name "ghost\monster".
+  assert.equal(unescapeMarkdown("ghost" + B + B + "monster"), "ghost" + B + "monster");
+});
+
+test("unescapeMarkdown leaves lone backslashes before non-punctuation alone", () => {
+  assert.equal(unescapeMarkdown(B + "n not a newline"), B + "n not a newline");
+});
+
+test("unescapeMarkdown is NOT idempotent -- this is why it is call-site confined", () => {
+  // Pinning the hazard so nobody 'simplifies' it into cleanText later.
+  const once = unescapeMarkdown("a" + B + B + "(b");
+  const twice = unescapeMarkdown(once);
+  assert.equal(once, "a" + B + "(b");
+  assert.equal(twice, "a(b");
+  assert.notEqual(once, twice);
+});
+
+test("cleanText/cleanTextPreservingBreaks stay idempotent (they must not unescape)", () => {
+  const input = "a" + B + B + "(b &amp; c";
+  assert.equal(cleanText(cleanText(input)), cleanText(input));
+  assert.equal(
+    cleanTextPreservingBreaks(cleanTextPreservingBreaks(input)),
+    cleanTextPreservingBreaks(input)
+  );
+  assert.ok(cleanText(input).includes(B), "cleanText must leave backslashes intact");
+});
+
+test("fromMarkdownFeedText unescapes then decodes, in that order", () => {
+  assert.equal(fromMarkdownFeedText("Sheryl &amp; The Pretenders " + B + "(tribute" + B + ")"),
+    "Sheryl & The Pretenders (tribute)");
+});
+
+test("fromMarkdownFeedText preserves paragraphs when asked", () => {
+  assert.equal(
+    fromMarkdownFeedText("One " + B + "(a" + B + ")\n\nTwo &amp; three", { preserveBreaks: true }),
+    "One (a)\n\nTwo & three"
+  );
+});
+
+// --- structural guards -----------------------------------------------------
+// unescapeMarkdown cannot be applied twice to the same string without losing
+// data, so these pin the invariant in the source itself rather than trusting a
+// comment: exactly one module may unescape, and it may only ever be handed a
+// raw feed field.
+
+test("GUARD: only scrape-bigbigslo.mjs imports the non-idempotent helpers", () => {
+  const offenders = fs
+    .readdirSync(SCRIPTS_DIR)
+    .filter((f) => f.endsWith(".mjs") && !f.endsWith(".test.mjs"))
+    .filter((f) => f !== "_clean-html.mjs" && f !== "scrape-bigbigslo.mjs")
+    .filter((f) => {
+      const src = fs.readFileSync(path.join(SCRIPTS_DIR, f), "utf8");
+      return /\b(unescapeMarkdown|fromMarkdownFeedText)\b/.test(src);
+    });
+  assert.deepEqual(
+    offenders,
+    [],
+    `non-idempotent unescaping must stay confined to scrape-bigbigslo.mjs; found in: ${offenders.join(", ")}`
+  );
+});
+
+test("GUARD: every fromMarkdownFeedText call takes a RAW feed field, never a reused value", () => {
+  const src = fs.readFileSync(path.join(SCRIPTS_DIR, "scrape-bigbigslo.mjs"), "utf8");
+  const calls = [];
+  const needle = "fromMarkdownFeedText(";
+  let i = src.indexOf(needle);
+  while (i !== -1) {
+    // Skip the import line.
+    const lineStart = src.lastIndexOf("\n", i) + 1;
+    if (!src.slice(lineStart, i).includes("import")) {
+      let depth = 0;
+      let j = i + needle.length - 1;
+      for (; j < src.length; j++) {
+        if (src[j] === "(") depth++;
+        else if (src[j] === ")") {
+          depth--;
+          if (depth === 0) break;
+        }
+      }
+      calls.push(src.slice(i + needle.length, j));
+    }
+    i = src.indexOf(needle, i + 1);
+  }
+
+  assert.ok(calls.length > 0, "expected at least one call site");
+  for (const arg of calls) {
+    assert.ok(
+      /\be\.[A-Za-z]/.test(arg),
+      `argument must come straight off the feed object, got: ${arg}`
+    );
+    assert.ok(
+      !arg.includes("fromMarkdownFeedText"),
+      `nested unescaping would double-apply, got: ${arg}`
+    );
+  }
 });

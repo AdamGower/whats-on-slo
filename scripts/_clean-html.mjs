@@ -62,3 +62,55 @@ export function cleanDescriptionHtml(html) {
   text = decodeHTML(text);
   return text.replace(/\s+/g, " ").trim();
 }
+
+// --- markdown unescaping ---------------------------------------------------
+//
+// BigBigSLO (CitySpark) markdown-escapes ASCII punctuation in its feed, so
+// "Tragedy (all metal Bee Gees Tribute)" arrives as
+// "Tragedy \(all metal Bee Gees Tribute\)" and renders with the backslashes
+// visible on our cards.
+//
+// UNLIKE entity decoding, THIS IS NOT IDEMPOTENT. A literal backslash reaches
+// us doubled, so one pass yields a single backslash -- and if the character
+// after it happens to be punctuation, a SECOND pass consumes that too:
+//
+//     "\("  --pass 1-->  "\("  --pass 2-->  "("        <-- data loss
+//
+// That property is why this is deliberately NOT folded into cleanText: those
+// helpers get applied liberally and must stay safe to re-apply. Unescaping is
+// confined to fromMarkdownFeedText below, called exactly once, where a raw
+// feed field is first read. A guard test in _clean-html.test.mjs pins that
+// call-site count so a second application cannot be added by accident.
+
+// Built from char codes rather than written as a literal so no shell/heredoc
+// layer between here and disk can eat an escape: 92 is backslash, 96 backtick.
+// Two backslash characters in a RegExp source match one literal backslash.
+const BACKSLASH = String.fromCharCode(92);
+const ASCII_PUNCT =
+  "[!-/:-@[-" + String.fromCharCode(96) + "{-~]";
+const MD_ESCAPE = new RegExp(
+  BACKSLASH + BACKSLASH + "(" + ASCII_PUNCT + ")",
+  "g"
+);
+
+export function unescapeMarkdown(value) {
+  if (!value) return "";
+  return String(value).replace(MD_ESCAPE, "$1");
+}
+
+// The single feed boundary for markdown-escaped sources. Takes a RAW field
+// straight off the wire and returns display text: unescape first (the CMS
+// applied that layer outermost), then decode entities.
+//
+// Correctness depends on the input never having been through this function
+// before. That holds structurally, not by convention: scrapers build rows
+// purely from freshly fetched feed payloads and never read their own stored
+// text back to re-write it (_prune-missing.mjs selects title only to log it,
+// and only ever DELETEs). Every write is a full-row upsert of feed-derived
+// values, so no stored string can make a second trip through.
+export function fromMarkdownFeedText(value, { preserveBreaks = false } = {}) {
+  const unescaped = unescapeMarkdown(value);
+  return preserveBreaks
+    ? cleanTextPreservingBreaks(unescaped)
+    : cleanText(unescaped);
+}
