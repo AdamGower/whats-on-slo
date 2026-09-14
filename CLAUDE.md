@@ -18,7 +18,10 @@ Work through this in order. Don't insert anything until the checks pass.
    calendar-plugin headers, which are often wrong.
 2. **Confirm the link is worth publishing.** If it doesn't describe the
    event, say so before seeding. A "Learn more" link to a bare contact
-   form is a weak listing.
+   form is a weak listing. When the fetched text doesn't mention the
+   event, check whether the detail lives in an image (flyers, posters,
+   event graphics) before calling the link weak. Absence from
+   extracted text is not absence from the page.
 3. **Split multi-night events into one row per night.** Expiry keys on
    start date only, so a single row spanning two days disappears before
    the second night. A submitter describing "Fri 5 PM to Sat 9 PM"
