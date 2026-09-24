@@ -143,7 +143,7 @@ jobs:
             echo "LOG_TAILS<<$eof"
             for f in .autofix-logs/*.log; do
               echo "===== $(basename "$f" .log) (last 80 lines)"
-              tail -n 80 "$f" | cut -c30- | cut -c1-300 | grep -vF "$eof"
+              tail -n 80 "$f" | cut -c30- | cut -c1-300 | { grep -vF "$eof" || true; }
             done
             echo "$eof"
           } >> "$GITHUB_ENV"
