@@ -136,13 +136,16 @@ jobs:
           echo "JOB_NAMES=$(jq -r 'map(.name) | join(", ")' <<<"$NEW_JOBS")" >> "$GITHUB_ENV"
           # The tail of each log goes straight into the prompt, saving turns.
           # Timestamps are stripped; the full 400 lines stay on disk.
+          # Random delimiter: log text comes from scraped sites and must not
+          # be able to end the value early and set other variables.
+          eof="EOF_$(openssl rand -hex 16)"
           {
-            echo 'LOG_TAILS<<AUTOFIX_EOF'
+            echo "LOG_TAILS<<$eof"
             for f in .autofix-logs/*.log; do
               echo "===== $(basename "$f" .log) (last 80 lines)"
-              tail -n 80 "$f" | cut -c30- | cut -c1-300
+              tail -n 80 "$f" | cut -c30- | cut -c1-300 | grep -vF "$eof"
             done
-            echo 'AUTOFIX_EOF'
+            echo "$eof"
           } >> "$GITHUB_ENV"
 
       - name: Prepare git
