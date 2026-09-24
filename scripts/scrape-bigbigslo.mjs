@@ -13,7 +13,7 @@
 // silent failures we want loud, so we exit non-zero in that case to fail
 // the GitHub Actions run.
 
-import { createClient } from "@supabase/supabase-js";
+import { createScraperClient } from "./_supabase.mjs";
 import { logRun } from "./_log-run.mjs";
 import { fetchWithRetry } from "./_fetch-retry.mjs";
 import { fromMarkdownFeedText } from "./_clean-html.mjs";
@@ -292,16 +292,7 @@ export function buildRows(events) {
 }
 
 async function main() {
-  const SUPABASE_URL =
-    process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const SUPABASE_SECRET_KEY = process.env.SUPABASE_SECRET_KEY;
-  if (!SUPABASE_URL || !SUPABASE_SECRET_KEY) {
-    console.error(
-      "Missing env vars. Need SUPABASE_URL (or NEXT_PUBLIC_SUPABASE_URL) and SUPABASE_SECRET_KEY."
-    );
-    process.exit(1);
-  }
-  const supabase = createClient(SUPABASE_URL, SUPABASE_SECRET_KEY);
+  const supabase = createScraperClient();
 
   console.log(`Fetching ${PORTAL_URL} ...`);
   const res = await fetchWithRetry(PORTAL_URL, { headers: { "User-Agent": UA } });

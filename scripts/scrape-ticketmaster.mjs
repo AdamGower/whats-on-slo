@@ -1,17 +1,12 @@
-import { createClient } from "@supabase/supabase-js";
+import { createScraperClient } from "./_supabase.mjs";
 import { logRun } from "./_log-run.mjs";
 import { fetchWithRetry } from "./_fetch-retry.mjs";
 import { cleanText } from "./_clean-html.mjs";
 
-const SUPABASE_URL =
-  process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-const SUPABASE_SECRET_KEY = process.env.SUPABASE_SECRET_KEY;
 const TICKETMASTER_API_KEY = process.env.TICKETMASTER_API_KEY;
 
-if (!SUPABASE_URL || !SUPABASE_SECRET_KEY || !TICKETMASTER_API_KEY) {
-  console.error(
-    "Missing env vars. Need SUPABASE_URL (or NEXT_PUBLIC_SUPABASE_URL), SUPABASE_SECRET_KEY, TICKETMASTER_API_KEY."
-  );
+if (!TICKETMASTER_API_KEY) {
+  console.error("Missing env var TICKETMASTER_API_KEY (needed even with SCRAPE_DRY_RUN=1).");
   process.exit(1);
 }
 
@@ -20,7 +15,7 @@ const RADIUS_MILES = 25;
 const PAGE_SIZE = 100;
 const MAX_PAGES = 5;
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_SECRET_KEY);
+const supabase = createScraperClient();
 
 const SEGMENT_TO_CATEGORY = {
   Music: "Music",

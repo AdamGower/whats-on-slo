@@ -24,7 +24,7 @@
 
 import crypto from "node:crypto";
 import * as cheerio from "cheerio";
-import { createClient } from "@supabase/supabase-js";
+import { createScraperClient } from "./_supabase.mjs";
 import { logRun } from "./_log-run.mjs";
 import { fetchWithRetry } from "./_fetch-retry.mjs";
 import {
@@ -293,14 +293,7 @@ async function fetchRss(state) {
 }
 
 async function main() {
-  const SUPABASE_URL =
-    process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const SUPABASE_SECRET_KEY = process.env.SUPABASE_SECRET_KEY;
-  if (!SUPABASE_URL || !SUPABASE_SECRET_KEY) {
-    console.error("Missing env vars. Need SUPABASE_URL and SUPABASE_SECRET_KEY.");
-    process.exit(1);
-  }
-  const supabase = createClient(SUPABASE_URL, SUPABASE_SECRET_KEY);
+  const supabase = createScraperClient();
 
   console.log("Loading scraper state...");
   const state = await loadState(supabase);

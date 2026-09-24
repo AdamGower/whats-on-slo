@@ -4,7 +4,7 @@
 // for starts_at; titles still group correctly under the right calendar day.
 
 import * as cheerio from "cheerio";
-import { createClient } from "@supabase/supabase-js";
+import { createScraperClient } from "./_supabase.mjs";
 import { logRun } from "./_log-run.mjs";
 import { fetchWithRetry } from "./_fetch-retry.mjs";
 import {
@@ -14,18 +14,7 @@ import {
 } from "./_prune-missing.mjs";
 import { cleanDescriptionHtml, cleanText } from "./_clean-html.mjs";
 
-const SUPABASE_URL =
-  process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-const SUPABASE_SECRET_KEY = process.env.SUPABASE_SECRET_KEY;
-
-if (!SUPABASE_URL || !SUPABASE_SECRET_KEY) {
-  console.error(
-    "Missing env vars. Need SUPABASE_URL (or NEXT_PUBLIC_SUPABASE_URL) and SUPABASE_SECRET_KEY."
-  );
-  process.exit(1);
-}
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_SECRET_KEY);
+const supabase = createScraperClient();
 
 const MONTHS = {
   Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,

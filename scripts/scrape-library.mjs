@@ -4,24 +4,13 @@
 // programming, story times, art exhibits, tech classes — content
 // systematically missed by tourism-oriented sources.
 
-import { createClient } from "@supabase/supabase-js";
+import { createScraperClient } from "./_supabase.mjs";
 import { logRun } from "./_log-run.mjs";
 import { fetchWithRetry } from "./_fetch-retry.mjs";
 import { cleanDescriptionHtml, cleanText } from "./_clean-html.mjs";
 import { firstPrunableDay, pruneMissing } from "./_prune-missing.mjs";
 
-const SUPABASE_URL =
-  process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-const SUPABASE_SECRET_KEY = process.env.SUPABASE_SECRET_KEY;
-
-if (!SUPABASE_URL || !SUPABASE_SECRET_KEY) {
-  console.error(
-    "Missing env vars. Need SUPABASE_URL and SUPABASE_SECRET_KEY."
-  );
-  process.exit(1);
-}
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_SECRET_KEY);
+const supabase = createScraperClient();
 
 // Library JSON returns naive timestamps in their listed timezone (always
 // America/Los_Angeles for SLO). Convert "YYYY-MM-DD HH:MM:SS" assumed
