@@ -66,7 +66,7 @@ fails on `main` (or on an `autofix-test/*` branch, used to test it).
    job that already has one is not diagnosed again, so close the item
    once it's resolved.
 3. **Diagnose.** Claude (via `anthropics/claude-code-action`, using the
-   `CLAUDE_CODE_OAUTH_TOKEN` secret, max 20 turns) reads the last 400
+   `CLAUDE_CODE_OAUTH_TOKEN` secret, max 30 turns) reads the last 400
    log lines of each failed job and returns one of: a code fix, an
    issue for something outside the code, or "none" if it was transient.
 4. **Publish.** A code fix becomes a PR from `auto-fix/<run id>` into

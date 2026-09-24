@@ -166,7 +166,7 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ github.token }}
           claude_args: |
-            --max-turns 20
+            --max-turns 30
             --allowedTools "Read,Edit,Write,Glob,Grep,WebFetch,Bash(node scripts/*),Bash(SCRAPE_DRY_RUN=1 node scripts/*),Bash(node --test *),Bash(ls*),Bash(cat *),Bash(head *),Bash(tail *),Bash(grep *),Bash(wc *),Bash(npm test),Bash(npm test *),Bash(env -u SCRAPE_DRY_RUN npm test*),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git show*),Bash(git add *),Bash(git commit *)"
             --json-schema '{"type":"object","properties":{"kind":{"type":"string","enum":["pr","issue","none"]},"title":{"type":"string","maxLength":90},"body":{"type":"string"}},"required":["kind","title","body"]}'
           prompt: |
@@ -180,7 +180,7 @@ jobs:
             Each scraper job runs scripts/scrape-<job>.mjs; enrich-times runs
             scripts/enrich-event-times.mjs and monitor runs scripts/check-scraper-runs.mjs.
 
-            You have 20 turns, so be economical, and return your result by turn 16
+            You have 30 turns, so be economical, and return your result by turn 26
             at the latest. If you are unsure by then, return an issue that says what
             you found so far; that is far more useful than running out of turns. Prefer the Read, Grep and Glob tools
             for looking at files. The only shell commands allowed are: node scripts/...,
@@ -248,7 +248,7 @@ jobs:
           mkdir -p out
           if [ -z "$RESULT" ]; then
             run_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
-            body="Claude could not finish diagnosing this failure (it errored or hit the 20-turn cap), so no fix was attempted.
+            body="Claude could not finish diagnosing this failure (it errored or hit the 30-turn cap), so no fix was attempted.
 
           ## What you need to do
 
