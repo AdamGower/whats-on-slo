@@ -6,6 +6,7 @@
 import * as cheerio from "cheerio";
 import { createClient } from "@supabase/supabase-js";
 import { logRun } from "./_log-run.mjs";
+import { fetchWithRetry } from "./_fetch-retry.mjs";
 import {
   firstPrunableDay,
   latestPacificDay,
@@ -88,7 +89,7 @@ function communityFromVenue(venue) {
 
 async function main() {
   console.log("Fetching https://goslo.events/all ...");
-  const res = await fetch("https://goslo.events/all", {
+  const res = await fetchWithRetry("https://goslo.events/all", {
     headers: { "User-Agent": "whats-on-slo/1.0 (+https://whatsonslo.com)" },
   });
   if (!res.ok) throw new Error(`goslo.events ${res.status}`);

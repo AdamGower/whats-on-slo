@@ -25,6 +25,7 @@ import crypto from "node:crypto";
 import ical from "node-ical";
 import { createClient } from "@supabase/supabase-js";
 import { logRun } from "./_log-run.mjs";
+import { fetchWithRetry } from "./_fetch-retry.mjs";
 import {
   firstPrunableDay,
   latestPacificDay,
@@ -298,7 +299,7 @@ async function fetchIcs(state) {
   const headers = { "User-Agent": UA, Accept: "text/calendar" };
   if (state.etag) headers["If-None-Match"] = state.etag;
   if (state.last_modified) headers["If-Modified-Since"] = state.last_modified;
-  const r = await fetch(ICS_URL, { headers });
+  const r = await fetchWithRetry(ICS_URL, { headers });
   return {
     status: r.status,
     text: r.status === 304 ? null : await r.text(),

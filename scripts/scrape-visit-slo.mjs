@@ -6,6 +6,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { logRun } from "./_log-run.mjs";
+import { fetchWithRetry } from "./_fetch-retry.mjs";
 import { cleanDescriptionHtml, cleanText } from "./_clean-html.mjs";
 import {
   dayBefore,
@@ -176,7 +177,7 @@ async function fetchPage(page, today, end) {
     end_date: end,
   });
   const url = `${BASE}?${params}`;
-  const r = await fetch(url, {
+  const r = await fetchWithRetry(url, {
     headers: { "User-Agent": UA, Accept: "application/json" },
   });
   if (!r.ok) throw new Error(`Visit SLO API ${r.status} on page ${page}`);

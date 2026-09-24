@@ -21,6 +21,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { logRun } from "./_log-run.mjs";
+import { fetchWithRetry } from "./_fetch-retry.mjs";
 import {
   firstPrunableDay,
   latestPacificDay,
@@ -239,7 +240,7 @@ async function fetchPage(page, startDate, endDate) {
   url.searchParams.set("results_per_page", PAGE_SIZE.toString());
   url.searchParams.set("page", page.toString());
 
-  const res = await fetch(url, {
+  const res = await fetchWithRetry(url, {
     headers: { "User-Agent": UA, Accept: "application/json" },
   });
   if (!res.ok) {

@@ -9,6 +9,7 @@
 import * as cheerio from "cheerio";
 import { createClient } from "@supabase/supabase-js";
 import { logRun } from "./_log-run.mjs";
+import { fetchWithRetry } from "./_fetch-retry.mjs";
 import { cleanText } from "./_clean-html.mjs";
 import {
   firstPrunableDay,
@@ -91,7 +92,7 @@ function guessCategory(title) {
 
 async function main() {
   console.log("Fetching Madonna Inn calendar page...");
-  const calRes = await fetch("https://www.madonnainn.com/calendar", {
+  const calRes = await fetchWithRetry("https://www.madonnainn.com/calendar", {
     headers: { "User-Agent": UA },
   });
   if (!calRes.ok) throw new Error(`Madonna Inn calendar ${calRes.status}`);
@@ -121,7 +122,7 @@ async function main() {
 
     let icsText;
     try {
-      const r = await fetch(icsUrl, { headers: { "User-Agent": UA } });
+      const r = await fetchWithRetry(icsUrl, { headers: { "User-Agent": UA } });
       if (!r.ok) {
         console.warn(`  ${r.status} for ${icsUrl}, skipping`);
         fetchFailures++;

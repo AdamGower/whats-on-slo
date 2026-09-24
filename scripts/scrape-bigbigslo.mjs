@@ -15,6 +15,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { logRun } from "./_log-run.mjs";
+import { fetchWithRetry } from "./_fetch-retry.mjs";
 import { fromMarkdownFeedText } from "./_clean-html.mjs";
 import {
   firstPrunableDay,
@@ -303,7 +304,7 @@ async function main() {
   const supabase = createClient(SUPABASE_URL, SUPABASE_SECRET_KEY);
 
   console.log(`Fetching ${PORTAL_URL} ...`);
-  const res = await fetch(PORTAL_URL, { headers: { "User-Agent": UA } });
+  const res = await fetchWithRetry(PORTAL_URL, { headers: { "User-Agent": UA } });
   if (!res.ok) {
     console.error(`BigBigSLO portal ${res.status}`);
     process.exit(1);

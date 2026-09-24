@@ -6,6 +6,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { logRun } from "./_log-run.mjs";
+import { fetchWithRetry } from "./_fetch-retry.mjs";
 import { cleanDescriptionHtml, cleanText } from "./_clean-html.mjs";
 import { firstPrunableDay, pruneMissing } from "./_prune-missing.mjs";
 
@@ -88,7 +89,7 @@ async function main() {
   console.log(
     "Fetching https://sanluisobispo.librarycalendar.com/events/feed/json ..."
   );
-  const res = await fetch(
+  const res = await fetchWithRetry(
     "https://sanluisobispo.librarycalendar.com/events/feed/json",
     {
       headers: {

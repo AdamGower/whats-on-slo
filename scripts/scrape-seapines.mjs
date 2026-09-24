@@ -26,6 +26,7 @@ import crypto from "node:crypto";
 import * as cheerio from "cheerio";
 import { createClient } from "@supabase/supabase-js";
 import { logRun } from "./_log-run.mjs";
+import { fetchWithRetry } from "./_fetch-retry.mjs";
 import {
   firstPrunableDay,
   latestPacificDay,
@@ -282,7 +283,7 @@ async function fetchRss(state) {
   const headers = { "User-Agent": UA, Accept: "application/rss+xml, application/xml" };
   if (state.etag) headers["If-None-Match"] = state.etag;
   if (state.last_modified) headers["If-Modified-Since"] = state.last_modified;
-  const r = await fetch(RSS_URL, { headers });
+  const r = await fetchWithRetry(RSS_URL, { headers });
   return {
     status: r.status,
     text: r.status === 304 ? null : await r.text(),
