@@ -18,6 +18,7 @@ const SLO_LATLONG = "35.2828,-120.6596";
 const RADIUS_MILES = 25;
 const PAGE_SIZE = 100;
 const MAX_PAGES = 5;
+const RETRY_DELAYS_MS = [5_000, 15_000]; // 3 attempts total
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SECRET_KEY);
 
@@ -93,12 +94,33 @@ async function fetchPage(page) {
   url.searchParams.set("page", page.toString());
   url.searchParams.set("apikey", TICKETMASTER_API_KEY);
 
-  const res = await fetch(url);
-  if (!res.ok) {
+  // Retry transient failures only. Two scheduled runs on 2026-09-23 died on a
+  // 10s connect timeout to app.ticketmaster.com and the next run was fine.
+  // A 4xx other than 429 (bad key, bad params) fails at once so it stays loud.
+  for (let attempt = 1; ; attempt++) {
+    let res;
+    try {
+      res = await fetch(url);
+    } catch (err) {
+      if (attempt >= RETRY_DELAYS_MS.length + 1) throw err;
+      await backoff(attempt, `network error (${err.cause?.code || err.message})`);
+      continue;
+    }
+    if (res.ok) return res.json();
+
     const body = await res.text();
-    throw new Error(`Ticketmaster API ${res.status}: ${body}`);
+    const transient = res.status === 429 || res.status >= 500;
+    if (!transient || attempt >= RETRY_DELAYS_MS.length + 1) {
+      throw new Error(`Ticketmaster API ${res.status}: ${body}`);
+    }
+    await backoff(attempt, `HTTP ${res.status}`);
   }
-  return res.json();
+}
+
+async function backoff(attempt, reason) {
+  const ms = RETRY_DELAYS_MS[attempt - 1];
+  console.warn(`  Attempt ${attempt} failed: ${reason}. Retrying in ${ms / 1000}s...`);
+  await new Promise((r) => setTimeout(r, ms));
 }
 
 async function main() {
