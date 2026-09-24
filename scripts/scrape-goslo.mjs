@@ -32,11 +32,11 @@ function slugify(s) {
 }
 
 // Parse "Wed Apr 29 2026" → ISO string at noon Pacific (sentinel for time-unknown)
-function parseGosloDate(dateStr) {
+export function parseGosloDate(dateStr) {
   const m = dateStr.trim().match(/^\w{3}\s+(\w{3})\s+(\d{1,2})\s+(\d{4})$/);
   if (!m) return null;
   const [, monAbbr, day, year] = m;
-  const month = MONTH[monAbbr];
+  const month = MONTHS[monAbbr];
   if (month === undefined) return null;
   // Construct as midnight UTC then shift via ISO. Easier: use Date.UTC on
   // 19:00 UTC ≈ noon PDT (Apr–Oct). Off by 1h during PST but fine for grouping.
