@@ -53,3 +53,37 @@ Work through this in order. Don't insert anything until the checks pass.
 - `ends_at` is stored even though expiry ignores it.
 - Never correct deliberate misspellings in submitted copy. Band names
   and event branding are often intentionally odd.
+
+## Scrape failure auto-fix
+
+`.github/workflows/scrape-autofix.yml` runs whenever "Scrape events"
+fails on `main` (or on an `autofix-test/*` branch, used to test it).
+
+1. **Rerun.** It reruns only the failed jobs once and waits. A pass
+   ends it there: most failures are transient timeouts.
+2. **Skip known failures.** Open issues and PRs labelled `auto-fix`
+   carry their job names in the title, as `[auto-fix: goslo] ...`. A
+   job that already has one is not diagnosed again, so close the item
+   once it's resolved.
+3. **Diagnose.** Claude (via `anthropics/claude-code-action`, using the
+   `CLAUDE_CODE_OAUTH_TOKEN` secret, max 20 turns) reads the last 400
+   log lines of each failed job and returns one of: a code fix, an
+   issue for something outside the code, or "none" if it was transient.
+4. **Publish.** A code fix becomes a PR from `auto-fix/<run id>` into
+   the branch that failed, with the workflow's own `npm test` and
+   dry-run output appended. Anything else becomes an issue with steps
+   for the owner. If Claude can't finish, an issue says so.
+
+Safety rules the workflow depends on; keep them when editing it:
+
+- Claude's job has a read-only `GITHUB_TOKEN` and no Supabase or
+  Ticketmaster keys. Scrapers there run with `SCRAPE_DRY_RUN=1`.
+- Only the publish job can write, and it never runs Claude's code. It
+  applies the commits as a patch and pushes an `auto-fix/*` branch.
+- Workflow logs include text from scraped sites; the prompt tells
+  Claude to treat it as data.
+
+`SCRAPE_DRY_RUN=1 node scripts/scrape-<name>.mjs` works locally too,
+with no env vars except Ticketmaster's API key. Source fetches go
+through `scripts/_fetch-retry.mjs`, which retries network errors, 429
+and 5xx three times before a job fails.

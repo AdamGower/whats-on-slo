@@ -42,3 +42,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Scrape auto-fix workflow scratch (job logs handed to Claude)
+.autofix-logs/
