@@ -33,6 +33,12 @@ export default function SiteFooter() {
             Towns
           </Link>
           <Link
+            href="/visiting-slo"
+            className="underline decoration-dotted underline-offset-2 hover:text-accent"
+          >
+            Visiting SLO
+          </Link>
+          <Link
             href="/hiking"
             className="underline decoration-dotted underline-offset-2 hover:text-accent"
           >
