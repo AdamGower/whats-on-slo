@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { submitEvent } from "./actions";
 import SiteFooter from "@/components/SiteFooter";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "Submit an event",
+export const metadata = pageMetadata({
+  title: "Submit an Event",
   description:
     "Tell What's On SLO about an event in San Luis Obispo or the Central Coast. Submissions are reviewed before they appear.",
-};
+  path: "/submit",
+});
 
 const CATEGORIES = [
   "Music",

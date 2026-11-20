@@ -13,6 +13,8 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Home", href: "/" },
   { label: "About", href: "/about" },
   { label: "Events", href: "/" },
+  { label: "This Weekend", href: "/this-weekend" },
+  { label: "Towns", href: "/towns" },
   { label: "Hiking", href: "/hiking" },
   { label: "Submit your event", href: "/submit" },
   { label: "Contact", href: "/comments" },
@@ -22,6 +24,8 @@ const NAV_ITEMS: NavItem[] = [
 // Home and Events both point at "/". We mark Events as the active one
 // because the page IS the events listing.
 function activeLabel(pathname: string): string | null {
+  if (pathname.startsWith("/this-weekend")) return "This Weekend";
+  if (pathname.startsWith("/towns")) return "Towns";
   if (pathname.startsWith("/hiking")) return "Hiking";
   if (pathname.startsWith("/subscribe")) return "Subscribe";
   if (pathname.startsWith("/about")) return "About";
@@ -62,6 +66,9 @@ export default function SiteNav() {
       : "opacity-60 hover:opacity-100 transition-opacity";
   }
 
+  // Embeddable widgets render inside other sites' iframes: no site nav.
+  if (pathname.startsWith("/embed/")) return null;
+
   return (
     <nav
       ref={navRef}
@@ -72,8 +79,8 @@ export default function SiteNav() {
       style={{ background: "#2C2416", color: "#F5F0E8" }}
     >
       <div className="mx-auto max-w-5xl px-6 py-3 flex items-center justify-between gap-8">
-        {/* Desktop: horizontal links. Hidden below md. */}
-        <div className="hidden md:flex items-center gap-8 text-[11px] uppercase tracking-[0.2em] font-sans">
+        {/* Desktop: horizontal links. Hidden below lg. */}
+        <div className="hidden lg:flex items-center gap-6 xl:gap-8 whitespace-nowrap text-[11px] uppercase tracking-[0.2em] font-sans">
           {NAV_ITEMS.map((item) => {
             const isActive = active === item.label;
             if (!item.href) {
@@ -99,14 +106,14 @@ export default function SiteNav() {
           })}
         </div>
 
-        {/* Mobile: hamburger toggle. Hidden at md+. */}
+        {/* Mobile: hamburger toggle. Hidden at lg+. */}
         <button
           type="button"
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
           aria-controls="site-nav-mobile"
           onClick={() => setOpen((v) => !v)}
-          className="md:hidden ml-auto inline-flex items-center justify-center w-9 h-9 -mr-2 opacity-80 hover:opacity-100"
+          className="lg:hidden ml-auto inline-flex items-center justify-center w-9 h-9 -mr-2 opacity-80 hover:opacity-100"
         >
           {open ? (
             <svg
@@ -141,10 +148,10 @@ export default function SiteNav() {
         </button>
       </div>
 
-      {/* Mobile dropdown panel. Rendered at md and below; collapsed when closed. */}
+      {/* Mobile dropdown panel. Rendered below lg; collapsed when closed. */}
       <div
         id="site-nav-mobile"
-        className={`md:hidden overflow-hidden transition-[max-height,opacity] duration-200 ease-out ${
+        className={`lg:hidden overflow-hidden transition-[max-height,opacity] duration-200 ease-out ${
           open ? "max-h-[480px] opacity-100" : "max-h-0 opacity-0"
         }`}
         style={{ borderTop: open ? "1px solid rgba(245,240,232,0.15)" : "none" }}

@@ -1,5 +1,7 @@
 export type Event = {
   id: string;
+  // URL slug for /events/[slug]: title + Pacific date, unique within the day.
+  slug: string;
   title: string;
   startsAt: string;
   endsAt?: string;

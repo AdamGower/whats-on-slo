@@ -2,12 +2,14 @@ import { trails, DIFFICULTIES, directionsUrl, trailSlug } from "@/lib/trails";
 import type { Trail } from "@/types";
 import MapWrapper from "./MapWrapper";
 import SiteFooter from "@/components/SiteFooter";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "Hiking trails",
+export const metadata = pageMetadata({
+  title: "Hiking Trails Near San Luis Obispo",
   description:
     "54 hand-picked hiking trails within 25 miles of San Luis Obispo. Filter by difficulty and dog-friendliness. Each trail includes distance, elevation, parking, hazards, and one-tap directions.",
-};
+  path: "/hiking",
+});
 
 type DogsFilter = "all" | "yes" | "no";
 type ViewMode = "list" | "map";

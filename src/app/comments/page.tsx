@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { submitComment } from "./actions";
 import SiteFooter from "@/components/SiteFooter";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "Share your thoughts",
+export const metadata = pageMetadata({
+  title: "Contact Us",
   description:
     "Send feedback, ideas, or comments to What's On SLO. We read every message.",
-};
+  path: "/comments",
+});
 
 type SearchParams = Promise<{ ok?: string; err?: string }>;
 
