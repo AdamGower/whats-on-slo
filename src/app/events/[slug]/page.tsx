@@ -195,7 +195,7 @@ export default async function EventPage({ params }: { params: Params }) {
           <img
             src={ev.imageUrl}
             alt={ev.title}
-            className="mt-8 w-full max-h-[28rem] object-cover rounded-sm border border-rule"
+            className="mt-8 mx-auto block w-auto max-w-full h-auto max-h-[44rem] rounded-sm border border-rule"
           />
         )}
 

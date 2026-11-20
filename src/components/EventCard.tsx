@@ -79,7 +79,7 @@ export function EventCard({ ev }: { ev: Event }) {
             src={ev.imageUrl}
             alt={ev.title}
             loading="lazy"
-            className="w-full aspect-[4/3] object-cover rounded-sm border border-rule"
+            className="w-full aspect-[4/3] object-cover object-top rounded-sm border border-rule"
           />
         </Link>
       )}
