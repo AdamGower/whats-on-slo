@@ -26,10 +26,15 @@
 -- DESCRIPTION_WORD_LIMIT (50, checked with truncateWords in
 -- src/lib/event-format.ts) so the card shows it whole with no ellipsis.
 --
+-- Update, Nov 20: the organizer emailed the flyer as the photo and asked for
+-- her Instagram as the link. The photo is served from public/events/
+-- (resized to 1000px wide); the link is now her Instagram profile rather than
+-- the single flyer post.
+--
 -- Run once in the Supabase SQL Editor.
 
 insert into public.events
-  (id, title, starts_at, ends_at, venue, community, description, source, source_url, category)
+  (id, title, starts_at, ends_at, venue, community, description, source, source_url, category, image_url)
 values
   ('the-vintage-vase-marketplace-holiday-edition-2026-12-13',
    'The Vintage Vase Marketplace (Holiday Edition)',
@@ -38,8 +43,9 @@ values
    'The Vintage Vase Marketplace closes out its 2026 season with a holiday market at Camp Arroyo Grande, up the hill from the Village. Local makers, artisans and bakers bring gifts, jewelry, vintage finds and collectibles, plus fresh cut flowers and arrangements.
 
 There will be a hot chocolate bar and plenty of food. Follow @vintagevasemarketplace on Instagram for updates, or message the organizers there if you would like to join the vendor list for 2027.',
-   'The Vintage Vase Marketplace', 'https://www.instagram.com/vintagevasemarketplace/p/Dfui6DFC8ue/',
-   'Community')
+   'The Vintage Vase Marketplace', 'https://www.instagram.com/vintagevasemarketplace/',
+   'Community',
+   'https://whatsonslo.com/events/the-vintage-vase-marketplace-holiday-edition-2026-12-13.jpg')
 on conflict (id) do update set
   title = excluded.title,
   starts_at = excluded.starts_at,
@@ -50,4 +56,5 @@ on conflict (id) do update set
   source = excluded.source,
   source_url = excluded.source_url,
   category = excluded.category,
+  image_url = excluded.image_url,
   updated_at = now();
