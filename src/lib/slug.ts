@@ -32,3 +32,10 @@ export function slugDate(slug: string): string | null {
 export function baseEventSlug(title: string, pacificDay: string): string {
   return `${slugify(title) || "event"}-${pacificDay}`;
 }
+
+// Venue strings that name no single place, so they get no venue widget.
+export const GENERIC_VENUE = /^(offsite|online|tba|tbd|various( locations)?|virtually anywhere|\d+ (library branches|venues))$/i;
+
+export function venueSlug(venue: string): string {
+  return slugify(venue, 60);
+}

@@ -10,6 +10,7 @@ import {
 } from "@/lib/event-format";
 import { isHandCurated } from "@/lib/supabase";
 import { SITE_NAME, SITE_URL, absUrl } from "@/lib/seo";
+import { GENERIC_VENUE } from "@/lib/slug";
 
 // schema.org structured data. The rule throughout: leave a property out rather
 // than guess at it. We hold no price data (so no `offers`), no postal codes,
@@ -51,8 +52,6 @@ export function eventDates(ev: Event): { startDate: string; endDate?: string } {
   return { startDate: startDay };
 }
 
-// Venue strings that name no real place.
-const GENERIC_VENUE = /^(offsite|tba|tbd|various|\d+ (library branches|venues))$/i;
 const VIRTUAL_VENUE = /\bvirtual(ly)?\b|\bonline\b/i;
 
 // "SLO Elks Lodge, 222 Elks Lane" -> name + street. A venue that is itself an

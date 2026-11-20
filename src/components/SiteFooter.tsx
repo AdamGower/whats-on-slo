@@ -51,6 +51,12 @@ export default function SiteFooter() {
             Submit your event
           </Link>
           <Link
+            href="/for-venues"
+            className="underline decoration-dotted underline-offset-2 hover:text-accent"
+          >
+            For venues
+          </Link>
+          <Link
             href="/comments"
             className="underline decoration-dotted underline-offset-2 hover:text-accent"
           >

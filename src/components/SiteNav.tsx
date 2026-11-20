@@ -66,6 +66,9 @@ export default function SiteNav() {
       : "opacity-60 hover:opacity-100 transition-opacity";
   }
 
+  // Embeddable widgets render inside other sites' iframes: no site nav.
+  if (pathname.startsWith("/embed/")) return null;
+
   return (
     <nav
       ref={navRef}
