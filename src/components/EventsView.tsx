@@ -1,20 +1,15 @@
 import { fetchUpcomingEvents, fetchEventsForMonth } from "@/lib/supabase";
 import type { Event } from "@/types";
 import SiteFooter from "@/components/SiteFooter";
+import { EventDayList, JsonLd } from "@/components/EventCard";
+import { itemListJsonLd } from "@/lib/jsonld";
 import {
   CATEGORIES,
-  DESCRIPTION_WORD_LIMIT,
   TIMEZONE,
   eventDate,
-  formatCompactDate,
-  formatDayLabel,
-  formatEventTime,
   formatMonthLabel,
   formatMonthShort,
-  groupByDay,
   monthKey,
-  splitSourceAttribution,
-  truncateWords,
 } from "@/lib/event-format";
 
 function buildMonthIndex(events: Event[]) {
@@ -112,7 +107,6 @@ export default async function EventsView({
   const filteredEvents = validCat
     ? monthEvents.filter((ev) => ev.category === validCat)
     : monthEvents;
-  const grouped = groupByDay(filteredEvents);
 
   const defaultMonthKey = months[0]?.key ?? null;
 
@@ -294,116 +288,16 @@ export default async function EventsView({
           </p>
         </section>
 
-        {grouped.length === 0 ? (
-          <p className="text-muted italic">
-            No events listed for this month yet. Check back soon.
-          </p>
-        ) : (
-          <div className="space-y-12">
-            {grouped.map(([dayKey, events]) => (
-              <section key={dayKey}>
-                <h3 className="font-serif text-2xl font-bold mb-4 flex items-baseline gap-3">
-                  <span>{formatDayLabel(eventDate(events[0].startsAt))}</span>
-                  <span className="flex-1 h-px bg-rule" />
-                </h3>
-                <ul className="space-y-6">
-                  {events.map((ev) => (
-                    <li
-                      key={ev.id}
-                      className={
-                        ev.imageUrl
-                          ? "grid grid-cols-1 md:grid-cols-[10rem_1fr_11rem] gap-x-6 gap-y-3"
-                          : "grid grid-cols-1 md:grid-cols-[10rem_1fr] gap-x-6 gap-y-1"
-                      }
-                    >
-                      <div className="text-sm">
-                        <p className="text-muted text-[11px] uppercase tracking-wider">
-                          {formatCompactDate(eventDate(ev.startsAt))}
-                        </p>
-                        <p className="font-semibold mt-0.5">
-                          {formatEventTime(ev)}
-                        </p>
-                        <p className="text-muted uppercase text-[11px] tracking-wider mt-1">
-                          {ev.category}
-                        </p>
-                      </div>
-                      <div className="md:order-2 order-3">
-                        <h4 className="font-serif text-xl font-bold leading-snug">
-                          <a
-                            href={ev.sourceUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="hover:text-accent"
-                          >
-                            {ev.title}
-                          </a>
-                        </h4>
-                        <p className="text-sm text-muted mt-0.5">
-                          {ev.source === "rideshare.org" ? (
-                            <a
-                              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${ev.venue}, ${ev.community}`)}`}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="underline decoration-dotted underline-offset-2 hover:text-accent"
-                            >
-                              {ev.venue}
-                            </a>
-                          ) : (
-                            ev.venue
-                          )}{" "}
-                          &middot; {ev.community}
-                        </p>
-                        {(() => {
-                          const { body, source } = splitSourceAttribution(
-                            ev.description
-                          );
-                          return (
-                            <>
-                              <p className="mt-2 leading-relaxed">
-                                {truncateWords(body, DESCRIPTION_WORD_LIMIT)}
-                              </p>
-                              {source && (
-                                <p className="mt-1 text-xs italic text-muted">
-                                  {source}
-                                </p>
-                              )}
-                            </>
-                          );
-                        })()}
-                        <p className="mt-2 text-xs">
-                          <a
-                            href={ev.sourceUrl}
-                            className="underline decoration-dotted underline-offset-2 hover:text-accent"
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            Learn more &raquo;
-                          </a>
-                        </p>
-                      </div>
-                      {ev.imageUrl && (
-                        <a
-                          href={ev.sourceUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="md:order-3 order-2 block max-w-[12rem] md:max-w-none"
-                        >
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={ev.imageUrl}
-                            alt={ev.title}
-                            loading="lazy"
-                            className="w-full aspect-[4/3] object-cover rounded-sm border border-rule"
-                          />
-                        </a>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            ))}
-          </div>
-        )}
+        <EventDayList
+          events={filteredEvents}
+          emptyText="No events listed for this month yet. Check back soon."
+        />
+        <JsonLd
+          data={itemListJsonLd(
+            filteredEvents,
+            `${validCat ? validCat + " events" : "Events"} in ${formatMonthLabel(validMonth)}`
+          )}
+        />
       </main>
 
       <SiteFooter />

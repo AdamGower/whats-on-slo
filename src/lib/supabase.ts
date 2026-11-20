@@ -1,5 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
+import { cache } from "react";
 import type { Event } from "@/types";
+import { baseEventSlug, slugDate, slugify } from "@/lib/slug";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!;
@@ -21,7 +23,7 @@ type EventRow = {
   time_tba: boolean | null;
 };
 
-function rowToEvent(row: EventRow): Event {
+function rowToEvent(row: EventRow): Omit<Event, "slug"> {
   return {
     id: row.id,
     title: row.title,
@@ -64,6 +66,12 @@ function sourceScore(id: string): number {
     if (id.startsWith(prefix)) return score;
   }
   return 0; // hand-curated rows have no prefix
+}
+
+// Hand-curated rows (published from /submit by hand) carry no source prefix.
+// Only for those is `source` the organizing body rather than a listing site.
+export function isHandCurated(id: string): boolean {
+  return sourceScore(id) === 0;
 }
 
 // Build a cross-source dedup key that catches "same event indexed by two
@@ -153,7 +161,7 @@ function collapseSameSourceMultiVenue(rows: EventRow[]): EventRow[] {
 // absolute time whether the date falls in PST or PDT. This is the single place
 // the Pacific-day cutoff is derived; every other cutoff (today, month bounds)
 // goes through it.
-function pacificMidnightUtcIso(pacificDate: string): string {
+export function pacificMidnightUtcIso(pacificDate: string): string {
   const utcGuess = new Date(`${pacificDate}T00:00:00Z`);
   const laFormat = utcGuess.toLocaleString("sv-SE", {
     timeZone: "America/Los_Angeles",
@@ -230,7 +238,11 @@ const MAX_EVENTS = 10_000; // backstop so a bad cursor cannot loop forever
 // `lt` is optional: the upcoming view leaves the far edge open, a month view
 // bounds it. The Data API caps any single response at 1000 rows and does so
 // silently, so we page rather than one-shot.
-async function fetchEventRows(gte: string, lt?: string): Promise<EventRow[]> {
+async function fetchEventRows(
+  gte: string,
+  lt?: string,
+  strict = false
+): Promise<EventRow[]> {
   const rows: EventRow[] = [];
   for (let from = 0; from < MAX_EVENTS; from += PAGE_SIZE) {
     let query = supabase
@@ -247,6 +259,10 @@ async function fetchEventRows(gte: string, lt?: string): Promise<EventRow[]> {
       .range(from, from + PAGE_SIZE - 1);
 
     if (error) {
+      // Strict callers (event, weekend, town pages) throw instead: a failed
+      // background refresh then keeps the last good cached page, where an
+      // empty result would cache a 404 or an empty list for hours.
+      if (strict) throw new Error(`Supabase events fetch failed: ${error.message}`);
       // Keep whatever we already have: a partial calendar beats an empty one,
       // and the log surfaces the failure.
       console.error("Failed to fetch events from Supabase", error);
@@ -269,7 +285,46 @@ function assembleEvents(rows: EventRow[]): Event[] {
   const sameSourceCollapsed = collapseSameSourceMultiVenue(rows);
   const deduped = dedupRows(sameSourceCollapsed);
   const balanced = balancePerSourcePerDay(deduped);
-  return balanced.map(rowToEvent);
+  return assignSlugs(balanced.map(rowToEvent));
+}
+
+function pacificDayOf(iso: string): string {
+  return new Date(iso).toLocaleDateString("en-CA", {
+    timeZone: "America/Los_Angeles",
+  });
+}
+
+// Give every event its /events/[slug] URL: title + Pacific date. Two events
+// can share a title on one day (the same show listed at two venues); the
+// highest-priority source keeps the plain slug and the rest add their venue.
+// Every input to this is per-day (dedup, collapse and the daily cap all key on
+// the Pacific day), so an event gets the same slug whichever date range it
+// was fetched in: the homepage, a month view or a single-day lookup.
+function assignSlugs(events: Omit<Event, "slug">[]): Event[] {
+  const groups = new Map<string, Omit<Event, "slug">[]>();
+  for (const ev of events) {
+    const base = baseEventSlug(ev.title, pacificDayOf(ev.startsAt));
+    const list = groups.get(base);
+    if (list) list.push(ev);
+    else groups.set(base, [ev]);
+  }
+  const slugById = new Map<string, string>();
+  const taken = new Set<string>(groups.keys());
+  for (const [base, list] of groups) {
+    list.sort(
+      (a, b) => sourceScore(a.id) - sourceScore(b.id) || a.id.localeCompare(b.id)
+    );
+    slugById.set(list[0].id, base);
+    for (const ev of list.slice(1)) {
+      const day = pacificDayOf(ev.startsAt);
+      const stem = `${slugify(ev.title) || "event"}-${slugify(ev.venue, 40) || "venue"}`;
+      let slug = `${stem}-${day}`;
+      for (let n = 2; taken.has(slug); n++) slug = `${stem}-${n}-${day}`;
+      taken.add(slug);
+      slugById.set(ev.id, slug);
+    }
+  }
+  return events.map((ev) => ({ ...ev, slug: slugById.get(ev.id)! }));
 }
 
 export async function fetchUpcomingEvents(): Promise<Event[]> {
@@ -279,6 +334,39 @@ export async function fetchUpcomingEvents(): Promise<Event[]> {
   const rows = await fetchEventRows(startOfTodayPacificUtcIso());
   return assembleEvents(rows);
 }
+
+// Events whose Pacific calendar day falls in [fromDay, toDay), both
+// "YYYY-MM-DD". Backs the weekend, town, related-events and embed views.
+export async function fetchEventsBetweenDays(
+  fromDay: string,
+  toDay: string
+): Promise<Event[]> {
+  const rows = await fetchEventRows(
+    pacificMidnightUtcIso(fromDay),
+    pacificMidnightUtcIso(toDay),
+    true
+  );
+  return assembleEvents(rows);
+}
+
+function nextDay(day: string): string {
+  return new Date(Date.parse(`${day}T12:00:00Z`) + 86_400_000)
+    .toISOString()
+    .slice(0, 10);
+}
+
+// One event by its /events/[slug] URL. The slug ends in the Pacific date, so
+// only that day is fetched, then put through the same pipeline as every list
+// so the slug matches the one the listing linked to. Wrapped in cache() so
+// generateMetadata and the page share one fetch per request.
+export const fetchEventBySlug = cache(
+  async (slug: string): Promise<Event | null> => {
+    const day = slugDate(slug);
+    if (!day) return null;
+    const events = await fetchEventsBetweenDays(day, nextDay(day));
+    return events.find((ev) => ev.slug === slug) ?? null;
+  }
+);
 
 // Fetch a single Pacific calendar month ("YYYY-MM") in full, including days
 // already past. Backs the direct-URL past-month view; the month rail never
