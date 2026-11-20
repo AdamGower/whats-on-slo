@@ -1,143 +1,21 @@
 import { fetchUpcomingEvents, fetchEventsForMonth } from "@/lib/supabase";
 import type { Event } from "@/types";
 import SiteFooter from "@/components/SiteFooter";
-
-const TIMEZONE = "America/Los_Angeles";
-const DESCRIPTION_WORD_LIMIT = 50;
-
-function eventDate(iso: string) {
-  return new Date(iso);
-}
-
-function dayKey(d: Date) {
-  return d.toLocaleDateString("en-CA", { timeZone: TIMEZONE });
-}
-
-// "2026-04" — Pacific calendar month of a Date
-function monthKey(d: Date) {
-  return dayKey(d).slice(0, 7);
-}
-
-function formatMonthLabel(monthKey: string) {
-  // Construct a date at noon Pacific on the first of that month for safe formatting
-  const [y, m] = monthKey.split("-").map(Number);
-  const d = new Date(Date.UTC(y, m - 1, 1, 19, 0, 0));
-  return d.toLocaleDateString("en-US", {
-    month: "long",
-    year: "numeric",
-    timeZone: TIMEZONE,
-  });
-}
-
-function formatMonthShort(monthKey: string) {
-  const [y, m] = monthKey.split("-").map(Number);
-  const d = new Date(Date.UTC(y, m - 1, 1, 19, 0, 0));
-  const month = d.toLocaleDateString("en-US", {
-    month: "short",
-    timeZone: TIMEZONE,
-  });
-  const yr = String(y).slice(-2);
-  return `${month} ’${yr}`;
-}
-
-function formatDayLabel(d: Date) {
-  return d.toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    timeZone: TIMEZONE,
-  });
-}
-
-// Compact per-card date stamp, e.g. "Fri, May 1"
-function formatCompactDate(d: Date) {
-  return d.toLocaleDateString("en-US", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    timeZone: TIMEZONE,
-  });
-}
-
-function formatTime(d: Date) {
-  return d
-    .toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      timeZone: TIMEZONE,
-    })
-    .replace(":00 ", " ");
-}
-
-function formatTimeRange(start: Date, end?: Date) {
-  const s = formatTime(start);
-  if (!end) return s;
-  if (dayKey(end) !== dayKey(start)) {
-    return `${s} → ${end.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      timeZone: TIMEZONE,
-    })}`;
-  }
-  return `${s} – ${formatTime(end)}`;
-}
-
-// Library staff write bilingual English-then-Spanish descriptions joined into
-// one paragraph. Cut at the first ¡ or ¿ — those characters are unique to
-// Spanish and never appear in English, so this is a safe, deterministic
-// language boundary.
-function stripBilingualSpanish(text: string) {
-  if (!text) return text;
-  const idx = text.search(/[¡¿]/);
-  return idx === -1 ? text : text.slice(0, idx).trim();
-}
-
-// HTML stripping in scrapers can leave sentences smashed together when
-// paragraph tags are removed: "End.Next sentence" or "(format)Next". Insert
-// a space between sentence-ending punctuation and the next capitalized word.
-function fixPunctuationSpacing(text: string) {
-  if (!text) return text;
-  return text.replace(/([.!?)])([A-Z])/g, "$1 $2");
-}
-
-// A scraper may end its description with a final "Source: ..." line that
-// should render below the body in muted italic styling rather than be
-// truncated as part of the body text. This is a lightweight convention —
-// any source can opt in by appending "\n\nSource: ..." to the description.
-function splitSourceAttribution(text: string): {
-  body: string;
-  source: string | null;
-} {
-  if (!text) return { body: "", source: null };
-  const m = text.match(/\n\s*(Source:\s*[^\n]+?)\s*$/);
-  if (!m) return { body: text, source: null };
-  return { body: text.slice(0, m.index!).trimEnd(), source: m[1] };
-}
-
-// Truncate at a word boundary near maxWords. Adds an ellipsis when truncated.
-function truncateWords(text: string, maxWords: number) {
-  if (!text) return "";
-  const cleaned = fixPunctuationSpacing(stripBilingualSpanish(text)).trim();
-  const words = cleaned.split(/\s+/);
-  if (words.length <= maxWords) return cleaned;
-  // Try to break on the nearest sentence-ending punctuation in the last few
-  // words of the cap so we don't dangle mid-clause.
-  const slice = words.slice(0, maxWords);
-  for (let i = slice.length - 1; i >= Math.max(0, slice.length - 8); i--) {
-    if (/[.!?]$/.test(slice[i])) return slice.slice(0, i + 1).join(" ");
-  }
-  return slice.join(" ") + "…";
-}
-
-function groupByDay(events: Event[]) {
-  const map = new Map<string, Event[]>();
-  for (const ev of events) {
-    const key = dayKey(eventDate(ev.startsAt));
-    if (!map.has(key)) map.set(key, []);
-    map.get(key)!.push(ev);
-  }
-  return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
-}
+import {
+  CATEGORIES,
+  DESCRIPTION_WORD_LIMIT,
+  TIMEZONE,
+  eventDate,
+  formatCompactDate,
+  formatDayLabel,
+  formatEventTime,
+  formatMonthLabel,
+  formatMonthShort,
+  groupByDay,
+  monthKey,
+  splitSourceAttribution,
+  truncateWords,
+} from "@/lib/event-format";
 
 function buildMonthIndex(events: Event[]) {
   const counts = new Map<string, number>();
@@ -149,15 +27,6 @@ function buildMonthIndex(events: Event[]) {
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([key, count]) => ({ key, count, label: formatMonthLabel(key) }));
 }
-
-const CATEGORIES: Event["category"][] = [
-  "Music",
-  "Food & Drink",
-  "Arts",
-  "Community",
-  "Family",
-  "Outdoors",
-];
 
 function buildCategoryCounts(events: Event[]) {
   const counts = new Map<string, number>();
@@ -452,12 +321,7 @@ export default async function EventsView({
                           {formatCompactDate(eventDate(ev.startsAt))}
                         </p>
                         <p className="font-semibold mt-0.5">
-                          {ev.timeTba
-                            ? "Time TBA"
-                            : formatTimeRange(
-                                eventDate(ev.startsAt),
-                                ev.endsAt ? eventDate(ev.endsAt) : undefined
-                              )}
+                          {formatEventTime(ev)}
                         </p>
                         <p className="text-muted uppercase text-[11px] tracking-wider mt-1">
                           {ev.category}
