@@ -8,6 +8,7 @@
 //   'no-data'        — source returned, but zero events matched our filters
 //   'not-modified'   — source returned HTTP 304 (no work needed)
 //   'out-of-season'  — seasonal source skipped: outside its active months
+//   'blocked'        — source site refused us (e.g. Cloudflare bot challenge)
 
 export async function logRun(supabase, source, eventCount, status = "success") {
   const { error } = await supabase.from("scraper_logs").insert({

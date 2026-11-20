@@ -12,6 +12,7 @@ import {
   stripDatePhrase,
   extractSeriesLabel,
   extractSlug,
+  isBotChallenge,
   guessCategory,
   pacificPartsToUtcIso,
   truncateDescription,
@@ -201,4 +202,13 @@ test("truncateDescription respects the cap and prefers sentence breaks", () => {
   const out = truncateDescription(long, 80);
   assert.ok(out.length <= 80);
   assert.match(out, /[.!?…]$/);
+});
+
+test("isBotChallenge: recognises Cloudflare's challenge, nothing else", () => {
+  assert.equal(isBotChallenge(403, "challenge"), true);
+  assert.equal(isBotChallenge(503, "Challenge"), true);
+  // A plain 403 with no challenge header is a real refusal: still fail.
+  assert.equal(isBotChallenge(403, null), false);
+  assert.equal(isBotChallenge(200, "challenge"), false);
+  assert.equal(isBotChallenge(304, null), false);
 });

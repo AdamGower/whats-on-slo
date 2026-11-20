@@ -279,6 +279,19 @@ async function saveState(supabase, etag, lastModified) {
   if (error) console.warn(`scraper_state save failed:`, error.message);
 }
 
+// Since 2026-11-17 Sea Pines has put its whole site behind a Cloudflare
+// bot challenge, which answers every automated request with a 403 "Just a
+// moment..." page and a `cf-mitigated: challenge` header. We don't try to
+// get past it; we recognise it and skip the run so the job stays green and
+// the existing rows are left alone (they expire on their own dates). Once
+// Sea Pines allows us through, the feed parses as before with no change.
+export function isBotChallenge(status, cfMitigated) {
+  return (
+    (status === 403 || status === 503) &&
+    (cfMitigated || "").toLowerCase() === "challenge"
+  );
+}
+
 async function fetchRss(state) {
   const headers = { "User-Agent": UA, Accept: "application/rss+xml, application/xml" };
   if (state.etag) headers["If-None-Match"] = state.etag;
@@ -289,6 +302,7 @@ async function fetchRss(state) {
     text: r.status === 304 ? null : await r.text(),
     etag: r.headers.get("etag"),
     lastModified: r.headers.get("last-modified"),
+    cfMitigated: r.headers.get("cf-mitigated"),
   };
 }
 
@@ -308,6 +322,15 @@ async function main() {
   if (res.status === 304) {
     console.log("Not modified since last run. Exiting cleanly.");
     await logRun(supabase, SOURCE_LABEL, 0, "not-modified");
+    return;
+  }
+  if (isBotChallenge(res.status, res.cfMitigated)) {
+    // No prune and no state save: we saw nothing, so nothing is "missing".
+    console.log(
+      "Blocked by a Cloudflare bot challenge on Sea Pines' site. Skipping " +
+        "this run and keeping existing rows. See issue #11."
+    );
+    await logRun(supabase, SOURCE_LABEL, 0, "blocked");
     return;
   }
   if (res.status !== 200) {

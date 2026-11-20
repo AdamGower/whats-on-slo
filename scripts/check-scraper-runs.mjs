@@ -56,12 +56,17 @@ const zeroEvents = latest.filter((r) => r.status === "no-data");
 const successes = latest.filter((r) => r.status === "success");
 const notModified = latest.filter((r) => r.status === "not-modified");
 const outOfSeason = latest.filter((r) => r.status === "out-of-season");
+const blocked = latest.filter((r) => r.status === "blocked");
 
 console.log(
   `Sources reporting in last ${WINDOW_MINUTES}m: ${latest.length} ` +
     `(success=${successes.length}, no-data=${zeroEvents.length}, ` +
-    `not-modified=${notModified.length}, out-of-season=${outOfSeason.length}).`
+    `not-modified=${notModified.length}, out-of-season=${outOfSeason.length}, ` +
+    `blocked=${blocked.length}).`
 );
+for (const r of blocked) {
+  console.log(`  BLOCKED: ${r.source} refused our request (bot challenge).`);
+}
 
 if (zeroEvents.length === 0) {
   console.log("All clear. No alert needed.");
@@ -91,6 +96,11 @@ if (notModified.length) {
 if (outOfSeason.length) {
   lines.push("Out-of-season (seasonal) sources, skipped:");
   for (const r of outOfSeason) lines.push(`  • ${r.source}`);
+  lines.push("");
+}
+if (blocked.length) {
+  lines.push("Blocked sources (site refused our request), skipped:");
+  for (const r of blocked) lines.push(`  • ${r.source}`);
   lines.push("");
 }
 lines.push(
