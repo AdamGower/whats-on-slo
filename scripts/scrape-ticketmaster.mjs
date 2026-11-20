@@ -44,12 +44,14 @@ function pickImage(images) {
 function mapEvent(e) {
   const venue = e._embedded?.venues?.[0];
   const segment = e.classifications?.[0]?.segment?.name;
+  // Ticketmaster labels unclassified events with the segment "Undefined".
+  const segmentLabel = segment && segment !== "Undefined" ? segment.toLowerCase() : "event";
   const category = SEGMENT_TO_CATEGORY[segment] || "Community";
 
   const description =
     e.info?.trim() ||
     e.pleaseNote?.trim() ||
-    `Live ${segment?.toLowerCase() || "event"} at ${
+    `Live ${segmentLabel} at ${
       venue?.name || "a local venue"
     }.`;
 

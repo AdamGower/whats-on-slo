@@ -39,3 +39,21 @@ test("a real time stays timed", () => {
   assert.equal(timeKind(ev), "timed");
   assert.equal(formatEventTime(ev), "5 PM – 8 PM");
 });
+
+test("end equal to start shows just the start time", async () => {
+  const { formatTimeRange } = await import("../src/lib/event-format.ts");
+  const t = new Date("2026-11-22T22:00:00Z");
+  assert.equal(formatTimeRange(t, new Date(t)), "2 PM");
+});
+
+test("BigBigSLO boilerplate is dropped from descriptions", async () => {
+  const { cleanDescription } = await import("../src/lib/event-format.ts");
+  assert.equal(
+    cleanDescription("The event is held on November 20, 2026 at Hotel Cheval in Paso Robles, CA."),
+    "",
+  );
+  assert.equal(
+    cleanDescription("The event is held on November 20, 2026 at SLO Botanical Gardens in San Luis Obispo, CA. The cost is 60.00 - 75.00"),
+    "The cost is 60.00 - 75.00",
+  );
+});
