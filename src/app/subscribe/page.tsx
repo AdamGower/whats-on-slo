@@ -4,7 +4,7 @@ import { pageMetadata } from "@/lib/seo";
 export const metadata = pageMetadata({
   title: "Subscribe to the Weekly Events Email",
   description:
-    "Get the week's best events on the Central Coast delivered to your inbox every Friday.",
+    "Get the week's best events on the Central Coast delivered to your inbox every Thursday evening.",
   path: "/subscribe",
 });
 
@@ -33,7 +33,7 @@ export default function SubscribePage() {
       <main className="mx-auto max-w-3xl w-full px-6 py-10 flex-1">
         <p className="text-center text-lg sm:text-xl text-muted">
           Get the week&rsquo;s best events delivered to your inbox every
-          Friday.
+          Thursday evening.
         </p>
         <div
           className="mt-8 mx-auto w-full max-w-[500px]"

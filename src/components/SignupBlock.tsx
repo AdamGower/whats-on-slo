@@ -6,7 +6,7 @@ const KIT_FORM_ACTION = "https://app.kit.com/forms/9399228/subscriptions";
 
 export default function SignupBlock({
   heading = "Get the weekend's events by email",
-  blurb = "One email every Friday with what's on across San Luis Obispo County that weekend. Free, and you can unsubscribe any time.",
+  blurb = "One email every Thursday evening with what's on across San Luis Obispo County that weekend. Free, and you can unsubscribe any time.",
   id = "signup",
 }: {
   heading?: string;
