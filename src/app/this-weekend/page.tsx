@@ -85,7 +85,7 @@ export default async function ThisWeekendPage() {
 
         <SignupBlock
           id="signup-top"
-          heading="Get this list in your inbox every Friday"
+          heading="Get this list in your inbox every Thursday"
         />
 
         <div className="mt-10">
