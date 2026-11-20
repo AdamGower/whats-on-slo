@@ -1,11 +1,13 @@
 import Link from "next/link";
 import SiteFooter from "@/components/SiteFooter";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "About",
+export const metadata = pageMetadata({
+  title: "About Us",
   description:
     "What's On SLO is your insider's guide to what's happening in and around San Luis Obispo, pulled together by people who actually live here.",
-};
+  path: "/about",
+});
 
 export default function AboutPage() {
   return (

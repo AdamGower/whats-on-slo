@@ -379,6 +379,15 @@ export async function fetchEventsForMonth(month: string): Promise<Event[]> {
   return assembleEvents(rows);
 }
 
+// Every event ever listed, past and future, through the same pipeline as the
+// pages so the slugs match. Backs the sitemap: past event pages stay live and
+// keep their search value. Strict, so a failed refresh keeps the last sitemap
+// rather than publishing an empty one.
+export async function fetchAllEvents(): Promise<Event[]> {
+  const rows = await fetchEventRows("1970-01-01T00:00:00Z", undefined, true);
+  return assembleEvents(rows);
+}
+
 // Distinct Pacific months that have at least one event, past and future, for
 // the sitemap. Selects only starts_at (cheap) and buckets by Pacific month, so
 // search engines can reach archived months the default view hides.

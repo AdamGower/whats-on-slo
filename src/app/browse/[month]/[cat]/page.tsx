@@ -1,4 +1,5 @@
 import EventsView, { eventsTitle } from "@/components/EventsView";
+import { pageMetadata } from "@/lib/seo";
 
 // Internal route. Visitors never see /browse URLs: next.config.ts rewrites
 // "/?month=YYYY-MM&cat=X" here so each filter combination is rendered once,
@@ -25,11 +26,16 @@ export async function generateMetadata({ params }: { params: Params }) {
   const p = await params;
   const { month, cat } = readParams(p.month, p.cat);
   const title = eventsTitle(month, cat);
-  return {
-    title,
-    openGraph: { title: title ?? undefined },
-    twitter: { title: title ?? undefined },
-  };
+  if (!title) return {};
+  // Canonical is the public URL visitors and the sitemap use, not /browse.
+  const qs = new URLSearchParams();
+  if (month) qs.set("month", month);
+  if (cat) qs.set("cat", cat);
+  return pageMetadata({
+    title: `${title} in San Luis Obispo County`,
+    description: `${title} across San Luis Obispo and the Central Coast: dates, times, venues and links, updated every six hours.`,
+    path: `/?${qs.toString()}`,
+  });
 }
 
 export default async function Browse({ params }: { params: Params }) {

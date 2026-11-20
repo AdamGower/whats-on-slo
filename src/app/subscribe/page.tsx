@@ -1,10 +1,12 @@
 import SiteFooter from "@/components/SiteFooter";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "Subscribe",
+export const metadata = pageMetadata({
+  title: "Subscribe to the Weekly Events Email",
   description:
     "Get the week's best events on the Central Coast delivered to your inbox every Friday.",
-};
+  path: "/subscribe",
+});
 
 // Kit HTML embed. Pasted verbatim from Kit's embed UI — do not edit the form
 // attributes, action URL, data-* attributes, or scoped <style> block. The CSS
