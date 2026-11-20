@@ -4,12 +4,12 @@ import SiteFooter from "@/components/SiteFooter";
 import { pageMetadata } from "@/lib/seo";
 
 // Where Kit sends people after they sign up (set as the form's redirect URL
-// in Kit). Kit uses double opt-in, so the main job of this page is to tell
-// them to confirm by email. Not useful in search results, so noindex.
+// in Kit). The form has no double opt-in, so signing up is the whole step.
+// Not useful in search results, so noindex.
 export const metadata = pageMetadata({
   title: "Thanks for Subscribing",
   description:
-    "Check your inbox to confirm your subscription to the weekly What's On SLO email.",
+    "You're subscribed to the weekly What's On SLO email, sent every Thursday at 5 PM.",
   path: "/subscribe/thanks",
   noindex: true,
 });
@@ -28,24 +28,18 @@ export default function SubscribeThanksPage() {
 
       <main className="mx-auto max-w-3xl w-full px-6 py-10 flex-1">
         <section className="border-2 border-foreground/80 px-5 py-6 sm:px-8">
-          <p className="text-[11px] uppercase tracking-widest text-muted">One last step</p>
-          <h2 className="font-serif text-2xl font-bold mt-1">Confirm your email address</h2>
+          <p className="text-[11px] uppercase tracking-widest text-muted">You&rsquo;re on the list</p>
+          <h2 className="font-serif text-2xl font-bold mt-1">Your first email arrives Thursday</h2>
           <p className="mt-3 text-lg leading-relaxed">
-            We&rsquo;ve just sent you an email from What&rsquo;s On SLO. Open it and click the
-            confirm button, and you&rsquo;re on the list.
+            The weekend email goes out every Thursday at 5 PM, with what&rsquo;s on across
+            San Luis Obispo County from Friday to Sunday: live music, markets, theater,
+            family days out and more.
           </p>
           <p className="mt-3 text-muted leading-relaxed">
-            Not there after a few minutes? Check your spam or promotions folder, and add
-            hello@whatsonslo.com to your contacts so the weekly email lands in your inbox.
+            Add hello@whatsonslo.com to your contacts so it lands in your inbox, not your
+            spam or promotions folder. Every email has an unsubscribe link at the bottom.
           </p>
         </section>
-
-        <p className="mt-8 text-lg leading-relaxed">
-          Once you&rsquo;ve confirmed, the weekend email arrives every Thursday at 5 PM,
-          with what&rsquo;s on across San Luis Obispo County from Friday to Sunday: live
-          music, markets, theater, family days out and more. Every email has an unsubscribe
-          link at the bottom.
-        </p>
 
         <h2 className="font-serif text-2xl font-bold mt-12 border-b-2 border-foreground pb-1">
           While you&rsquo;re here
