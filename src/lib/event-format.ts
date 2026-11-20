@@ -156,7 +156,9 @@ export function formatTime(d: Date) {
 
 export function formatTimeRange(start: Date, end?: Date) {
   const s = formatTime(start);
-  if (!end) return s;
+  // Some sources store the end as equal to the start when they have no end
+  // time; "2 PM – 2 PM" reads as a mistake, so show just the start.
+  if (!end || end.getTime() <= start.getTime()) return s;
   if (dayKey(end) !== dayKey(start)) {
     return `${s} → ${end.toLocaleDateString("en-US", {
       month: "short",
@@ -216,9 +218,13 @@ export function splitSourceAttribution(text: string): {
 
 // The description as shown on a full event page: same cleanup as the card,
 // no truncation.
+// BigBigSLO fills empty descriptions with "The event is held on <date> at
+// <venue> in <Town>, CA.", which repeats what the card already shows.
+const BOILERPLATE = /The event is held on [^.]*?, CA\.\s*/g;
+
 export function cleanDescription(text: string) {
   if (!text) return "";
-  return fixPunctuationSpacing(stripBilingualSpanish(text)).trim();
+  return fixPunctuationSpacing(stripBilingualSpanish(text.replace(BOILERPLATE, ""))).trim();
 }
 
 // Truncate at a word boundary near maxWords. Adds an ellipsis when truncated.
