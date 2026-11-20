@@ -7,7 +7,7 @@ export default function SiteFooter() {
     <footer className="border-t border-rule mt-10 px-6 py-6">
       <div className="mx-auto max-w-5xl text-xs text-muted flex flex-col sm:flex-row items-center justify-between gap-2">
         <span>What&rsquo;s On SLO</span>
-        <span className="flex items-center gap-4">
+        <span className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
           <Link
             href="/about"
             className="underline decoration-dotted underline-offset-2 hover:text-accent"
@@ -19,6 +19,12 @@ export default function SiteFooter() {
             className="underline decoration-dotted underline-offset-2 hover:text-accent"
           >
             Events
+          </Link>
+          <Link
+            href="/this-weekend"
+            className="underline decoration-dotted underline-offset-2 hover:text-accent"
+          >
+            This weekend
           </Link>
           <Link
             href="/hiking"

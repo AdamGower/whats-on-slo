@@ -151,6 +151,13 @@ export default async function EventsView({
               </a>
               <span aria-hidden>&middot;</span>
               <a
+                href="/this-weekend"
+                className="underline decoration-dotted underline-offset-2 hover:text-accent"
+              >
+                This weekend
+              </a>
+              <span aria-hidden>&middot;</span>
+              <a
                 href="/hiking"
                 className="underline decoration-dotted underline-offset-2 hover:text-accent"
               >

@@ -13,6 +13,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Home", href: "/" },
   { label: "About", href: "/about" },
   { label: "Events", href: "/" },
+  { label: "This Weekend", href: "/this-weekend" },
   { label: "Hiking", href: "/hiking" },
   { label: "Submit your event", href: "/submit" },
   { label: "Contact", href: "/comments" },
@@ -22,6 +23,7 @@ const NAV_ITEMS: NavItem[] = [
 // Home and Events both point at "/". We mark Events as the active one
 // because the page IS the events listing.
 function activeLabel(pathname: string): string | null {
+  if (pathname.startsWith("/this-weekend")) return "This Weekend";
   if (pathname.startsWith("/hiking")) return "Hiking";
   if (pathname.startsWith("/subscribe")) return "Subscribe";
   if (pathname.startsWith("/about")) return "About";
