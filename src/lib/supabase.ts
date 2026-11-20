@@ -2,6 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import { cache } from "react";
 import type { Event } from "@/types";
 import { baseEventSlug, slugDate, slugify } from "@/lib/slug";
+import { normalizeCommunity } from "@/lib/towns";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!;
@@ -30,7 +31,8 @@ function rowToEvent(row: EventRow): Omit<Event, "slug"> {
     startsAt: row.starts_at,
     endsAt: row.ends_at ?? undefined,
     venue: row.venue,
-    community: row.community,
+    // Cleaned for display (typos, trailing commas); the row is untouched.
+    community: normalizeCommunity(row.community),
     description: row.description,
     source: row.source,
     sourceUrl: row.source_url,

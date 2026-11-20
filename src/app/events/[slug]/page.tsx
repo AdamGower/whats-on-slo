@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import SiteFooter from "@/components/SiteFooter";
-import { EventMiniList, JsonLd } from "@/components/EventCard";
+import { EventMiniList, JsonLd, TownName } from "@/components/EventCard";
+import { townByName } from "@/lib/towns";
 import {
   addDays,
   allDayLastDay,
@@ -126,6 +127,9 @@ export default async function EventPage({ params }: { params: Params }) {
       <JsonLd
         data={breadcrumbJsonLd([
           { name: "Events", path: "/" },
+          ...(townByName(ev.community)
+            ? [{ name: ev.community, path: `/towns/${townByName(ev.community)!.slug}` }]
+            : []),
           { name: ev.title, path: `/events/${ev.slug}` },
         ])}
       />
@@ -136,7 +140,7 @@ export default async function EventPage({ params }: { params: Params }) {
             Events
           </Link>{" "}
           <span aria-hidden>&rsaquo;</span>{" "}
-          <span>{ev.community}</span>
+          <TownName name={ev.community} />
         </nav>
 
         {isPast && (
@@ -181,7 +185,7 @@ export default async function EventPage({ params }: { params: Params }) {
             >
               {ev.venue}
             </a>
-            , {ev.community}
+            , <TownName name={ev.community} />
           </dd>
         </dl>
 

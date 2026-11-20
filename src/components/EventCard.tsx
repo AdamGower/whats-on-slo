@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Event } from "@/types";
 import { jsonLdString } from "@/lib/seo";
+import { townByName } from "@/lib/towns";
 import {
   DESCRIPTION_WORD_LIMIT,
   eventDate,
@@ -53,7 +54,7 @@ export function EventCard({ ev }: { ev: Event }) {
           ) : (
             ev.venue
           )}{" "}
-          &middot; {ev.community}
+          &middot; <TownName name={ev.community} />
         </p>
         <p className="mt-2 leading-relaxed">
           {truncateWords(body, DESCRIPTION_WORD_LIMIT)}
@@ -83,6 +84,17 @@ export function EventCard({ ev }: { ev: Event }) {
         </Link>
       )}
     </li>
+  );
+}
+
+// The town, linked to its /towns page when we have one.
+export function TownName({ name }: { name: string }) {
+  const town = townByName(name);
+  if (!town) return <>{name}</>;
+  return (
+    <Link href={`/towns/${town.slug}`} className="hover:text-accent hover:underline underline-offset-2">
+      {name}
+    </Link>
   );
 }
 

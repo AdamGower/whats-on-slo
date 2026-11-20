@@ -27,6 +27,12 @@ export default function SiteFooter() {
             This weekend
           </Link>
           <Link
+            href="/towns"
+            className="underline decoration-dotted underline-offset-2 hover:text-accent"
+          >
+            Towns
+          </Link>
+          <Link
             href="/hiking"
             className="underline decoration-dotted underline-offset-2 hover:text-accent"
           >

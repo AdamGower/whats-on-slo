@@ -1,7 +1,7 @@
 import Link from "next/link";
 import SiteFooter from "@/components/SiteFooter";
 import PageHeader from "@/components/PageHeader";
-import { EventDayList, JsonLd } from "@/components/EventCard";
+import { EventDayList, JsonLd, TownName } from "@/components/EventCard";
 import { itemListJsonLd } from "@/lib/jsonld";
 import { pageMetadata } from "@/lib/seo";
 import { fetchWeekendEvents, weekendLabel, weekendWindow } from "@/lib/weekend";
@@ -68,7 +68,7 @@ export default async function ThisWeekendPage() {
               {topTowns.map(([t, n], i) => (
                 <span key={t}>
                   {i > 0 && <span aria-hidden className="text-muted"> &middot; </span>}
-                  {t} <span className="text-muted text-[11px]">{n}</span>
+                  <TownName name={t} /> <span className="text-muted text-[11px]">{n}</span>
                 </span>
               ))}
             </p>

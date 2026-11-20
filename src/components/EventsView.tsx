@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { fetchUpcomingEvents, fetchEventsForMonth } from "@/lib/supabase";
 import type { Event } from "@/types";
 import SiteFooter from "@/components/SiteFooter";
@@ -156,6 +157,13 @@ export default async function EventsView({
               >
                 This weekend
               </a>
+              <span aria-hidden>&middot;</span>
+              <Link
+                href="/towns"
+                className="underline decoration-dotted underline-offset-2 hover:text-accent"
+              >
+                Towns
+              </Link>
               <span aria-hidden>&middot;</span>
               <a
                 href="/hiking"
