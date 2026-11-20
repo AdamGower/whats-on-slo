@@ -1,5 +1,6 @@
 import Link from "next/link";
 import SiteFooter from "@/components/SiteFooter";
+import SignupBlock from "@/components/SignupBlock";
 import PageHeader from "@/components/PageHeader";
 import { EventDayList, JsonLd, TownName } from "@/components/EventCard";
 import { itemListJsonLd } from "@/lib/jsonld";
@@ -16,11 +17,18 @@ const TITLE = "Things to Do in San Luis Obispo This Weekend";
 
 export async function generateMetadata() {
   const w = weekendWindow();
-  return pageMetadata({
+  const meta = pageMetadata({
     title: TITLE,
     description: `Events, live music, markets and family activities in San Luis Obispo and across SLO County, ${weekendLabel(w)}. Updated every few hours.`,
     path: "/this-weekend",
   });
+  return {
+    ...meta,
+    alternates: {
+      ...meta.alternates,
+      types: { "application/rss+xml": "/this-weekend/feed.xml" },
+    },
+  };
 }
 
 export default async function ThisWeekendPage() {
@@ -75,12 +83,19 @@ export default async function ThisWeekendPage() {
           </div>
         )}
 
+        <SignupBlock
+          id="signup-top"
+          heading="Get this list in your inbox every Friday"
+        />
+
         <div className="mt-10">
           <EventDayList
             events={events}
             emptyText="No events listed for this weekend yet. Check back soon."
           />
         </div>
+
+        <SignupBlock id="signup-bottom" />
 
         <p className="mt-12 text-sm text-muted">
           Planning further ahead? See the{" "}

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import SiteFooter from "@/components/SiteFooter";
+import SignupBlock from "@/components/SignupBlock";
 import { EventMiniList, JsonLd, TownName } from "@/components/EventCard";
 import { townByName } from "@/lib/towns";
 import {
@@ -228,6 +229,8 @@ export default async function EventPage({ params }: { params: Params }) {
           Listed by {ev.source}. Details can change, so check with the
           organizer before you go.
         </p>
+
+        <SignupBlock />
 
         {upcoming.length > 0 && (
           <section className="mt-12">
