@@ -1,0 +1,35 @@
+name: Weekend email
+
+# Schedules the "This weekend in SLO" Kit broadcast for Thursday at 5 PM
+# Pacific. Runs Thursday morning, with a second run in the early afternoon in
+# case the first fails or GitHub delays it; the script skips a weekend that is
+# already scheduled. See docs/weekly-email.md.
+
+on:
+  schedule:
+    - cron: "0 16 * * 4" # Thursday 8 AM PST / 9 AM PDT
+    - cron: "0 20 * * 4" # Thursday noon PST / 1 PM PDT, backup
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "draft = build it in Kit without sending; schedule = send Thursday 5 PM Pacific"
+        type: choice
+        options: [draft, schedule]
+        default: draft
+
+permissions:
+  contents: read
+
+jobs:
+  schedule-email:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - run: node scripts/send-weekend-email.mjs
+        env:
+          KIT_API_KEY: ${{ secrets.KIT_API_KEY }}
+          WEEKEND_EMAIL_MODE: ${{ inputs.mode || 'schedule' }}
