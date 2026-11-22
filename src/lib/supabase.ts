@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { cache } from "react";
+import { unstable_cache } from "next/cache";
 import type { Event } from "@/types";
 import { baseEventSlug, slugDate, slugify } from "@/lib/slug";
 import { normalizeCommunity } from "@/lib/towns";
@@ -118,47 +119,146 @@ const EVENT_COLUMNS =
 const PAGE_SIZE = 1000;
 const MAX_EVENTS = 10_000; // backstop so a bad cursor cannot loop forever
 
-// Page through events in the half-open range [gte, lt) ordered by start time.
-// `lt` is optional: the upcoming view leaves the far edge open, a month view
-// bounds it. The Data API caps any single response at 1000 rows and does so
-// silently, so we page rather than one-shot.
-async function fetchEventRows(
-  gte: string,
-  lt?: string,
-  strict = false
-): Promise<EventRow[]> {
+// Page through events in the half-open range [gte, lt) straight from the
+// database, ordered by start time. Always throws on error so a failed or
+// partial read is never written into the cache below. Only the week loader
+// and the bounds query call this; pages go through fetchEventRows.
+async function queryEventRows(gte: string, lt: string): Promise<EventRow[]> {
   const rows: EventRow[] = [];
   for (let from = 0; from < MAX_EVENTS; from += PAGE_SIZE) {
-    let query = supabase
+    const { data, error } = await supabase
       .from("events")
       .select(EVENT_COLUMNS)
-      .gte("starts_at", gte);
-    if (lt) query = query.lt("starts_at", lt);
-    const { data, error } = await query
+      .gte("starts_at", gte)
+      .lt("starts_at", lt)
       .order("starts_at", { ascending: true })
       // Tie-break on the primary key. Rows sharing a starts_at have no
       // inherent order, so a tie straddling a page boundary could repeat some
       // rows on one page and skip them on the next.
       .order("id", { ascending: true })
       .range(from, from + PAGE_SIZE - 1);
-
-    if (error) {
-      // Strict callers (event, weekend, town pages) throw instead: a failed
-      // background refresh then keeps the last good cached page, where an
-      // empty result would cache a 404 or an empty list for hours.
-      if (strict) throw new Error(`Supabase events fetch failed: ${error.message}`);
-      // Keep whatever we already have: a partial calendar beats an empty one,
-      // and the log surfaces the failure.
-      console.error("Failed to fetch events from Supabase", error);
-      return rows;
-    }
+    if (error) throw new Error(`Supabase events fetch failed: ${error.message}`);
     rows.push(...(data as EventRow[]));
     if (data.length < PAGE_SIZE) return rows;
   }
-  console.warn(
-    `Hit the ${MAX_EVENTS}-event ceiling; later events were not fetched.`
-  );
+  console.warn(`Hit the ${MAX_EVENTS}-event ceiling; later events were not fetched.`);
   return rows;
+}
+
+// --- Shared data cache -----------------------------------------------------
+//
+// Page-level ISR caches each page's HTML, but every page that renders (a
+// first visit, or a background refresh) used to query Supabase for its own
+// slice of events. With every event page in the sitemap, crawlers render
+// thousands of pages a day, each pulling up to three weeks of events, and the
+// free plan's 5 GB egress went in November 2026.
+//
+// Now the database is read in Pacific-week chunks held in Vercel's Data Cache
+// and shared by every page. A week is fetched from Supabase at most once per
+// LIVE_WEEK_TTL while it is current or upcoming, and once per PAST_WEEK_TTL
+// after it has ended. Week-sized chunks keep each entry well under the Data
+// Cache's 2 MB per-item limit.
+//
+// The deployment id is part of every key, so a redeploy starts from fresh
+// data: that remains the way to show a hand-curated row immediately.
+const LIVE_WEEK_TTL = 3 * 3600; // scrapes run every 6 hours
+const PAST_WEEK_TTL = 7 * 86400;
+const DEPLOY_KEY =
+  process.env.VERCEL_DEPLOYMENT_ID ?? process.env.VERCEL_GIT_COMMIT_SHA ?? "local";
+
+function addDaysIso(day: string, n: number): string {
+  return new Date(Date.parse(`${day}T12:00:00Z`) + n * 86_400_000)
+    .toISOString()
+    .slice(0, 10);
+}
+
+// Monday ("YYYY-MM-DD") of the Pacific week containing a Pacific date.
+function weekStartOf(day: string): string {
+  const dow = new Date(`${day}T12:00:00Z`).getUTCDay(); // 0 = Sunday
+  return addDaysIso(day, -((dow + 6) % 7));
+}
+
+function loadWeek(weekStart: string): Promise<EventRow[]> {
+  return queryEventRows(
+    pacificMidnightUtcIso(weekStart),
+    pacificMidnightUtcIso(addDaysIso(weekStart, 7))
+  );
+}
+
+const cachedLiveWeek = unstable_cache(loadWeek, ["event-week-live", DEPLOY_KEY], {
+  revalidate: LIVE_WEEK_TTL,
+  tags: ["events"],
+});
+const cachedPastWeek = unstable_cache(loadWeek, ["event-week-past", DEPLOY_KEY], {
+  revalidate: PAST_WEEK_TTL,
+  tags: ["events"],
+});
+
+// Pacific date of the earliest and latest event, so open-ended ranges know
+// which weeks to read. Two one-row queries, cached on the live schedule.
+const cachedEventBounds = unstable_cache(
+  async (): Promise<{ first: string; last: string } | null> => {
+    const edge = async (ascending: boolean) => {
+      const { data, error } = await supabase
+        .from("events")
+        .select("starts_at")
+        .order("starts_at", { ascending })
+        .limit(1);
+      if (error) throw new Error(`Supabase bounds fetch failed: ${error.message}`);
+      return (data as { starts_at: string }[])[0]?.starts_at ?? null;
+    };
+    const [first, last] = await Promise.all([edge(true), edge(false)]);
+    if (!first || !last) return null;
+    return { first: pacificDayOf(first), last: pacificDayOf(last) };
+  },
+  ["event-bounds", DEPLOY_KEY],
+  { revalidate: LIVE_WEEK_TTL, tags: ["events"] }
+);
+
+// Events in the half-open range [gte, lt) ordered by start time, assembled
+// from cached weeks. `lt` is optional: the upcoming view leaves the far edge
+// open, a month view bounds it. Same contract as the old direct query.
+async function fetchEventRows(
+  gte: string,
+  lt?: string,
+  strict = false
+): Promise<EventRow[]> {
+  const rows: EventRow[] = [];
+  try {
+    const bounds = await cachedEventBounds();
+    if (!bounds) return rows;
+    let fromDay = pacificDayOf(gte);
+    if (fromDay < bounds.first) fromDay = bounds.first;
+    // lt is exclusive; the day before it is the last day we need.
+    let toDay = lt ? pacificDayOf(new Date(Date.parse(lt) - 1).toISOString()) : bounds.last;
+    if (toDay > bounds.last) toDay = bounds.last;
+    if (toDay < fromDay) return rows;
+
+    const thisWeek = weekStartOf(pacificDayOf(new Date().toISOString()));
+    const weeks: string[] = [];
+    for (let w = weekStartOf(fromDay); w <= toDay; w = addDaysIso(w, 7)) weeks.push(w);
+
+    const chunks = await Promise.all(
+      weeks.map((w) => (w < thisWeek ? cachedPastWeek(w) : cachedLiveWeek(w)))
+    );
+    const gteMs = Date.parse(gte);
+    const ltMs = lt ? Date.parse(lt) : Infinity;
+    for (const chunk of chunks) {
+      for (const r of chunk) {
+        const t = Date.parse(r.starts_at);
+        if (t >= gteMs && t < ltMs) rows.push(r);
+      }
+    }
+    return rows;
+  } catch (err) {
+    // Strict callers (event, weekend, town pages) throw instead: a failed
+    // background refresh then keeps the last good cached page, where an
+    // empty result would cache a 404 or an empty list for hours.
+    if (strict) throw err;
+    // A partial calendar beats an empty one, and the log surfaces it.
+    console.error("Failed to fetch events from Supabase", err);
+    return rows;
+  }
 }
 
 // Shared post-processing: collapse same-source multi-venue dupes, dedup across
